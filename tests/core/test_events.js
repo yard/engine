@@ -333,3 +333,17 @@ test("Fire 2 arguments", function () {
 
     o.fire("test", value, value2);
 });
+
+test("Million fires", function () {
+    var o = {};
+    pc.events.attach(o);
+    var count = 0;
+    o.on("test", function (c) {
+        strictEqual(count, c);
+        count++;
+    });
+
+    for (var i = 0, n = 1000000; i < n; i++) {
+        o.fire("test", i);
+    }
+})

@@ -19,6 +19,11 @@
  */
 pc.events = function () {
 
+    var _callbacks = {
+        callbacks: new Array(1),
+        size: 1
+    };
+
     var Events = {
         /**
         * @function
@@ -147,7 +152,18 @@ pc.events = function () {
                         }
                     }
 
-                    callbacks = this._callbacks[name].slice(); // clone list so that deleting inside callbacks works
+                    // ensure allocated callback array is large enough
+                    while (this._callbacks[name].length > _callbacks.size) {
+                        _callbacks.callbacks = new Array(_callbacks.size*2);
+                        _callbacks.size *= 2;
+                    }
+
+                    // copy callbacks so that deleting inside callbacks works
+                    for (index = 0, length = this._callbacks[name].length; index < length; index++) {
+                        _callbacks.callbacks[index] = this._callbacks[name][index];
+                    }
+                    callbacks = _callbacks.callbacks;
+                    // callbacks = this._callbacks[name].slice(); // clone list so that deleting inside callbacks works
                     var originalIndex = 0;
                     for(index = 0; index < length; ++index) {
                         var scope = callbacks[index].scope;
