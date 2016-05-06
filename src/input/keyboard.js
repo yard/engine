@@ -198,7 +198,6 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        // this.fire("keydown", new KeyboardEvent(this, event));
         this.fire("keydown", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
@@ -218,7 +217,6 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        // this.fire("keyup", new KeyboardEvent(this, event));
         this.fire("keyup", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
@@ -236,7 +234,6 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        // this.fire("keypress", new KeyboardEvent(this, event));
         this.fire("keypress", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
