@@ -35,12 +35,17 @@ pc.extend(pc, (function () {
     var ObjectPool = function (constructor, options) {
         this.objects = [];
         this.ctor = constructor;
-        this.name = options.name;
-        this.useNew = options.useNew === undefined || options.useNew;
-        this.metrics = options.metrics;
-        if (options.metrics) {
-            this.total = 0;
-            this.used = 0;
+        this.name = "";
+        this.useNew = true;
+        this.metrics = false;
+        if (options) {
+            this.name = options.name;
+            this.useNew = options.useNew === undefined || options.useNew;
+            this.metrics = options.metrics;
+            if (options.metrics) {
+                this.total = 0;
+                this.used = 0;
+            }
         }
     };
 
@@ -135,5 +140,4 @@ pc.extend(pc, (function () {
         AllocatePool: AllocatePool,
         ObjectPool: ObjectPool
     };
-
 }()));

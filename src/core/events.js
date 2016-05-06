@@ -19,10 +19,8 @@
  */
 pc.events = function () {
 
-    var _callbacks = {
-        callbacks: new Array(1),
-        size: 1
-    };
+    //
+    var _arrayPool = new pc.ObjectPool(pc.SArray);
 
     var Events = {
         /**
@@ -139,6 +137,7 @@ pc.events = function () {
         fire: function (name) {
             var index;
             var length;
+            var argArray;
             var args;
             var callbacks;
 
@@ -146,33 +145,34 @@ pc.events = function () {
                 length = this._callbacks[name].length;
                 if (length) {
                     if (arguments.length > 1) {
-                        args = new Array(arguments.length-1);
+                        // allocate pooled SArray to copy arguments into
+                        argArray = _arrayPool.allocate();
                         for (index = 1; index < arguments.length; index++) {
-                            args[index-1] = arguments[index];
+                            argArray.set(index-1, arguments[index]);
                         }
+                        args = argArray.data;
                     }
 
-                    // ensure allocated callback array is large enough
-                    while (this._callbacks[name].length > _callbacks.size) {
-                        _callbacks.callbacks = new Array(_callbacks.size*2);
-                        _callbacks.size *= 2;
-                    }
+                    // allocate pooled SArray
+                    // copy callbacks so that deleting inside callbacks work
+                    callbacks = _arrayPool.allocate();
+                    callbacks.copy(this._callbacks[name]);
 
-                    // copy callbacks so that deleting inside callbacks works
-                    for (index = 0, length = this._callbacks[name].length; index < length; index++) {
-                        _callbacks.callbacks[index] = this._callbacks[name][index];
-                    }
-                    callbacks = _callbacks.callbacks;
-                    // callbacks = this._callbacks[name].slice(); // clone list so that deleting inside callbacks works
                     var originalIndex = 0;
-                    for(index = 0; index < length; ++index) {
-                        var scope = callbacks[index].scope;
-                        callbacks[index].callback.apply(scope, args);
-                        if (callbacks[index].callback.once) {
+                    for(index = 0, length = callbacks.length; index < length; ++index) {
+                        var scope = callbacks.data[index].scope;
+                        callbacks.data[index].callback.apply(scope, args);
+                        if (callbacks.data[index].callback.once) {
                             this._callbacks[name].splice(originalIndex, 1);
                         } else {
                             originalIndex++;
                         }
+                    }
+
+                    // free pool allocations
+                    _arrayPool.free(callbacks);
+                    if(argArray) {
+                        _arrayPool.free(argArray);
                     }
                 }
             }
