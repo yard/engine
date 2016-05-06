@@ -18,9 +18,20 @@ pc.extend(pc, function(){
     * app.keyboard.on("keydown", onKeyDown, this);
     */
     var KeyboardEvent = function (keyboard, event) {
-        this.key = event.keyCode;
-        this.element = event.target;
-        this.event = event;
+        if (event) {
+            this.key = event.keyCode;
+            this.element = event.target;
+            this.event = event;
+        }
+    };
+
+    var _keyboardEvent = new KeyboardEvent();
+
+    function makeKeyboardEvent(event) {
+        _keyboardEvent.key = event.keyCode;
+        _keyboardEvent.element = event.target;
+        _keyboardEvent.event = event;
+        return _keyboardEvent;
     };
 
     /**
@@ -187,7 +198,8 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        this.fire("keydown", new KeyboardEvent(this, event));
+        // this.fire("keydown", new KeyboardEvent(this, event));
+        this.fire("keydown", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
             event.preventDefault();
@@ -206,7 +218,8 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        this.fire("keyup", new KeyboardEvent(this, event));
+        // this.fire("keyup", new KeyboardEvent(this, event));
+        this.fire("keyup", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
             event.preventDefault();
@@ -223,7 +236,8 @@ pc.extend(pc, function(){
         // Patch on the keyIdentifier property in non-webkit browsers
         //event.keyIdentifier = event.keyIdentifier || id;
 
-        this.fire("keypress", new KeyboardEvent(this, event));
+        // this.fire("keypress", new KeyboardEvent(this, event));
+        this.fire("keypress", makeKeyboardEvent(event));
 
         if (this.preventDefault) {
             event.preventDefault();
@@ -242,7 +256,12 @@ pc.extend(pc, function(){
      */
     Keyboard.prototype.update = function (dt) {
         var prop;
-        this._lastmap = {};
+
+        // clear all keys
+        for (prop in this._lastmap) {
+            delete this._lastmap[prop];
+        }
+
         for(prop in this._keymap) {
             if(this._keymap.hasOwnProperty(prop)) {
                 this._lastmap[prop] = this._keymap[prop];
