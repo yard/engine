@@ -1002,16 +1002,21 @@ pc.extend(pc, function () {
          * @name pc.GraphNode#addChild
          * @description Add a new child to the child list and update the parent value of the child node
          * @param {pc.GraphNode} node The new child to add
+         * @returns {Boolean} true if child was successfully added
          * @example
          * var e = new pc.Entity(app);
          * this.entity.addChild(e);
          */
         addChild: function (node) {
-            if (node._parent !== null)
-                throw new Error("GraphNode is already parented");
+            if (node._parent !== null) {
+                console.error("GraphNode is already parented");
+                return false;
+            }
 
             this._children.push(node);
             this._onInsertChild(node);
+
+            return true;
         },
 
         addChildAndSaveTransform: function(node) {
@@ -1041,16 +1046,21 @@ pc.extend(pc, function () {
          * @description Insert a new child to the child list at the specified index and update the parent value of the child node
          * @param {pc.GraphNode} node The new child to insert
          * @param {Number} index The index in the child list of the parent where the new node will be inserted
+         * @returns {Boolean} true if child was successfully inserted
          * @example
          * var e = new pc.Entity(app);
          * this.entity.insertChild(e, 1);
          */
         insertChild: function (node, index) {
-            if (node._parent !== null)
-                throw new Error("GraphNode is already parented");
+            if (node._parent !== null) {
+                console.error("GraphNode is already parented");
+                return false;
+            }
 
             this._children.splice(index, 0, node);
             this._onInsertChild(node);
+
+            return true;
         },
 
         _onInsertChild: function (node) {
@@ -1079,6 +1089,7 @@ pc.extend(pc, function () {
          * @name pc.GraphNode#removeChild
          * @description Remove the node from the child list and update the parent value of the child.
          * @param {pc.GraphNode} node The node to remove
+         * @returns {Boolean} true if child was successfully removed
          * @example
          * var child = this.entity.children[0];
          * this.entity.removeChild(child);
@@ -1094,9 +1105,11 @@ pc.extend(pc, function () {
             for(i = 0; i < length; ++i) {
                 if(this._children[i] === child) {
                     this._children.splice(i, 1);
-                    return;
+                    return true;
                 }
             }
+
+            return false;
         },
 
         /**

@@ -213,25 +213,53 @@ pc.extend(pc, function () {
         return this._request;
     };
 
-    Entity.prototype.addChild = function (child) {
-        if (child instanceof pc.Entity) {
-            var index = this._app._entityIndex;
-            if (index[child._guid]) {
-                throw new Error("GUID already exists in graph");
-            } else {
-                index[child._guid] = child;
+    Entity.prototype._indexEntity = function (entity) {
+        if (this._app._entityIndex[entity._guid]) return false;
+
+        for (var i = 0, l = entity._children.length; i < l; i++) {
+            if (entity._children[i] instanceof pc.Entity) {
+                if (!this._indexEntity(entity._children[i])) return false;
             }
         }
-        pc.GraphNode.prototype.addChild.call(this, child);
+
+        this._app._entityIndex[entity._guid] = entity;
+
+        console.log(Object.keys(this._app._entityIndex).length);
+        return true;
+    };
+
+    Entity.prototype._deindexEntity = function (entity) {
+        // remove entity guid from index
+        delete this._app._entityIndex[entity._guid];
+
+        // remove all children
+        for (var i = 0, l = entity._children.length; i < l; i++) {
+            if (entity._children[i] instanceof pc.Entity) {
+                if (this._deindexEntity(entity._children[i])) return false;
+            }
+        }
+        console.log(Object.keys(this._app._entityIndex).length);
+
+        return true;
+    };
+
+    Entity.prototype.addChild = function (child) {
+        if (child instanceof pc.Entity) {
+            if (!this._indexEntity(child)) {
+                console.error("GUID already exists in graph");
+                return false;
+            }
+        }
+
+        return pc.GraphNode.prototype.addChild.call(this, child);
     };
 
     Entity.prototype.removeChild = function (child) {
         if (child instanceof pc.Entity) {
-            var index = this._app._entityIndex;
-            delete index[child._guid];
+            this._deindexEntity(child);
         }
 
-        pc.GraphNode.prototype.removeChild.call(this, child);
+        return pc.GraphNode.prototype.removeChild.call(this, child);
     }
 
     /**
