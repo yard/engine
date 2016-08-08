@@ -186,6 +186,7 @@ pc.extend(pc, function () {
         var textsys = new pc.TextComponentSystem(this);
         var imagesys = new pc.ImageComponentSystem(this);
         var zonesys = new pc.ZoneComponentSystem(this);
+        var selectablesys = new pc.SelectableComponentSystem(this);
 
         this._visibilityChangeHandler = this.onVisibilityChange.bind(this);
 
