@@ -55,6 +55,8 @@ pc.extend(pc, function () {
             }
         }
 
+        this.selector = new Selector(this, this._app.selectionManager);
+
         pc.events.attach(this);
     };
     Entity = pc.inherits(Entity, pc.GraphNode);

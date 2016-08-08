@@ -124,6 +124,7 @@ pc.extend(pc, function () {
         this.loader = new pc.ResourceLoader();
 
         this.scene = new pc.Scene();
+        this.selectionManager = new SelectionManager(this, this.graphicsDevice);
         this.root = new pc.Entity(this);
         this.root._enabledInHierarchy = true;
         this._enableList = [ ];
@@ -140,6 +141,8 @@ pc.extend(pc, function () {
         this.mouse = options.mouse || null;
         this.touch = options.touch || null;
         this.gamepads = options.gamepads || null;
+
+        this.selectionManager.attach(this);
 
         this._inTools = false;
 
