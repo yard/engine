@@ -187,6 +187,8 @@ pc.extend(pc, function () {
         // var imagesys = new pc.ImageComponentSystem(this);
         var zonesys = new pc.ZoneComponentSystem(this);
 
+        this._tweenManager = new pc.TweenManager(this);
+
         this._visibilityChangeHandler = this.onVisibilityChange.bind(this);
 
         // Depending on browser add the correct visibiltychange event and store the name of the hidden attribute
@@ -690,6 +692,8 @@ pc.extend(pc, function () {
             this.stats.frame.updateStart = pc.now();
             // #endif
 
+            this._tweenManager.update(dt);
+
             // Perform ComponentSystem update
             if (pc.script.legacy)
                 pc.ComponentSystem.fixedUpdate(1.0 / 60.0, this._inTools);
@@ -1018,6 +1022,10 @@ pc.extend(pc, function () {
                 width: width,
                 height: height
             };
+        },
+
+        tween: function (target) {
+            return new pc.Tween(target, this._tweenManager);
         },
 
         /**

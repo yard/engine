@@ -314,6 +314,12 @@ pc.extend(pc, function () {
         return c;
     };
 
+    Entity.prototype.tween = function (target) {
+        var tween = this._app.tween(target);
+        tween.entity = this;
+        return tween;
+    }
+
     return {
         Entity: Entity
     };
