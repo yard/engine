@@ -20,7 +20,7 @@ pc.extend(pc, function () {
         this.height = 0;
 
         // private
-        this._node = new pc.GraphNode();
+        this._node = this._entity;//new pc.GraphNode();
         this._model = null;
         this._mesh = null;
         this._meshInstance = null;
@@ -128,7 +128,7 @@ pc.extend(pc, function () {
                 if (this._entity.enabled) {
                     this._system.app.scene.addModel(this._model);
                 }
-                this._entity.addChild(this._model.graph);
+                // this._entity.addChild(this._model.graph);
                 this._model._entity = this._entity;
             } else {
                 this._updateMesh(this._mesh, text);

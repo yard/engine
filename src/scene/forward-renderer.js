@@ -1398,7 +1398,7 @@ pc.extend(pc, function () {
                     return instancingData.count - 1;
                 }
             } else {
-                modelMatrix = meshInstance.node.worldTransform;
+                modelMatrix = meshInstance.node.getModelMatrix();
                 this.modelMatrixId.setValue(modelMatrix.data);
 
                 if (normal) {

@@ -1473,6 +1473,10 @@ pc.extend(pc, function () {
                 this.dirtyLocal = true;
             };
         }(),
+
+        getModelMatrix: function () {
+            return this.worldTransform;
+        }
     });
 
     return {
