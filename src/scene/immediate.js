@@ -47,9 +47,7 @@ pc.extend(pc.Application.prototype, function () {
                 this.vbRam = new DataView(this.vb.lock());
 
                 if (!this.meshInstance) {
-                    // var node = {worldTransform: pc.Mat4.IDENTITY};
                     var node = new pc.GraphNode();
-                    // node.worldTransform = matrix;
                     this.meshInstance = new pc.MeshInstance(node, this.mesh, this.material);
                 }
             }
@@ -261,7 +259,6 @@ pc.extend(pc.Application.prototype, function () {
 
     // Draw mesh at this frame
     function renderMesh(mesh, material, matrix) {
-        // var node = {worldTransform: matrix};
         var node = new pc.GraphNode();
         node.worldTransform = matrix;
         var instance = new pc.MeshInstance(node, mesh, material);
@@ -294,7 +291,6 @@ pc.extend(pc.Application.prototype, function () {
             quadMesh.primitive[0].indexed = false;
         }
         // Issue quad drawcall
-        // var node = {worldTransform: matrix};
         var node = new pc.GraphNode();
         node.worldTransform = matrix;
         var quad = new pc.MeshInstance(node, quadMesh, material);
