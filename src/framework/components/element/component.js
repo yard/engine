@@ -43,78 +43,13 @@ pc.extend(pc, function () {
 
 
     pc.extend(ElementComponent.prototype, {
-        // internal used to get the element world transform
-        // and ensure it is synced before returning
-        // _getWorldTransform: function () {
-        //     var syncList = [];
-
-        //     return function () {
-        //         var current = this.entity;
-        //         syncList.length = 0;
-
-        //         while (current !== null) {
-        //             syncList.push(current);
-        //             current = current._parent;
-        //         }
-
-        //         for (var i = syncList.length - 1; i >= 0; i--) {
-        //             syncList[i].sync();
-        //         }
-
-        //         return this._worldTransform;
-        //     };
-        // }(),
-
-        _getModelMatrix: function () {
-            return this.element._modelTransform;
-        },
-
         _patch: function () {
             this.entity.sync = this._sync;
-            // this.entity.setPosition = this._setPosition;
-            // this.entity.getPosition = this._getPosition;
-            // this.entity.getRotation = this._getRotation;
-            this.entity.getModelMatrix = this._getModelMatrix;
         },
 
         _unpatch: function () {
             this.entity.sync = pc.Entity.prototype.sync;
-            this.entity.getModelMatrix = pc.GraphNode.prototype.getModelMatrix;
-            // this.entity.setPosition = pc.Entity.prototype.setPosition;
-            // this.entity.getPosition = pc.Entity.prototype.getPosition;
-            // this.entity.getRotation = pc.Entity.prototype.getRotation;
         },
-
-        // _getPosition: function () {
-        //     this.element._getWorldTransform().getTranslation(this.position);
-        //     return this.position;
-        // },
-
-        // _setPosition: function () {
-        //     var position = new pc.Vec3();
-        //     var invParentWtm = new pc.Mat4();
-
-        //     return function () {
-        //         if (arguments.length === 1) {
-        //             position.copy(arguments[0]);
-        //         } else {
-        //             position.set(arguments[0], arguments[1], arguments[2]);
-        //         }
-
-        //         if (this._parent === null || this._parent && !this._parent.element) {
-        //             this.localPosition.copy(position);
-        //         } else {
-        //             invParentWtm.copy(this._parent.element._getWorldTransform()).invert();
-        //             invParentWtm.transformPoint(position, this.localPosition);
-        //         }
-        //         this.dirtyLocal = true;
-        //     };
-        // }(),
-
-        // _getRotation: function () {
-        //     this.rotation.setFromMat4(this.element._getWorldTransform());
-        //     return this.rotation;
-        // },
 
         _sync: function () {
             if (this.dirtyLocal) {
@@ -152,36 +87,15 @@ pc.extend(pc, function () {
                 if (this._parent === null) {
                     this.worldTransform.copy(this.localTransform);
                 } else {
+                    // regular world transform
                     this.worldTransform.mul2(this._parent.worldTransform, this.localTransform);
 
-                    // transform element hierarchy
-                    // if (this._parent.element) {
-                    //     this.element._worldTransform.mul2(this._parent.element._worldTransform, this.localTransform);
-
-                    //     this.element._modelTransform.mul2(this.element._anchorTransform, this.localTransform);
-                    //     this.element._modelTransform.mul2(this._parent.element._modelTransform, this.element._modelTransform);
-                    // } else {
-                    //     this.element._worldTransform.copy(this.localTransform);
-                    //     this.element._modelTransform.mul2(this.element._anchorTransform, this.localTransform);
-                    // }
-
-                    // if (screen) {
-                    //     this.worldTransform.mul2(screen.screen._screenMatrix, this.element._modelTransform);
-
-                    //     if (!screen.screen.screenSpace) {
-                    //         this.worldTransform.mul2(screen.worldTransform, this.worldTransform);
-                    //     }
-                    // } else {
-                    //     this.worldTransform.copy(this.element._modelTransform);
-                    // }
+                    // element specific transforms
 
                     if (this._parent.element) {
-                        // this.element._worldTransform.mul2(this._parent.element._worldTransform, this.localTransform);
-
                         this.element._worldTransform.mul2(this.element._anchorTransform, this.localTransform);
                         this.element._worldTransform.mul2(this._parent.element._worldTransform, this.element._worldTransform);
                     } else {
-                        // this.element._worldTransform.copy(this.localTransform);
                         this.element._worldTransform.mul2(this.element._anchorTransform, this.localTransform);
                     }
 
@@ -310,9 +224,6 @@ pc.extend(pc, function () {
             this.fire('screen:set:screenspace', this.screen.screen.screenSpace);
         },
 
-        // override regular entity.sync method with this one
-
-
         // store pixel positions of anchor relative to current parent resolution
         _setAnchors: function () {
             var resx = 0;
@@ -373,8 +284,10 @@ pc.extend(pc, function () {
 
                 if (value === pc.ELEMENTTYPE_IMAGE) {
                     this._image = new pc.ImageElement(this);
+                    this._image._node.modelTransform = this._modelTransform;
                 } else if (value === pc.ELEMENTTYPE_TEXT) {
                     this._text = new pc.TextElement(this);
+                    this._text._node.modelTransform = this._modelTransform;
                 }
 
             }

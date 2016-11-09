@@ -21,7 +21,7 @@ pc.extend(pc, function () {
         this._indices = [];
 
         this._mesh = this._createMesh();
-        this._node = this._entity;//new pc.GraphNode();
+        this._node = new pc.GraphNode();
         this._model = new pc.Model();
         this._model.graph = this._node;
         this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
@@ -30,7 +30,7 @@ pc.extend(pc, function () {
 
         // add model to sceen
         this._system.app.scene.addModel(this._model);
-        // this._entity.addChild(this._model.graph);
+        this._entity.addChild(this._model.graph);
         this._model._entity = this._entity;
 
         // initialize based on screen
@@ -51,6 +51,8 @@ pc.extend(pc, function () {
                 this._model.destroy();
                 this._model = null;
             }
+
+            this._entity.removeChild(this._node);
 
             this._element.off('resize', this._onParentResize, this);
             this._element.off('screen:set:screenspace', this._onScreenSpaceChange, this);

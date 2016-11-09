@@ -175,7 +175,8 @@ pc.extend(pc, function () {
                     device.setDepthWrite(material.depthWrite);
                     device.setDepthTest(material.depthTest);
 
-                    modelMatrixId.setValue(meshInstance.node.getModelMatrix().data);
+                    var modelMatrix = meshInstance.node.modelTransform || meshInstance.node.worldTransform;
+                    modelMatrixId.setValue(modelMatrix.data);
                     if (meshInstance.skinInstance) {
                         skinPosOffsetId.setValue(meshInstance.node.getPosition().data);
                         if (device.supportsBoneTextures) {

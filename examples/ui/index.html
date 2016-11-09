@@ -52,12 +52,15 @@
 
             app.start();
 
+            app.root.name = "root";
+
             // see selection-manager.js
             var selectionManager = new SelectionManager(app, app.graphicsDevice);
             selectionManager.attach(app);
 
             // create camera
             var c = new pc.Entity();
+            c.name = "camera";
             c.addComponent('camera', {
                 clearColor: new pc.Color(44/255, 62/255, 80/255),
                 farClip: 10000
@@ -109,8 +112,8 @@
                 button.addComponent('element', {
                     anchor: new pc.Vec4(0.5,1,0.5,1),
                     pivot: new pc.Vec2(0.5,1),
-                    width: 50,
-                    height: 50,
+                    width: 256,
+                    height: 64,
                     type: "image",
                     rect: [0,0,1,0.25],
                     textureAsset: buttonAsset
@@ -132,43 +135,43 @@
                 button.setLocalPosition(x, y, 0);
                 button.script.button.on("press", callback);
 
-                // var label = new pc.Entity();
-                // label.name = "label";
-                // label.addComponent('element', {
-                //     anchor: new pc.Vec4(0.5,0.5,0.5,0.5),
-                //     pivot: new pc.Vec2(0.5,0.5),
-                //     width: 256,
-                //     height: 64,
-                //     type: "text",
-                //     text: text,
-                //     fontAsset: fontAsset,
-                //     color: new pc.Color(1,1,1,0.5)
-                // });
-                // label.setLocalPosition(0, 8, 0)
-                // button.addChild(label);
+                var label = new pc.Entity();
+                label.name = "label";
+                label.addComponent('element', {
+                    anchor: new pc.Vec4(0.5,0.5,0.5,0.5),
+                    pivot: new pc.Vec2(0.5,0.5),
+                    width: 256,
+                    height: 64,
+                    type: "text",
+                    text: text,
+                    fontAsset: fontAsset,
+                    color: new pc.Color(1,1,1,0.5)
+                });
+                label.setLocalPosition(0, 8, 0)
+                button.addChild(label);
 
-                // button.script.button.on("disabledstate", function (state) {
-                //     if (state) {
-                //         label.element.color = new pc.Color(0,0,0,0.5);
-                //     } else {
-                //         label.element.color = new pc.Color(1,1,1,0.5);
-                //     }
-                // });
+                button.script.button.on("disabledstate", function (state) {
+                    if (state) {
+                        label.element.color = new pc.Color(0,0,0,0.5);
+                    } else {
+                        label.element.color = new pc.Color(1,1,1,0.5);
+                    }
+                });
 
-                // button.selector.on('pointerdown', function () {
-                //     if (button.script.button.disabled) return;
-                //     label.translateLocal(0,-8,0);
-                // });
-                // button.selector.on('pointerup', function () {
-                //     if (button.script.button.disabled) return;
-                //     label.translateLocal(0,8,0);
-                // });
-                // button.selector.on('pointerleave', function () {
-                //     if (button.script.button.disabled) return;
-                //     if (button.script.button.active) {
-                //         label.translateLocal(0,8,0);
-                //     }
-                // });
+                button.selector.on('pointerdown', function () {
+                    if (button.script.button.disabled) return;
+                    label.translateLocal(0,-8,0);
+                });
+                button.selector.on('pointerup', function () {
+                    if (button.script.button.disabled) return;
+                    label.translateLocal(0,8,0);
+                });
+                button.selector.on('pointerleave', function () {
+                    if (button.script.button.disabled) return;
+                    if (button.script.button.active) {
+                        label.translateLocal(0,8,0);
+                    }
+                });
 
                 return button;
             };
@@ -199,6 +202,7 @@
             // create the menu screen, panel and buttons
             function createMenu() {
                 menu = new pc.Entity();
+                menu.name = "menu";
                 menu.addComponent("screen", {resolution: new pc.Vec2(640,480), screenSpace: true});
                 menu.screen.scaleMode = "blend";
                 menu.screen.referenceResolution = new pc.Vec2(1280,720);
@@ -251,7 +255,7 @@
                     fontAsset: fontAsset,
                     color: new pc.Color(1,1,1)
                 });
-                score.translateLocal(-84, -10, 0);
+                score.translateLocal(-100, 0, 0);
                 hud.addChild(score);
 
                 lives = [];
@@ -265,7 +269,7 @@
                         type: "image",
                         textureAsset: heartAsset
                     });
-                    lives[i].translateLocal(64, -64*i-10, 0);
+                    lives[i].translateLocal(-10, -64*i-10, 0);
                     hud.addChild(lives[i]);
                 }
                 app.root.addChild(hud);
@@ -275,6 +279,7 @@
             // create some world space text that displays the current FPS
             function createFps() {
                 fps = new pc.Entity();
+                fps.name = "fps";
                 fps.addComponent("element", {
                     anchors: [0,0,0,0],
                     pivot: [0.5,0],
@@ -365,7 +370,7 @@
                 } else {
                     // if annoy mode is active rotate the panel
                     if (spin) {
-                        // panel.rotateLocal(0, 0, 90*dt);
+                        panel.rotateLocal(0, 0, 90*dt);
                         // panel.getChildren()[1].rotateLocal(0, 0, -90*dt);
                     }
 

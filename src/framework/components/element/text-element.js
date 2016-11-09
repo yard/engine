@@ -20,7 +20,8 @@ pc.extend(pc, function () {
         this.height = 0;
 
         // private
-        this._node = this._entity;//new pc.GraphNode();
+        this._node = new pc.GraphNode();
+        this._entity.addChild(this._node);
         this._model = null;
         this._mesh = null;
         this._meshInstance = null;
@@ -50,6 +51,8 @@ pc.extend(pc, function () {
                 this._model.destroy();
                 this._model = null;
             }
+
+            this._entity.removeChild(this._node);
 
             this._element.off('resize', this._onParentResize, this);
             this._element.off('set:screen', this._onScreenChange, this);
@@ -109,9 +112,9 @@ pc.extend(pc, function () {
 
                 this._mesh = this._createMesh(text);
 
-                if (this._node.getParent()) {
-                    this._node.getParent().removeChild(this._node);
-                }
+                // if (this._node.getParent()) {
+                //     this._node.getParent().removeChild(this._node);
+                // }
 
                 this._model = new pc.Model();
                 this._model.graph = this._node;
