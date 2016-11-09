@@ -45,6 +45,13 @@ pc.extend(pc, function () {
     pc.extend(ElementComponent.prototype, {
         _patch: function () {
             this.entity.sync = this._sync;
+            if (this._image) {
+                this._image._node.modelTransform = this._modelTransform;
+            }
+            if (this._text) {
+                this._text._node.modelTransform = this._modelTransform;
+            }
+
         },
 
         _unpatch: function () {
@@ -284,12 +291,14 @@ pc.extend(pc, function () {
 
                 if (value === pc.ELEMENTTYPE_IMAGE) {
                     this._image = new pc.ImageElement(this);
-                    this._image._node.modelTransform = this._modelTransform;
                 } else if (value === pc.ELEMENTTYPE_TEXT) {
                     this._text = new pc.TextElement(this);
-                    this._text._node.modelTransform = this._modelTransform;
                 }
 
+                // repatch image and text nodes
+                if (this.screen) {
+                    this._patch();
+                }
             }
             this._type = value;
         }
