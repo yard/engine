@@ -550,7 +550,7 @@ pc.extend(pc, function () {
             // if VR is enabled in the project and there is no native VR support
             // load the polyfill
             if (props.vr && props.vr_polyfill_url) {
-                if (!pc.VrManager.hasWebVr()) {
+                if (!pc.VrManager.isSupported) {
                     props.libraries.push(props.vr_polyfill_url);
                 }
             }
@@ -709,6 +709,7 @@ pc.extend(pc, function () {
             // Perform ComponentSystem update
             if (pc.script.legacy)
                 pc.ComponentSystem.fixedUpdate(1.0 / 60.0, this._inTools);
+
             pc.ComponentSystem.update(dt, this._inTools);
             pc.ComponentSystem.postUpdate(dt, this._inTools);
 
