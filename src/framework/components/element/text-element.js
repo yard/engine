@@ -1,4 +1,33 @@
 pc.extend(pc, function () {
+
+    /**
+     * @name pc.TextElement
+     * @description Attaches text extension to an element.
+     * @class This extension makes an element render text string using SDF texture. The extension exposes the properties
+     * for controlling text alignment within the element's bounds, as well as color settings.
+     * @param {pc.ElementComponent} element The ElementComponent to attach image extension to.
+     * @property {String} text The string of text to render. It can include '\n' chars which would make the text wrap to the next line.
+     * @property {pc.Color} color The color to tint the text with.
+     * @property {Number} opacity Opacity multiplier for the text.
+     * @property {Number} lineHeight Line height of the text.
+     * @property {Number} spacing Spacing multiplier for the text.
+     * @property {String} align The horizontal aligntment of the text in relation to element's bounds.
+     * <ul>
+     * <li>{@link pc.TEXT_ALIGN_LEFT}: Align to the left side.</li>
+     * <li>{@link pc.TEXT_ALIGN_CENTER}: Center the text.</li>
+     * <li>{@link pc.TEXT_ALIGN_RIGHT}: Align to the right side.</li>
+     * </ul>
+     * @property {String} verticalAlign The vertical aligntment of the text in relation to element's bounds.
+     * <ul>
+     * <li>{@link pc.TEXT_ALIGN_TOP}: Align to the top side.</li>
+     * <li>{@link pc.TEXT_ALIGN_MIDDLE}: Center the text.</li>
+     * <li>{@link pc.TEXT_ALIGN_BOTTOM}: Align to the bottom side.</li>
+     * </ul>
+     * @property {Number} fontSize The size of the letters to render.
+     * @property {pc.Asset} fontAsset The asset to gather the font from.
+     * @property {pc.Font} font The font to use for rendering.
+     */  
+
     var TextElement = function TextElement (element) {
         this._element = element;
         this._system = element.system;
@@ -6,6 +35,9 @@ pc.extend(pc, function () {
 
         // public
         this._text = "";
+
+        this._align = pc.TEXT_ALIGN_CENTER;
+        this._veticalAlign = pc.TEXT_VERTICAL_ALIGN_MIDDLE;
 
         this._fontAsset = null;
         this._font = null;
@@ -18,6 +50,8 @@ pc.extend(pc, function () {
 
         this.width = 0;
         this.height = 0;
+
+        this._textMaterial = this._system.defaultTextMaterial.clone();
 
         // private
         this._node = new pc.GraphNode();
@@ -38,9 +72,10 @@ pc.extend(pc, function () {
 
         // start listening for element events
         element.on('resize', this._onParentResize, this);
-        this._element.on('set:screen', this._onScreenChange, this);
-        element.on('screen:set:screenspace', this._onScreenSpaceChange, this);
+        element.on('set:screen', this._onScreenChange, this);
+        element.on('screen:set:screentype', this._onScreenTypeChange, this);
         element.on('set:draworder', this._onDrawOrderChange, this);
+        element.on('set:stencillayer', this._onStencilLayerChange, this);
     };
 
     pc.extend(TextElement.prototype, {
@@ -53,8 +88,9 @@ pc.extend(pc, function () {
 
             this._element.off('resize', this._onParentResize, this);
             this._element.off('set:screen', this._onScreenChange, this);
-            this._element.off('screen:set:screenspace', this._onScreenSpaceChange, this);
+            this._element.off('screen:set:screentype', this._onScreenTypeChange, this);
             this._element.off('set:draworder', this._onDrawOrderChange, this);
+            this._element.off('set:stencillayer', this._onStencilLayerChange, this);
         },
 
         _onParentResize: function (width, height) {
@@ -62,16 +98,24 @@ pc.extend(pc, function () {
             if (this._font) this._updateText(this._text);
         },
 
-        _onScreenChange: function (screen) {
-            if (screen) {
-                this._updateMaterial(screen.screen.screenSpace);
+        _onStencilLayerChange: function(value) {
+            if (this._element.screen) {
+                this._updateMaterial(this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
             } else {
                 this._updateMaterial(false);
             }
         },
 
-        _onScreenSpaceChange: function (value) {
-            this._updateMaterial(value);
+        _onScreenChange: function (screen) {
+            if (screen) {
+                this._updateMaterial(screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
+            } else {
+                this._updateMaterial(false);
+            }
+        },
+
+        _onScreenTypeChange: function (value) {
+            this._updateMaterial(value == pc.SCREEN_TYPE_SCREEN);
         },
 
         _onDrawOrderChange: function (order) {
@@ -82,6 +126,10 @@ pc.extend(pc, function () {
         },
 
         _updateText: function (text) {
+            if (!this._font) {
+                return;
+            }
+
             if (text === undefined) text = this._text;
 
             if (!this._mesh || text.length !== this._text.length) {
@@ -101,7 +149,7 @@ pc.extend(pc, function () {
                     this._meshInstance = null;
                 }
 
-                var screenSpace = (this._element.screen && this._element.screen.screen.screenSpace);
+                var screenSpace = (this._element.screen && this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
 
                 this._updateMaterial(screenSpace);
 
@@ -131,21 +179,50 @@ pc.extend(pc, function () {
                 }
                 this._entity.addChild(this._model.graph);
                 this._model._entity = this._entity;
+
+                this._updateAligns();
             } else {
                 this._updateMesh(this._mesh, text);
                 this._meshInstance.setParameter("texture_msdfMap", this._font.texture);
             }
         },
 
-        _updateMaterial: function (screenSpace) {
-            if (screenSpace) {
-                this._material = this._system.defaultScreenSpaceTextMaterial;
-                if (this._meshInstance) this._meshInstance.layer = pc.scene.LAYER_HUD;
-            } else {
-                this._material = this._system.defaultTextMaterial;
-                if (this._meshInstance) this._meshInstance.layer = pc.scene.LAYER_WORLD;
+        _updateAligns: function() {
+            var wd = this._element.width - this.width;
+            var hd = this._element.height - this.height;
+
+            if (this._align == pc.TEXT_ALIGN_CENTER) {
+                wd *= 0.5;
             }
+
+            if (this._align == pc.TEXT_ALIGN_LEFT) {
+                wd *= 0;
+            }
+
+            if (this._veticalAlign == pc.TEXT_VERTICAL_ALIGN_MIDDLE) {
+                hd *= 0.5;
+            }
+
+            if (this._veticalAlign == pc.TEXT_VERTICAL_ALIGN_BOTTOM) {
+                hd *= 0;
+            }
+
+            if (!this._mesh) {
+                return;
+            }
+
+            var bottomLeftCorner = this._mesh.aabb.getMin();
+            this._node.setLocalPosition( new pc.Vec3( wd, hd, 0 ).sub(bottomLeftCorner) );
+        },
+
+        _updateMaterial: function (screenSpace) {
+            this._material = this._textMaterial;
+
+            this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
+            this._material.update();
+
             if (this._meshInstance) {
+                this._meshInstance.layer = screenSpace ? pc.scene.LAYER_HUD : pc.scene.LAYER_WORLD;
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
             }
@@ -191,10 +268,12 @@ pc.extend(pc, function () {
             var _x = 0; // cursors
             var _y = 0;
             var _z = 0;
+            var lines = 0;
 
             this._positions.length = 0;
             this._normals.length = 0;
             this._uvs.length = 0;
+            this._lines = [[]];
 
             var miny = Number.MAX_VALUE;
             var maxy = Number.MIN_VALUE;
@@ -202,7 +281,6 @@ pc.extend(pc, function () {
             var lastWordIndex = 0;
             var lastSoftBreak = 0;
 
-            var lines = 1;
             for (var i = 0; i < l; i++) {
                 var char = text.charCodeAt(i);
 
@@ -213,8 +291,13 @@ pc.extend(pc, function () {
                     lastWordIndex = i;
                     lastSoftBreak = i;
                     lines++;
+
+                    this._lines.push([]);
+
                     continue;
                 }
+
+                this._lines[ this._lines.length - 1 ].push( i );
 
                 if (char === 32) {
                     // space
@@ -256,11 +339,8 @@ pc.extend(pc, function () {
                 this._positions[i*4*3+10] = _y - y + scale;
                 this._positions[i*4*3+11] = _z;
 
-                this.width = _x - (x - scale);
-
                 if (this._positions[i*4*3+7] > maxy) maxy = this._positions[i*4*3+7];
                 if (this._positions[i*4*3+1] < miny) miny = this._positions[i*4*3+1];
-                this.height = maxy - miny;
 
                 // advance cursor
                 _x = _x + (this._spacing*advance);
@@ -299,20 +379,38 @@ pc.extend(pc, function () {
                 this._indices.push((i*4)+2, (i*4)+3, (i*4)+1);
             }
 
-            // offset for pivot
-            var hp = this._element.pivot.data[0];
-            var vp = this._element.pivot.data[1];
+            for(var lineIndex = 0; lineIndex < this._lines.length; lineIndex++) {
+                var lineIndices = this._lines[ lineIndex ];
 
-            for (var i = 0; i < this._positions.length; i += 3) {
-                this._positions[i] -= hp*this.width;
-                // this._positions[i+1] += (vp-1) + (lines*this._lineHeight*vp);
-                this._positions[i+1] += (((1-vp)*lines)-1)*this._lineHeight;
+                if (lineIndices.length == 0) {
+                    continue;
+                }
+
+                var leftIndex   = lineIndices[0] * 4 * 3;
+                var rightIndex  = lineIndices[ lineIndices.length - 1 ] * 4 * 3 + 9;
+                var width       = this._positions[ rightIndex ] - this._positions[ leftIndex ];
+                var wd          = this._element.width - width;
+
+                if (this._align == pc.TEXT_ALIGN_CENTER) {
+                    wd *= 0.5;
+                }
+
+                if (this._align == pc.TEXT_ALIGN_LEFT) {
+                    wd *= 0;
+                }
+
+                for(var idx = 0; idx < lineIndices.length; idx++) {
+                    var i = lineIndices[ idx ];
+
+                    this._positions[i * 4 * 3 + 0] += wd;
+                    this._positions[i * 4 * 3 + 3] += wd;
+                    this._positions[i * 4 * 3 + 6] += wd;
+                    this._positions[i * 4 * 3 + 9] += wd;
+                }
             }
 
             // update width/height of element
             this._noResize = true;
-            this._element.width = this.width;
-            this._element.height = this.height;
             this._noResize = false;
 
             // update vertex buffer
@@ -327,6 +425,11 @@ pc.extend(pc, function () {
             it.end();
 
             mesh.aabb.compute(this._positions);
+
+            this.width = mesh.aabb.halfExtents.x * 2;
+            this.height = mesh.aabb.halfExtents.y * 2;
+
+            this._updateAligns();
         },
 
         _onFontAdded: function (asset) {
@@ -418,6 +521,15 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.TextElement#color
+    * @type pc.Color
+    * @description The color to multiply the text pixels by.
+    * @example
+    * // make text be red.
+    * var element = this.entity.element;
+    * element.color = new pc.Color( 1, 0, 0 );
+    */
     Object.defineProperty(TextElement.prototype, "color", {
         get: function () {
             return this._color;
@@ -434,6 +546,11 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.TextElement#opacity
+    * @type Number
+    * @description The alpha multiplier for the text material.
+    */
     Object.defineProperty(TextElement.prototype, "opacity", {
         get: function () {
             return this._color.data[3];
@@ -447,6 +564,11 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.TextElement#lineHeight
+    * @type Number
+    * @description The size of a single text line.
+    */
     Object.defineProperty(TextElement.prototype, "lineHeight", {
         get: function () {
             return this._lineHeight
@@ -461,6 +583,11 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.TextElement#spacing
+    * @type Number
+    * @description The spacing multiplier for the text (to make it more condensed or sparse).
+    */
     Object.defineProperty(TextElement.prototype, "spacing", {
         get: function () {
             return this._spacing
@@ -475,6 +602,51 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.TextElement#align
+    * @type String
+    * @description The way the text should be aligned in relation to element's bounds. It not only affects the 
+    * bounding box positioning, but also changes the text flow, making it be left-aligned, right-aligned or centered.
+    */
+    Object.defineProperty(TextElement.prototype, "align", {
+        get: function() {
+            return this._align;
+        },
+
+        set: function(value) {
+            this._align = value;
+
+            if (this._mesh) {
+                this._updateMesh(this._mesh, this._text);
+            }
+        }
+    });
+
+    /**
+    * @name pc.TextElement#verticalAlign
+    * @type String
+    * @description The way the text should be vertically aligned in relation to element's bounds. It only affects the 
+    * bounding box positioning, making it be top-aligned, bottom-aligned or centered.
+    */
+    Object.defineProperty(TextElement.prototype, "verticalAlign", {
+        get: function() {
+            return this._veticalAlign;
+        },
+
+        set: function(value) {
+            this._veticalAlign = value;
+
+            if (this._mesh) {
+                this._updateMesh(this._mesh, this._text);
+            }
+        }
+    });
+
+    /**
+    * @name pc.TextElement#fontSize
+    * @type Number
+    * @description The font size to use when rendering the text.
+    */
     Object.defineProperty(TextElement.prototype, "fontSize", {
         get: function () {
             return this._fontSize;
@@ -489,6 +661,11 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.ImageElement#fontAsset
+    * @type pc.Asset
+    * @description The font asset to gather the font from.
+    */
     Object.defineProperty(TextElement.prototype, "fontAsset", {
         get function () {
             return this._fontAsset;
@@ -526,6 +703,11 @@ pc.extend(pc, function () {
         }
     });
 
+    /**
+    * @name pc.ImageElement#font
+    * @type pc.Font
+    * @description The font currently used for rendering.
+    */
     Object.defineProperty(TextElement.prototype, "font", {
         get: function () {
             return this._font;
@@ -539,7 +721,14 @@ pc.extend(pc, function () {
     });
 
     return {
-        TextElement: TextElement
+        TextElement: TextElement,
+
+        TEXT_ALIGN_LEFT: 'left',
+        TEXT_ALIGN_RIGHT: 'right',
+        TEXT_ALIGN_CENTER: 'center',
+        TEXT_VERTICAL_ALIGN_TOP: 'top',
+        TEXT_VERTICAL_ALIGN_MIDDLE: 'middle',
+        TEXT_VERTICAL_ALIGN_BOTTOM: 'bottom'
     };
 }());
 

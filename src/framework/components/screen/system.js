@@ -2,7 +2,7 @@ pc.extend(pc, function () {
     /**
      * @name pc.ScreenComponentSystem
      * @description Create a new ScreenComponentSystem
-     * @class Attach 2D text to an entity
+     * @class Allows screens to be attached to an entity
      * @param {pc.Application} app The application
      * @extends pc.ComponentSystem
      */
@@ -26,9 +26,11 @@ pc.extend(pc, function () {
 
     pc.extend(ScreenComponentSystem.prototype, {
         initializeComponentData: function (component, data, properties) {
-            if (data.screenSpace !== undefined) component.screenSpace = data.screenSpace;
+            if (data.screenType !== undefined) component.screenType = data.screenType;
             if (data.scaleMode !== undefined) component.scaleMode = data.scaleMode;
             if (data.scaleBlend !== undefined) component.scaleBlend = data.scaleBlend;
+            if (data.debugColor !== undefined) component.debugColor = data.debugColor;
+            if (data.screenDistance !== undefined) component.screenDistance = data.screenDistance;
             if (data.resolution !== undefined) {
                 if (data.resolution instanceof pc.Vec2){
                     component._resolution.copy(data.resolution);
@@ -67,7 +69,7 @@ pc.extend(pc, function () {
 
             return this.addComponent(clone, {
                 enabled: screen.enabled,
-                screenSpace: screen.screenSpace,
+                screenType: screen.screenType,
                 scaleMode: screen.scaleMode,
                 resolution: screen.resolution.clone(),
                 referenceResolution: screen.referenceResolution.clone()

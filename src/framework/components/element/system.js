@@ -2,11 +2,11 @@ pc.extend(pc, function () {
     /**
      * @name pc.ElementComponentSystem
      * @description Create a new ElementComponentSystem
-     * @class Attach 2D text to an entity
+     * @class Allows elements to be attached to an entity
      * @param {pc.Application} app The application
      * @extends pc.ComponentSystem
      */
-
+     
     var ElementComponentSystem = function ElementComponentSystem(app) {
         this.id = 'element';
         this.app = app;
@@ -23,6 +23,7 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
         this.defaultImageMaterial.emissiveMap = this._defaultTexture;
         this.defaultImageMaterial.emissiveMapTint = true;
+        this.defaultImageMaterial.diffuse = new pc.Color(0, 0, 0);
         this.defaultImageMaterial.opacityMap = this._defaultTexture;
         this.defaultImageMaterial.opacityMapChannel = "a";
         this.defaultImageMaterial.opacityTint = true;
@@ -37,6 +38,7 @@ pc.extend(pc, function () {
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
         this.defaultScreenSpaceImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
+        this.defaultScreenSpaceImageMaterial.diffuse = new pc.Color(0, 0, 0);
         this.defaultScreenSpaceImageMaterial.emissiveMap = this._defaultTexture;
         this.defaultScreenSpaceImageMaterial.emissiveMapTint = true;
         this.defaultScreenSpaceImageMaterial.opacityMap = this._defaultTexture;
@@ -100,6 +102,14 @@ pc.extend(pc, function () {
                 }
             }
 
+            if (data.debugColor !== undefined) {
+                component.debugColor = data.debugColor;
+            }
+
+            if (data.corners !== undefined) {
+                component._corners = data.corners;
+            }
+
             component.type = data.type;
             if (component.type === pc.ELEMENTTYPE_IMAGE) {
                 if (data.rect !== undefined) {
@@ -109,8 +119,11 @@ pc.extend(pc, function () {
                         component.rect.set(data.rect[0], data.rect[1], data.rect[2], data.rect[3])
                     }
                 }
+                if (data.masksChildren !== undefined) component.masksChildren = data.masksChildren;
+                if (data.alphaTest !== undefined) component.alphaTest = data.alphaTest;
                 if (data.materialAsset !== undefined) component.materialAsset = data.materialAsset;
                 if (data.material) component.material = data.material;
+                if (data.border) component.border = data.border;
                 if (data.color !== undefined) {
                     if (data.color instanceof pc.Color) {
                         component.color.set(data.color.data[0], data.color.data[1], data.color.data[2], data.opacity !== undefined ? data.opacity : 1);
@@ -122,7 +135,15 @@ pc.extend(pc, function () {
                 }
                 if (data.textureAsset !== undefined) component.textureAsset = data.textureAsset;
                 if (data.texture) component.texture = data.texture;
-            } else if(component.type === pc.ELEMENTTYPE_TEXT) {
+            } else if (component.type === pc.ELEMENTTYPE_TEXT) {
+                if (data.align !== undefined) {
+                    component.align = data.align;
+                }
+
+                if (data.verticalAlign !== undefined) {
+                    component.verticalAlign = data.verticalAlign;
+                }
+
                 if (data.text !== undefined) component.text = data.text;
                 if (data.color !== undefined) {
                     if (data.color instanceof pc.Color) {

@@ -19,6 +19,7 @@ pc.extend(pc, function () {
      * @property {Boolean} diffuseMapVertexColor Use vertex colors for diffuse instead of a map
      * @property {pc.Vec2} diffuseMapTiling Controls the 2D tiling of the diffuse map.
      * @property {pc.Vec2} diffuseMapOffset Controls the 2D offset of the diffuse map. Each component is between 0 and 1.
+     * @property {pc.Mat4} diffuseMapBorders Controls how the 2D texture is mapped onto the mesh. The value is matrix consisting of 4 rows: first two specify the control points within the target texture (in UV space), the last two are for UV coords. So, for instance, if the first row of the matrix is set to (0, 0.25, 0.5, 0.75) and the third is set to (0, 0.1, 0.9, 1), first and last 10% of the UV space of the mesh will get 25% of the texture mapped onto it, while the middle 90% will use 50% of the texture. This allows to make 9 patch borders that keep their size and have the middle of the texture stretched. Making matrix consisting of 1 and filling the first column with 0 will effectively make the texture be mapped as is onto the mesh (in accordance to the UV coords).
      * @property {pc.Color} specular The specular color of the material. This color value is 3-component (RGB),
      * @property {pc.Texture} specularMap The per-pixel specular map of the material. This must be a 2D texture
      * rather than a cube map. If this property is set to a valid texture, the texture is used as the source for
@@ -28,6 +29,7 @@ pc.extend(pc, function () {
      * @property {Boolean} specularMapVertexColor Use vertex colors for specular instead of a map
      * @property {pc.Vec2} specularMapTiling Controls the 2D tiling of the specular map.
      * @property {pc.Vec2} specularMapOffset Controls the 2D offset of the specular map. Each component is between 0 and 1.
+     * @property {pc.Mat4} specularMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Number} metalness Defines how much the surface is metallic. From 0 (dielectric) to 1 (metal).
      * This can be used as alternative to specular color to save space.
      * Metallic surfaces have their reflection tinted with diffuse color.
@@ -37,6 +39,7 @@ pc.extend(pc, function () {
      * @property {Boolean} metalnessMapVertexColor Use vertex colors for metalness instead of a map
      * @property {pc.Vec2} metalnessMapTiling Controls the 2D tiling of the metalness map.
      * @property {pc.Vec2} metalnessMapOffset Controls the 2D offset of the metalness map. Each component is between 0 and 1.
+     * @property {pc.Mat4} metalnessMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Boolean} useMetalness Use metalness properties instead of specular.
      * @property {Number} shininess Defines glossiness of the material from 0 (rough) to 100 (mirror).
      * A higher shininess value results in a more focussed specular highlight.
@@ -48,6 +51,7 @@ pc.extend(pc, function () {
      * @property {Boolean} glossMapVertexColor Use vertex colors for glossiness instead of a map
      * @property {pc.Vec2} glossMapTiling Controls the 2D tiling of the gloss map.
      * @property {pc.Vec2} glossMapOffset Controls the 2D offset of the gloss map. Each component is between 0 and 1.
+     * @property {pc.Mat4} glossMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Number} refraction Defines the visibility of refraction. Material can refract the same cube map as used for reflections.
      * @property {Number} refractionIndex Defines the index of refraction, i.e. the amount of distortion.
      * The value is calculated as (outerIor / surfaceIor), where inputs are measured indices of refraction, the one around the object and the one of it's own surface.
@@ -63,6 +67,7 @@ pc.extend(pc, function () {
      * @property {Boolean} emissiveMapVertexColor Use vertex colors for emission instead of a map
      * @property {pc.Vec2} emissiveMapTiling Controls the 2D tiling of the emissive map.
      * @property {pc.Vec2} emissiveMapOffset Controls the 2D offset of the emissive map. Each component is between 0 and 1.
+     * @property {pc.Mat4} emissiveMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Number} opacity The opacity of the material. This value can be between 0 and 1, where 0 is fully
      * transparent and 1 is fully opaque. If you want the material to be transparent you also need to
      * set the {@link pc.Material#blendType} to pc.BLEND_NORMAL or pc.BLEND_ADDITIVE.
@@ -75,6 +80,7 @@ pc.extend(pc, function () {
      * @property {Boolean} opacityMapVertexColor Use vertex colors for opacity instead of a map
      * @property {pc.Vec2} opacityMapTiling Controls the 2D tiling of the opacity map.
      * @property {pc.Vec2} opacityMapOffset Controls the 2D offset of the opacity map. Each component is between 0 and 1.
+     * @property {pc.Mat4} opacityMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {pc.Texture} normalMap The normal map of the material. This must be a 2D texture rather
      * than a cube map. The texture must contains normalized, tangent space normals.
      * @property {Number} normalMapUv Normal map UV channel
@@ -87,6 +93,7 @@ pc.extend(pc, function () {
      * @property {String} heightMapChannel Color channel of the height map to use. Can be "r", "g", "b" or "a".
      * @property {pc.Vec2} heightMapTiling Controls the 2D tiling of the height map.
      * @property {pc.Vec2} heightMapOffset Controls the 2D offset of the height map. Each component is between 0 and 1.
+     * @property {pc.Mat4} heightMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Number} bumpiness The bumpiness of the material. This value scales the assigned normal map
      * and can be between 0 and 1, where 0 shows no contribution from the normal map and 1 results in a full contribution.
      * @property {Number} heightMapFactor Height map multiplier. Height maps are used to create a parallax mapping effect
@@ -109,6 +116,7 @@ pc.extend(pc, function () {
      * @property {Boolean} lightMapVertexColor Use vertex lightmap instead of a texture-based one
      * @property {pc.Vec2} lightMapTiling Controls the 2D tiling of the lightmap.
      * @property {pc.Vec2} lightMapOffset Controls the 2D offset of the lightmap. Each component is between 0 and 1.
+     * @property {pc.Mat4} lightMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Boolean} ambientTint Enables scene ambient multiplication by material ambient color.
      * @property {Boolean} diffuseMapTint Enables diffuseMap multiplication by diffuse color.
      * @property {Boolean} specularMapTint Enables specularMap multiplication by specular color.
@@ -119,6 +127,7 @@ pc.extend(pc, function () {
      * @property {Boolean} aoMapVertexColor Use vertex colors for AO instead of a map
      * @property {pc.Vec2} aoMapTiling Controls the 2D tiling of the AO map.
      * @property {pc.Vec2} aoMapOffset Controls the 2D offset of the AO map. Each component is between 0 and 1.
+     * @property {pc.Mat4} aoMapBorders Controls how the 2D texture is mapped onto the mesh. Please refer to diffuseMapBorders property for more details.
      * @property {Number} occludeSpecular Uses aoMap to occlude specular/reflection. It's a hack, because real specular occlusion is view-dependent. However, it's much better than nothing.
      * <ul>
      *     <li>{@link pc.SPECOCC_NONE}: No specular occlusion</li>
@@ -230,17 +239,34 @@ pc.extend(pc, function () {
 
     var _defineTex2D = function (obj, name, uv, channels) {
         var privMap = "_" + name + "Map";
+
         var privMapTiling = privMap + "Tiling";
         var privMapOffset = privMap + "Offset";
         var mapTransform = privMap.substring(1) + "Transform";
+
+        var privMapBorders = privMap + "Borders";
+
         var privMapUv = privMap + "Uv";
         var privMapChannel = privMap + "Channel";
         var privMapVertexColor = privMap + "VertexColor";
 
         obj[privMap] = null;
+        
         obj[privMapTiling] = new pc.Vec2(1, 1);
         obj[privMapOffset] = new pc.Vec2(0, 0);
         obj[mapTransform] = null;
+
+        // The structure of this matrix is designed to store bordering information
+        // along with stretching ability of textures.
+        //
+        // The specific layout is as follows:
+        // Row 1: U stops across texture
+        // Row 2: V stops across texture
+        // Row 3: Normalized U stops across the mesh
+        // Row 4: Normalized V stops across the mesh
+        //
+        obj[privMapBorders] = null;
+
         obj[privMapUv] = uv;
         if (channels > 0) obj[privMapChannel] = channels > 1? "rgb" : "g";
         obj[privMapVertexColor] = false;
@@ -252,12 +278,17 @@ pc.extend(pc, function () {
             get: function() { return this[privMap]; },
             set: function (value) {
                 var oldVal = this[privMap];
-                if ((!oldVal && value) || (oldVal && !value)) this.dirtyShader = true;
+                
+                if (!!oldVal ^ !!value) {
+                    this.dirtyShader = true;
+                }
+
                 if (oldVal && value) {
                     if (oldVal.rgbm!==value.rgbm || oldVal.fixCubemapSeams!==value.fixCubemapSeams || oldVal.format!==value.format) {
                         this.dirtyShader = true;
                     }
                 }
+
                 this[privMap] = value;
             }
         });
@@ -265,10 +296,8 @@ pc.extend(pc, function () {
         var mapTiling = privMapTiling.substring(1);
         var mapOffset = privMapOffset.substring(1);
 
-
         Object.defineProperty(StandardMaterial.prototype, mapTiling, {
             get: function() {
-                this.dirtyShader = true;
                 return this[privMapTiling];
             },
             set: function (value) {
@@ -288,7 +317,6 @@ pc.extend(pc, function () {
 
         Object.defineProperty(StandardMaterial.prototype, mapOffset, {
             get: function() {
-                this.dirtyShader = true;
                 return this[privMapOffset];
             },
             set: function (value) {
@@ -306,17 +334,32 @@ pc.extend(pc, function () {
         };
 
 
+        var mapBorders = privMapBorders.substring(1);
+        Object.defineProperty(StandardMaterial.prototype, mapBorders, {
+            get: function() {
+                return this[privMapBorders];
+            },
+            set: function (value) {
+                this.dirtyShader = !!this[privMapBorders] ^ !!value;
+                this[privMapBorders] = value;
+            }
+        });
+        _prop2Uniform[mapBorders] = function (mat, val, changeMat) {
+            return {name: ("texture_" + mapBorders), value: (val ? val.data : null)};
+        };
+
+
         Object.defineProperty(StandardMaterial.prototype, privMapUv.substring(1), {
             get: function() { return this[privMapUv]; },
             set: function (value) {
-                this.dirtyShader = true;
+                this.dirtyShader = this[privMapUv] != value;
                 this[privMapUv] = value;
             }
         });
         Object.defineProperty(StandardMaterial.prototype, privMapChannel.substring(1), {
             get: function() { return this[privMapChannel]; },
             set: function (value) {
-                this.dirtyShader = true;
+                this.dirtyShader = this[privMapChannel] != value;
                 this[privMapChannel] = value;
             }
         });
@@ -355,7 +398,11 @@ pc.extend(pc, function () {
                 var oldVal = this[priv];
                 var wasBw = (oldVal.data[0]===0 && oldVal.data[1]===0 && oldVal.data[2]===0) || (oldVal.data[0]===1 && oldVal.data[1]===1 && oldVal.data[2]===1);
                 var isBw = (value.data[0]===0 && value.data[1]===0 && value.data[2]===0) || (value.data[0]===1 && value.data[1]===1 && value.data[2]===1);
-                if (wasBw || isBw) this.dirtyShader = true;
+                
+                if (wasBw ^ isBw) {
+                    this.dirtyShader = true;
+                }
+
                 this.dirtyColor = true;
                 this[priv] = value;
             }
@@ -391,7 +438,11 @@ pc.extend(pc, function () {
                     var oldVal = this[pmult];
                     var wasBw = oldVal===0 || oldVal===1;
                     var isBw = value===0 || value===1;
-                    if (wasBw || isBw) this.dirtyShader = true;
+                    
+                    if (wasBw ^ isBw) {
+                        this.dirtyShader = true;
+                    }
+
                     this.dirtyColor = true;
                     this[pmult] = value;
                 }
@@ -426,7 +477,11 @@ pc.extend(pc, function () {
                 var oldVal = this[priv];
                 var wasBw = oldVal===0 || oldVal===1;
                 var isBw = value===0 || value===1;
-                if (wasBw || isBw) this.dirtyShader = true;
+                
+                if (wasBw ^ isBw) {
+                    this.dirtyShader = true;
+                }
+                
                 this[priv] = value;
             }
         });
@@ -443,7 +498,11 @@ pc.extend(pc, function () {
             get: function() { return this[priv]; },
             set: function (value) {
                 var oldVal = this[priv];
-                if ((!oldVal && value) || (oldVal && !value)) this.dirtyShader = true;
+                
+                if (!!oldVal ^ !!value) { 
+                    this.dirtyShader = true;
+                }
+
                 this[priv] = value;
             }
         });
@@ -455,7 +514,6 @@ pc.extend(pc, function () {
         this._chunks = null;
         Object.defineProperty(StandardMaterial.prototype, "chunks", {
             get: function() {
-                this.dirtyShader = true;
                 return this._chunks;
             },
             set: function (value) {
@@ -472,7 +530,7 @@ pc.extend(pc, function () {
         Object.defineProperty(StandardMaterial.prototype, name, {
             get: function() { return this[priv]; },
             set: function (value) {
-                this.dirtyShader = true;
+                this.dirtyShader = this[priv] != value;
                 this[priv] = value;
             }
         });
@@ -638,7 +696,6 @@ pc.extend(pc, function () {
             var mname = p + "Map";
             if (this[mname]) {
                 this._setParameter("texture_" + mname, this[mname]);
-
                 var tname = mname + "Transform";
                 this[tname] = this._updateMapTransform(
                     this[tname],
@@ -648,6 +705,11 @@ pc.extend(pc, function () {
 
                 if (this[tname]) {
                     this._setParameter('texture_' + tname, this[tname].data);
+                }
+
+                var bname = mname + "Borders";
+                if (this[bname]) {
+                    this._setParameter("texture_" + bname, this[bname].data);
                 }
             }
         },
@@ -998,11 +1060,15 @@ pc.extend(pc, function () {
                     if (this[uname]===1 && !hasUv1) allow = false;
                     if (allow) {
                         options[mname] = !!this[mname];
+
                         var tname = mname + "Transform";
                         cname = mname + "Channel";
                         options[tname] = this._getMapTransformID(this[tname], this[uname]);
                         options[cname] = this[cname];
                         options[uname] = this[uname];
+
+                        var bname = mname + "Borders";
+                        options[bname] = this[bname];
                     }
                 }
             }
