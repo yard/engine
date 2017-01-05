@@ -73,7 +73,9 @@ pc.extend(pc, function () {
     Object.defineProperty(GraphNode.prototype, 'forward', {
         get: function() {
             return this.getWorldTransform().getZ(this._forward).normalize().scale(-1);
-        }
+        },
+
+        configurable: true
     });
 
     /**
