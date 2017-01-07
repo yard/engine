@@ -151,7 +151,13 @@ pc.extend(pc, function () {
             // at the lower left corner and (w, h) in size maps onto clipspace of the device.
             this._screenMatrix.setOrtho(0, w, 0, h, near, far);
 
-            if (this._screenType == pc.SCREEN_TYPE_CAMERA) {
+            var screenType = this._screenType;
+
+            if (!this.camera) {
+                screenType = pc.SCREEN_TYPE_SCREEN;
+            }
+
+            if (screenType == pc.SCREEN_TYPE_CAMERA) {
                 // camera case requires special consideration, however
                 var camera = this.camera;
 
@@ -169,7 +175,7 @@ pc.extend(pc, function () {
                     var fov = camera.fov / 2;
                     // then we compute the viewport height at nearClipOffset distance which is conveniently
                     // fov angle tangents times offset of the place
-                    var nearClipHalfHeight = Math.tan( fov * Math.PI / 180.0 ) * nearClipOffset;
+                    var nearClipHalfHeight = Math.tan( fov * Math.PI / 180.0 ) * Math.abs( nearClipOffset );
                     // the near clip width comes from screen proportions
                     var nearClipHalfWidth  = nearClipHalfHeight * w / h;
                     
@@ -410,7 +416,7 @@ pc.extend(pc, function () {
             this._calcProjectionMatrix();
         },
         get: function () {
-            return this._camera || pc.Application.getApplication().systems.camera.cameras[0].camera;
+            return this._camera;
         }
     });
 
