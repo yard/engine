@@ -53,6 +53,8 @@ pc.extend(pc, function () {
             }
 
             ScreenComponentSystem._super.initializeComponentData.call(this, component, data, properties);
+
+            component._updateScreenInChildren();
         },
 
         _onUpdate: function (dt) {
