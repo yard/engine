@@ -310,7 +310,7 @@ pc.extend(pc, function() {
         this.useMesh = true;
         this.useCpu = false;
 
-        this.pack8 = true;
+        //this.pack8 = true;
         this.localBounds = new pc.BoundingBox();
         this.worldBoundsNoTrail = new pc.BoundingBox();
         this.worldBoundsTrail = [new pc.BoundingBox(), new pc.BoundingBox()];
@@ -658,9 +658,9 @@ pc.extend(pc, function() {
             // Premultiplied alpha. We can use it for both additive and alpha-transparent blending.
             //this.material.blendSrc = pc.BLENDMODE_ONE;
             //this.material.blendDst = pc.BLENDMODE_ONE_MINUS_SRC_ALPHA;
-            this.material.blendType = this.blendType;
+            //this.material.blendType = this.blendType;
 
-            this.material.depthWrite = this.depthWrite;
+            //this.material.depthWrite = this.depthWrite;
             this.material.emitter = this;
 
             this.regenShader();
@@ -1167,6 +1167,7 @@ pc.extend(pc, function() {
 
             var emitterPos;
             var emitterScale = this.meshInstance.node === null ? pc.Vec3.ONE.data : this.meshInstance.node.localScale.data;
+
             this.material.setParameter("emitterScale", emitterScale);
             if (this.localSpace && this.meshInstance.node) {
                 this.material.setParameter("emitterPos", this.meshInstance.node.getPosition().data);
