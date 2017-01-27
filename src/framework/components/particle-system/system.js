@@ -19,6 +19,7 @@ pc.extend(pc, function() {
         'sort',
         'blendType',
         'stretch',
+        'billboardStretch',
         'alignToMotion',
         'emitterShape',
         'emitterExtents',
@@ -71,6 +72,7 @@ pc.extend(pc, function() {
         this.propertyTypes = {
             emitterExtents: 'vec3',
             wrapBounds: 'vec3',
+            billboardStretch: 'vec2',
             localVelocityGraph: 'curveset',
             localVelocityGraph2: 'curveset',
             velocityGraph: 'curveset',
