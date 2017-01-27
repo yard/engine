@@ -10,6 +10,7 @@ uniform float numParticles, numParticlesPot;
 uniform float graphSampleSize;
 uniform float graphNumSamples;
 uniform float stretch;
+uniform vec2 billboardStretch;
 uniform vec3 wrapBounds;
 uniform vec3 emitterScale, emitterPos;
 uniform float rate, rateDiv, lifetime, deltaRandomnessStatic, scaleDivMult, alphaDivMult, seed, delta;

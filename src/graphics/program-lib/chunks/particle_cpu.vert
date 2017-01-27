@@ -12,6 +12,7 @@ uniform mat4 matrix_viewInverse;
 uniform float numParticles;
 uniform float lifetime;
 uniform float stretch;
+uniform vec2 billboardStretch;
 //uniform float graphSampleSize;
 //uniform float graphNumSamples;
 uniform vec3 wrapBounds, emitterScale;

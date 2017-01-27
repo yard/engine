@@ -21,7 +21,9 @@ pc.extend(pc, function() {
             cubemap: false,
             mipmaps: false,
             minFilter: mipFilter,
-            magFilter: mipFilter
+            magFilter: mipFilter,
+            addressU: pc.ADDRESS_CLAMP_TO_EDGE,
+            addressV: pc.ADDRESS_CLAMP_TO_EDGE
         });
 
         var pixels = texture.lock();
@@ -209,6 +211,7 @@ pc.extend(pc, function() {
         setProperty("halfLambert", false);
         setProperty("intensity", 1.0);
         setProperty("stretch", 0.0);
+        setProperty("billboardStretch", pc.Vec2.ONE);
         setProperty("alignToMotion", false);
         setProperty("depthSoftening", 0);
         setProperty("mesh", null);                               // Mesh to be used as particle. Vertex buffer is supposed to hold vertex position in first 3 floats of each vertex
@@ -893,6 +896,7 @@ pc.extend(pc, function() {
             var gd = this.graphicsDevice;
 
             material.setParameter('stretch', this.stretch);
+            material.setParameter('billboardStretch', this.billboardStretch.data);
             if (this._isAnimated()) {
                 material.setParameter('animTexParams', this.animParams.data);
             }

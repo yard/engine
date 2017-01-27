@@ -7,7 +7,8 @@ pc.extend(pc, function() {
         'loop',
         'initialVelocity',
         'animSpeed',
-        'normalMap'
+        'normalMap',
+        'billboardStretch'
     ];
 
     // properties that need rebuilding the particle system
@@ -93,6 +94,7 @@ pc.extend(pc, function() {
      * @property {Number} startAngle2 Maximal inital Euler angle of a particle.
      * @property {Number} lifetime The length of time in seconds between a particle's birth and its death.
      * @property {Number} stretch A value in world units that controls the amount by which particles are stretched based on their velocity. Particles are stretched from their center towards their previous position.
+     * @property {pc.Vec2} billboardStretch A vector that defines how billboard particles are scaled across different axes. Use this to turn particle quads into rectangles.
      * @property {Number} intensity Color multiplier.
      * @property {Boolean} animLoop Controls whether the sprite sheet animation plays once or loops continuously.
      * @property {Number} animTilesX Number of horizontal tiles in the sprite sheet.
@@ -464,6 +466,7 @@ pc.extend(pc, function() {
                     preWarm: this.data.preWarm,
                     sort: this.data.sort,
                     stretch: this.data.stretch,
+                    billboardStretch: this.data.billboardStretch,
                     alignToMotion: this.data.alignToMotion,
                     lighting: this.data.lighting,
                     halfLambert: this.data.halfLambert,
