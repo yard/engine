@@ -161,10 +161,11 @@ pc.extend(pc, function () {
                         }
                     }
 
-                    var data8 = new Uint8Array(this.mesh.vertexBuffer.storage);
+                    var data8 = new Float32Array(this.mesh.vertexBuffer.storage);
                     var dataF = new Float32Array(this.mesh.vertexBuffer.storage);
                     var offsetPF = offsetP / 4;
                     var offsetWF = offsetW / 4;
+                    var offsetIF = offsetI / 4;
                     var vertSizeF = vertSize / 4;
 
                     var bMax, bMin;
@@ -181,7 +182,7 @@ pc.extend(pc, function () {
                     for(j=0; j<numVerts; j++) {
                         for(k=0; k<4; k++) {
                             if (dataF[j * vertSizeF + offsetWF + k] > 0) {
-                                index = data8[j * vertSize + offsetI + k];
+                                index = data8[j * vertSizeF + offsetIF + k];
                                 // Vertex j is affected by bone index
                                 x = dataF[j * vertSizeF + offsetPF];
                                 y = dataF[j * vertSizeF + offsetPF + 1];
