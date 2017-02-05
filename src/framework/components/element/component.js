@@ -78,6 +78,7 @@ pc.extend(pc, function () {
         this._image = null;
         this._text = null;
         this._group = null;
+        this._rect = new pc.Vec4;
 
         if (!_warning) {
             console.warn("Message from PlayCanvas: The element component is currently in Beta. APIs may change without notice.");
@@ -172,27 +173,19 @@ pc.extend(pc, function () {
             }
 
             var screen = this.element.screen;
-            var rect = null;
+            var rect = this.element._rect;
 
             if (this._parent && this._parent.element) {
-                rect = new pc.Vec4(
-                    this._parent.element._width  * this.element._anchor.x + this.element._corners.x,
-                    this._parent.element._height * this.element._anchor.y + this.element._corners.y,
-                    this._parent.element._width  * this.element._anchor.z + this.element._corners.z,
-                    this._parent.element._height * this.element._anchor.w + this.element._corners.w
-                );
+                rect.x = this._parent.element._width  * this.element._anchor.x + this.element._corners.x,
+                rect.y = this._parent.element._height * this.element._anchor.y + this.element._corners.y,
+                rect.z = this._parent.element._width  * this.element._anchor.z + this.element._corners.z,
+                rect.w = this._parent.element._height * this.element._anchor.w + this.element._corners.w
             } else if (screen) {
-                resolution = new pc.Vec2( screen.screen._width, screen.screen._height );
-
-                rect = new pc.Vec4(
-                    resolution.x * this.element._anchor.x + this.element._corners.x,
-                    resolution.y * this.element._anchor.y + this.element._corners.y,
-                    resolution.x * this.element._anchor.z + this.element._corners.z,
-                    resolution.y * this.element._anchor.w + this.element._corners.w
-                );
-            }
-
-            if (!rect) {
+                rect.x = screen.screen._width  * this.element._anchor.x + this.element._corners.x,
+                rect.y = screen.screen._height * this.element._anchor.y + this.element._corners.y,
+                rect.z = screen.screen._width  * this.element._anchor.z + this.element._corners.z,
+                rect.w = screen.screen._height * this.element._anchor.w + this.element._corners.w
+            } else {
                 return;
             }
 

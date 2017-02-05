@@ -370,7 +370,7 @@ pc.extend(pc, function () {
             }
 
             // world space screens do not support scale modes
-            if (!this._screenSpace && value !== pc.ScreenComponent.SCALEMODE_NONE) {
+            if (this._screenType == pc.SCREEN_TYPE_WORLD && value !== pc.ScreenComponent.SCALEMODE_NONE) {
                 value = pc.ScreenComponent.SCALEMODE_NONE;
             }
 

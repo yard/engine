@@ -97,7 +97,14 @@ pc.extend(pc, function () {
 
         _onParentResize: function () {
             if (this._mesh) {
+                if (this._width == this._element.width && this._height == this._element.height) {
+                    return;
+                }
+
                 this._updateMesh(this._mesh);
+
+                this._width = this._element.width;
+                this._height = this._element.height;
             }
         },
 
