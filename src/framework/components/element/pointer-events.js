@@ -6,6 +6,11 @@ pc.extend(pc, function() {
         // falls into the bounds of the current element and should be processed by it
         // or its children.
         _testPointerEvent: function(point) {
+            if (this._width == 0 || this._height == 0) {
+                // FIXME this is kinda ignoring the common sense, but Cashman uses zero-sized containers for some reason.
+                return true;
+            }
+
             return (point.x >= 0) && (point.y >= 0) && (point.x <= this._width) && (point.y <= this._height);
         },
 
