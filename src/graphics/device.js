@@ -1413,6 +1413,14 @@ pc.extend(pc, function () {
                             this.extInstancing.vertexAttribDivisorANGLE(locationId, 0);
                             this.instancedAttribs[locationId] = false;
                         }
+                    } else {
+                        if (attribute.scopeId.name == 'COLOR' && !attribute.scopeId.value) {
+                            locationId = attribute.locationId;
+                            this.enabledAttributes[locationId] = false;
+
+                            gl.disableVertexAttribArray(locationId);
+                            gl.vertexAttrib4f(locationId, 1, 1, 1, 1);
+                        }
                     }
                 }
 
