@@ -6,6 +6,10 @@ pc.extend(pc, function() {
         // falls into the bounds of the current element and should be processed by it
         // or its children.
         _testPointerEvent: function(point) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             if (this._width == 0 || this._height == 0) {
                 // FIXME this is kinda ignoring the common sense, but Cashman uses zero-sized containers for some reason.
                 return true;
@@ -43,6 +47,8 @@ pc.extend(pc, function() {
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
         _pointerEventDown: function(point) {
+
+
             point = this._parentPointToLocalPoint(point);
 
             if (!this._testPointerEvent(point)) {
@@ -113,37 +119,65 @@ pc.extend(pc, function() {
 
         // Mouse-specific event handler.
         _onMouseDown: function(mouseEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             this._pointerEventDown( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
         },
 
         // Mouse-specific event handler.
         _onMouseUp: function(mouseEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             this._pointerEventUp( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
         },
 
         // Mouse-specific event handler.
         _onMouseMove: function(mouseEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             this._pointerEventMove( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
         },
 
         // Mouse-specific event handler.
         _onMouseMove: function(mouseEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             this._pointerEventMove( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
         },
 
         // Touch-specific event handler.
         _onMouseWheel: function(mouseEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             this._pointerEventScroll( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ), mouseEvent.wheel );
         },
 
         // Touch-specific event handler.
         _onTouchUp: function(touchEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
             var touch = touchEvent.changedTouches[0];
             this._pointerEventUp( new pc.Vec3( touch.x, touch.y, 0 ) );
         },
 
         // Touch-specific event handler.
         _onTouchMove: function(touchEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+            
             var touch = touchEvent.changedTouches[0];
             this._pointerEventMove( new pc.Vec3( touch.x, touch.y, 0 ) );
         },

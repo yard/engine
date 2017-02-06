@@ -260,7 +260,8 @@ pc.extend(pc, function () {
 
                         // unless it's screen-space we need to account screen's world transform as well
                         if (screen.screen.screenType != pc.SCREEN_TYPE_SCREEN) {
-                            this.element._screenToWorld.mul2(screen.worldTransform, this.element._screenToWorld);
+                            var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
+                            this.element._screenToWorld.mul2(screenWorldTransform, this.element._screenToWorld);
                         }
 
                         // world transform if effectively the same as model transform,
@@ -402,10 +403,12 @@ pc.extend(pc, function () {
         },
 
         _findScreen: function () {
-            var screen = this.entity._parent;
+            var screen = this.entity;//._parent;
+
             while(screen && !screen.screen) {
                 screen = screen._parent;
             }
+
             return screen;
         },
 
