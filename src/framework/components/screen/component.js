@@ -199,9 +199,9 @@ pc.extend(pc, function () {
                 // in case of the the world everything is very simple – just normalize the size to match
                 // the desired "resolution"
                 var worldMatrix = new pc.Mat4();
-                worldMatrix.setTRS( new pc.Vec3(-this._resolution.x * 0.5, -this._resolution.y * 0.5, 0), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
+                worldMatrix.setTRS( new pc.Vec3( -this._resolution.x * 0.5, -this._resolution.y * 0.5, 0).scale(0), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
 
-                this._screenMatrix = worldMatrix.mul( this.entity.getWorldTransform() ); 
+                this._screenMatrix = worldMatrix; 
             }
 
             this._inverseScreenMatrix = this._screenMatrix.clone().invert();
