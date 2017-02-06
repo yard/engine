@@ -195,6 +195,12 @@ pc.extend(pc, function () {
             return mesh;
         },
 
+        _setSpriteMesh: function(mesh) {
+            this._mesh = mesh;
+            this._meshInstance.mesh = mesh;
+            this._updateMesh( mesh );
+        },
+
         _updateBorders: function() {
             if (!this._material) {
                 return;
@@ -226,7 +232,18 @@ pc.extend(pc, function () {
             var w = this._element.width;
             var h = this._element.height;
 
+            if (!w || !h) {
+                return;
+            }
+
             this._updateBorders();
+
+            // if (this._sprite) {
+            //     var pixelSize = this._sprite.pixelSize.scale( 1.0 / this.sprite.pixelsPerUnit );
+            //     this._model.graph.setLocalScale( w / pixelSize.x, h / pixelSize.y, 1 );
+            //     this._model.graph.setLocalPosition( 0.5 * w / pixelSize.x, 0.5 * h / pixelSize.y, 1 );
+            //     return;
+            // }
 
             this._positions[0] = 0;
             this._positions[1] = 0;

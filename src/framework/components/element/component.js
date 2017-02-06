@@ -78,7 +78,7 @@ pc.extend(pc, function () {
         this._image = null;
         this._text = null;
         this._group = null;
-        this._rect = new pc.Vec4;
+        this._elementRect = new pc.Vec4;
 
         if (!_warning) {
             console.warn("Message from PlayCanvas: The element component is currently in Beta. APIs may change without notice.");
@@ -173,7 +173,7 @@ pc.extend(pc, function () {
             }
 
             var screen = this.element.screen;
-            var rect = this.element._rect;
+            var rect = this.element._elementRect;
 
             if (this._parent && this._parent.element) {
                 rect.x = this._parent.element._width  * this.element._anchor.x + this.element._corners.x,
