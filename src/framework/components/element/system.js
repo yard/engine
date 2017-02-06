@@ -22,6 +22,7 @@ pc.extend(pc, function () {
         this._defaultTexture = new pc.Texture(app.graphicsDevice, {width:4, height:4, format:pc.PIXELFORMAT_R8_G8_B8});
 
         this.defaultImageMaterial = new pc.StandardMaterial();
+        this.defaultImageMaterial.cull = pc.CULLFACE_NONE;
         this.defaultImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
         this.defaultImageMaterial.emissiveMap = this._defaultTexture;
         this.defaultImageMaterial.emissiveMapTint = true;
@@ -39,6 +40,7 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.update();
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
+        this.defaultScreenSpaceImageMaterial.cull = pc.CULLFACE_NONE;
         this.defaultScreenSpaceImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
         this.defaultScreenSpaceImageMaterial.diffuse = new pc.Color(0, 0, 0);
         this.defaultScreenSpaceImageMaterial.emissiveMap = this._defaultTexture;
@@ -57,6 +59,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.update();
 
         this.defaultTextMaterial = new pc.StandardMaterial();
+        this.defaultTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultTextMaterial.msdfMap = this._defaultTexture;
         this.defaultTextMaterial.useLighting = false;
         this.defaultTextMaterial.useGammaTonemap = false;
@@ -69,6 +72,7 @@ pc.extend(pc, function () {
         this.defaultTextMaterial.update();
 
         this.defaultScreenSpaceTextMaterial = new pc.StandardMaterial();
+        this.defaultScreenSpaceTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultScreenSpaceTextMaterial.msdfMap = this._defaultTexture;
         this.defaultScreenSpaceTextMaterial.useLighting = false;
         this.defaultScreenSpaceTextMaterial.useGammaTonemap = false;
