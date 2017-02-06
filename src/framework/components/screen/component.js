@@ -46,6 +46,7 @@ pc.extend(pc, function () {
     var ScreenComponent = function ScreenComponent (system, entity) {
         this._resolution = new pc.Vec2(this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height);
         this._referenceResolution = new pc.Vec2(640,320);
+        this._offset = new pc.Vec2(0, 0);
         this._scaleMode = pc.ScreenComponent.SCALEMODE_NONE;
         this.scale = 1;
         this._scaleBlend = 0.5;
@@ -202,7 +203,7 @@ pc.extend(pc, function () {
                 // in case of the the world everything is very simple – just normalize the size to match
                 // the desired "resolution"
                 var worldMatrix = new pc.Mat4();
-                worldMatrix.setTRS( new pc.Vec3( 0, 0, 0 ), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
+                worldMatrix.setTRS( new pc.Vec3( this._offset.x, this._offset.y, 0 ), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
 
                 this._screenMatrix = worldMatrix; 
             }
@@ -289,6 +290,16 @@ pc.extend(pc, function () {
             } else {
                 pc.ComponentSystem.off("update", this._drawDebugBox, this);
             }
+        }
+    });
+
+    Object.defineProperty(ScreenComponent.prototype, "offset", {
+        set: function (value) {
+            this._offset.set(value.x, value.y);
+            this._calcProjectionMatrix();
+        },
+        get: function () {
+            return this._offset;
         }
     });
 
