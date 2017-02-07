@@ -954,7 +954,7 @@ pc.extend(pc, (function () {
 
             det =  m0 * a11 + m1 * a12 + m2 * a13;
             if (det === 0) { // no inverse
-                console.warn("pc.Mat4#invertTo3x3: Matrix not invertible");
+                //console.warn("pc.Mat4#invertTo3x3: Matrix not invertible");
                 return this;
             }
 

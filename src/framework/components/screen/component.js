@@ -43,6 +43,8 @@ pc.extend(pc, function () {
      * @property {pc.Camera} camera The camera to use for screen positioning (only for pc.SCREEN_TYPE_WORLD mode).
      */
 
+    var baseDrawOrder = 1000 * 1000;
+
     var ScreenComponent = function ScreenComponent (system, entity) {
         this._resolution = new pc.Vec2(this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height);
         this._referenceResolution = new pc.Vec2(640,320);
@@ -51,6 +53,9 @@ pc.extend(pc, function () {
         this.scale = 1;
         this._scaleBlend = 0.5;
         this._debugColor = null;
+        
+        this._baseDrawOrder = baseDrawOrder;
+        baseDrawOrder += 1000 * 1000;
 
         this._screenType = pc.SCREEN_TYPE_CAMERA;
         this._screenDistance = 1.0;
@@ -116,7 +121,11 @@ pc.extend(pc, function () {
         },
 
         syncDrawOrder: function () {
-            var i = 1;
+            var i = this._baseDrawOrder;
+
+            if (this.screenType == pc.SCREEN_TYPE_SCREEN) {
+                i = 0;
+            }
 
             var recurse = function (e) {
                 if (e.element) {
@@ -231,6 +240,48 @@ pc.extend(pc, function () {
             if (this._screenType != pc.SCREEN_TYPE_WORLD) {
                 this._resolution.set(width, height);
                 this.resolution = this._resolution; // force update
+            }
+        },
+
+        _updateStencilParameters: function () {
+            var ref     = 255;
+            var masking = 0;
+            var self    = this;
+
+            var walker = function (root) {
+                var element = root.element;
+                
+                if (element) {
+                    element._stencilLayer = ref;
+                    element._masked = masking > 0;
+
+                    if (element._image && element._image._masksChildren) {
+                        masking++;
+
+                        element._stencilLayer -= 1;
+                        ref -= 1;
+                    }
+                }
+
+                for(var i = 0; i < root._children.length; i++) {
+                    walker( root._children[i] );
+                }
+
+                if (element && element._image) {
+                    if (element._image._masksChildren) {
+                        masking--;
+                    }
+
+                    element._image._updateMaterial(self.screenType == pc.SCREEN_TYPE_SCREEN);
+                }
+
+                if (element && element._text) {
+                    element._text._updateMaterial(self.screenType == pc.SCREEN_TYPE_SCREEN);
+                }
+            }
+
+            if (this.entity) {
+                walker( this.entity )
             }
         }
 

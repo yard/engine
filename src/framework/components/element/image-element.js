@@ -374,7 +374,10 @@ pc.extend(pc, function () {
 
         set: function (value) {
             this._masksChildren = value;
-            this._element._setMasksChildren( value );
+
+            if (this._element.screen) {
+                this._element.screen.screen._updateStencilParameters();
+            }
         }
     });
 

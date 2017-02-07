@@ -96,16 +96,19 @@ pc.extend(pc, function () {
         // into each other) should fill the buffer with a const using GREATEREQUAL function,
         // while children should be drawn with smaller ref value and LESSEQUAL function.
         _getStencilParameters: function() {
+            var func = pc.FUNC_ALWAYS;
+
+            if (this._masked) {
+                func = this._masksChildren ? pc.FUNC_LESSEQUAL : pc.FUNC_EQUAL;
+            }
+
             return new pc.StencilParameters({
-                // if stencil layer is 255 it means we are the topmost mask in the heirarchy.
-                // and as default camera stencil clearing value is 0, it's better to not change
-                // it and work on top of it
-                func:  this._stencilLayer == 255 ? pc.FUNC_GREATEREQUAL : pc.FUNC_LESSEQUAL,
+                func:  func,
                 ref:   this._stencilLayer,
                 mask:  0xFF,
                 zfail: pc.STENCILOP_KEEP,
                 zpass: pc.STENCILOP_REPLACE,
-                fail:  pc.STENCILOP_KEEP
+                fail:  this._masked ? pc.STENCILOP_KEEP : pc.STENCILOP_REPLACE
             });
         },
 
@@ -113,22 +116,22 @@ pc.extend(pc, function () {
         // or removes it. Effectively enables children to be masked by this element or
         // removes this settings.
         //
-        _setMasksChildren: function(applyMask) {
-            this._masksChildren = applyMask;
-            var childStencilLayer = this._masksChildren ? (this._stencilLayer - 1) : this._stencilLayer;
+        // _setMasksChildren: function(applyMask) {
+        //     this._masksChildren = applyMask;
+        //     var childStencilLayer = this._masksChildren ? (this._stencilLayer - 1) : this._stencilLayer;
 
-            var children = this.entity.getChildren();
-            for (var i = 0; i < children.length; i++) {
-                var element = children[i].element;
+        //     var children = this.entity.getChildren();
+        //     for (var i = 0; i < children.length; i++) {
+        //         var element = children[i].element;
 
-                if (element) {
-                    element._stencilLayer = childStencilLayer;
-                    element._setMasksChildren( element._masksChildren );
-                }
-            }
+        //         if (element) {
+        //             element._stencilLayer = childStencilLayer;
+        //             element._setMasksChildren( element._masksChildren );
+        //         }
+        //     }
 
-            this.fire("set:stencillayer", this._stencilLayer);
-        },
+        //     this.fire("set:stencillayer", this._stencilLayer);
+        // },
  
         _patch: function () {
             this.entity.sync = this._sync;
@@ -321,8 +324,8 @@ pc.extend(pc, function () {
             var screen = this._findScreen();
             this._updateScreen(screen);
 
-            if (parent && parent.element) {
-                parent.element._setMasksChildren( parent.element._masksChildren );
+            if (screen) {
+                screen.screen._updateStencilParameters();
             }
         },
 
