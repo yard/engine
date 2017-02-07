@@ -74,6 +74,10 @@ pc.extend(pc, function () {
 
         this._type = pc.ELEMENTTYPE_GROUP;
 
+        this._fromPivotTransform = new pc.Mat4;
+        this._toPivotTransform = new pc.Mat4;
+        this._pivotPoint = new pc.Vec3;
+
         // element types
         this._image = null;
         this._text = null;
@@ -188,6 +192,14 @@ pc.extend(pc, function () {
                 rect.y = screen.screen._height * this.element._anchor.y + this.element._corners.y,
                 rect.z = screen.screen._width  * this.element._anchor.z + this.element._corners.z,
                 rect.w = screen.screen._height * this.element._anchor.w + this.element._corners.w
+
+                // if (screen.screen.pivot) {
+                //     rect.x += screen.screen.pivot.x;
+                //     rect.z += screen.screen.pivot.x;
+
+                //     rect.y += screen.screen.pivot.y;
+                //     rect.w += screen.screen.pivot.y;
+                // }
             } else {
                 return;
             }
@@ -200,6 +212,7 @@ pc.extend(pc, function () {
             if (this.element._anchorDirty || this.element._cornerDirty) {               
                 this.element._anchorTransform.setTranslate(rect.x, rect.y, 0);
                 this.element._anchorDirty = false;
+                this.element._cornerDirty = false;
             }
 
             if (this.dirtyWorld) {
@@ -231,31 +244,32 @@ pc.extend(pc, function () {
                     }
 
                     // let's compute the pivot point – remember it's local to element coord space
-                    var pivotPoint          = new pc.Vec3( this.element._width * this.element.pivot.x, this.element._height * this.element.pivot.y, 0 );
+                    this.element._pivotPoint.set( this.element._width * this.element.pivot.x, this.element._height * this.element.pivot.y, 0 );
                     // and compose a transform to move TO the pivot – as all local transformations,
                     // i.e. rotation should happen around the pivot
-                    var toPivotTransform    = new pc.Mat4().setTRS( pivotPoint, pc.Quat.IDENTITY, pc.Vec3.ONE );
-                    var fromPivotTransform  = toPivotTransform.clone().invert();
+                    this.element._toPivotTransform.setTRS( this.element._pivotPoint, pc.Quat.IDENTITY, pc.Vec3.ONE );
+                    this.element._fromPivotTransform.copy( this.element._toPivotTransform );
+                    this.element._fromPivotTransform.invert();
 
                     // we will maintain parent-to-local transform for optimization purposes as well
                     this.element._localModelTransform.copy(this.element._anchorTransform);
                     // ... then we move onto pivot point
-                    this.element._localModelTransform.mul( toPivotTransform );
+                    this.element._localModelTransform.mul( this.element._toPivotTransform );
                     // ... then we transform the model using local transformation matrix
                     this.element._localModelTransform.mul( this.localTransform )
                     // ... and get away from our pivot point
-                    this.element._localModelTransform.mul( fromPivotTransform );
+                    this.element._localModelTransform.mul( this.element._fromPivotTransform );
                     // ... and finally invert the matrix
                     this.element._localModelTransform.invert();
 
                     // our model transform starts off with what we've got from parent
                     this.element._modelTransform.copy( this.element._screenToWorld );
                     // ... then we move onto pivot point
-                    this.element._modelTransform.mul( toPivotTransform );
+                    this.element._modelTransform.mul( this.element._toPivotTransform );
                     // ... then we transform the model using local transformation matrix
                     this.element._modelTransform.mul( this.localTransform )
                     // ... and get away from our pivot point
-                    this.element._modelTransform.mul( fromPivotTransform );
+                    this.element._modelTransform.mul( this.element._fromPivotTransform );
 
                     if (screen) {
                         // if we have the screen somewhere is our heirarchy we apply screen matrix
@@ -263,14 +277,14 @@ pc.extend(pc, function () {
 
                         // unless it's screen-space we need to account screen's world transform as well
                         if (screen.screen.screenType != pc.SCREEN_TYPE_SCREEN) {
-                            var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
-                            this.element._screenToWorld.mul2(screenWorldTransform, this.element._screenToWorld);
+                            //var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
+                            this.element._screenToWorld.mul2(screen.getWorldTransform(), this.element._screenToWorld);
                         }
 
                         // world transform if effectively the same as model transform,
                         // BUT should account screen transformations applied on top of it
                         this.worldTransform.copy( this.element._screenToWorld );
-                        this.worldTransform.mul( toPivotTransform ).mul( this.localTransform ).mul( fromPivotTransform );
+                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform ).mul( this.element._fromPivotTransform );
                     } else {
                         this.worldTransform.copy(element._modelTransform);
                     }

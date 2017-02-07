@@ -206,12 +206,13 @@ pc.extend(pc, function () {
                     mul( clipSpaceToNearClipSpace ).
                     mul( this._screenMatrix );
             } else if (this._screenType == pc.SCREEN_TYPE_WORLD) {
-                w = 0;
-                h = 0;
+                w = this._resolution.x;
+                h = this._resolution.y;
 
                 // in case of the the world everything is very simple – just normalize the size to match
                 // the desired "resolution"
                 var worldMatrix = new pc.Mat4();
+                //worldMatrix.setTRS( new pc.Vec3( 0, 0, 0 ), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
                 worldMatrix.setTRS( new pc.Vec3( this._offset.x, this._offset.y, 0 ), pc.Quat.IDENTITY, new pc.Vec3( 1, 1, 1 ) );
 
                 this._screenMatrix = worldMatrix; 
