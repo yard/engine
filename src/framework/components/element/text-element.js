@@ -47,6 +47,9 @@ pc.extend(pc, function () {
         this._spacing = 1;
         this._fontSize = 32;
         this._lineHeight = 32;
+        this._bestFit = false;
+        this._minFontSize = 0;
+        this._maxFontSize = 1000;
 
         this.width = 0;
         this.height = 0;
@@ -188,8 +191,23 @@ pc.extend(pc, function () {
         },
 
         _updateAligns: function() {
-            var wd = this._element.width - this.width;
-            var hd = this._element.height - this.height;
+            var scale = 1.0;
+
+            if (this._bestFit) {
+                var xScale = this._element.width / this.width;
+                var yScale = this._element.width / this.width;
+
+                var minScale = this._minFontSize / this._fontSize;
+                var maxScale = this._maxFontSize / this._fontSize;
+
+                var scale = Math.min(xScale, yScale);
+                var scale = Math.min( maxScale, Math.max( minScale, scale ) );
+
+                this._node.setLocalScale(scale, scale, scale);
+            }
+
+            var wd = this._element.width - this.width * scale;
+            var hd = this._element.height - this.height * scale;
 
             if (this._align == pc.TEXT_ALIGN_CENTER) {
                 wd *= 0.5;
@@ -211,7 +229,7 @@ pc.extend(pc, function () {
                 return;
             }
 
-            var bottomLeftCorner = this._mesh.aabb.getMin();
+            var bottomLeftCorner = this._mesh.aabb.getMin().scale(scale);
             this._node.setLocalPosition( new pc.Vec3( wd, hd, 0 ).sub(bottomLeftCorner) );
         },
 
@@ -717,6 +735,45 @@ pc.extend(pc, function () {
             this._font = value;
             if (this._font)
                 this._updateText();
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "bestFit", {
+        get: function () {
+            return this._bestFit;
+        },
+
+        set: function (value) {
+            this._bestFit = value;
+            if (this._font) {
+                this._updateText();
+            }
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "minFontSize", {
+        get: function () {
+            return this._minFontSize;
+        },
+
+        set: function (value) {
+            this._minFontSize = value;
+            if (this._font) {
+                this._updateText();
+            }
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "maxFontSize", {
+        get: function () {
+            return this._maxFontSize;
+        },
+
+        set: function (value) {
+            this._maxFontSize = value;
+            if (this._font) {
+                this._updateText();
+            }
         }
     });
 

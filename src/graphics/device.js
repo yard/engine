@@ -5,6 +5,8 @@ pc.extend(pc, function () {
     var uniformValue;
     var scopeX, scopeY, scopeZ, scopeW;
 
+    var whiteColor = new Float32Array([1, 1, 1, 1]);
+
     // Exceptions
     function UnsupportedBrowserError(message) {
         this.name = "UnsupportedBrowserError";
@@ -1419,7 +1421,7 @@ pc.extend(pc, function () {
                             this.enabledAttributes[locationId] = false;
 
                             gl.disableVertexAttribArray(locationId);
-                            gl.vertexAttrib4f(locationId, 1, 1, 1, 1);
+                            gl.vertexAttrib4fv(locationId, whiteColor);
                         }
                     }
                 }

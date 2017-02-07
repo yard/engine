@@ -238,13 +238,6 @@ pc.extend(pc, function () {
 
             this._updateBorders();
 
-            // if (this._sprite) {
-            //     var pixelSize = this._sprite.pixelSize.scale( 1.0 / this.sprite.pixelsPerUnit );
-            //     this._model.graph.setLocalScale( w / pixelSize.x, h / pixelSize.y, 1 );
-            //     this._model.graph.setLocalPosition( 0.5 * w / pixelSize.x, 0.5 * h / pixelSize.y, 1 );
-            //     return;
-            // }
-
             this._positions[0] = 0;
             this._positions[1] = 0;
             this._positions[2] = 0;

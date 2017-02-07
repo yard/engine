@@ -10,7 +10,7 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            if (this._width == 0 || this._height == 0) {
+            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
                 // FIXME this is kinda ignoring the common sense, but Cashman uses zero-sized containers for some reason.
                 return true;
             }

@@ -122,6 +122,15 @@ pc.extend(pc, function () {
             });
             // #endif
 
+            // Performance fix: bind a non-color attribute to slot 0 to avoid performance slowdown
+            var slot = 1;
+            for(var attribute in this.definition.attributes) {
+                // var semantic = this.definition.attributes[ attribute ];
+                // if (semantic != pc.SEMANTIC_COLOR) {
+                gl.bindAttribLocation(this.program, slot++, attribute);
+                // }
+            }
+
             gl.linkProgram(this.program);
 
             // check for errors
