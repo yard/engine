@@ -287,8 +287,8 @@ pc.extend(pc, function () {
                         // world transform if effectively the same as model transform,
                         // BUT should account screen transformations applied on top of it
                         this.worldTransform.copy( this.element._screenToWorld );
-                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform );//.mul( this.element._fromPivotTransform );
-                        
+                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform );
+
                         if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
                             this.element._pivotGraph.localTransform.copy( this.element._fromPivotTransform );
                             this.element._pivotGraph.dirtyWorld = true;

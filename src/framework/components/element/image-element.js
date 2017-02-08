@@ -132,6 +132,7 @@ pc.extend(pc, function () {
         _onDrawOrderChange: function (order) {
             this._drawOrder = order;
             if (this._meshInstance) {
+                this._meshInstance._screen = this._element.screen;
                 this._meshInstance.drawOrder = order;
             }
         },
