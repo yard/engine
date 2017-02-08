@@ -52,6 +52,9 @@ pc.extend(pc, function () {
 
         // corner offsets in relation to anchors
         this._corners = new pc.Vec4(0, 0, 0, 0);
+        this._pivotGraph = new pc.Entity();
+
+        this.entity.addChild( this._pivotGraph );
 
         // the model transform used to render
         this._modelTransform = new pc.Mat4();
@@ -277,14 +280,22 @@ pc.extend(pc, function () {
 
                         // unless it's screen-space we need to account screen's world transform as well
                         if (screen.screen.screenType != pc.SCREEN_TYPE_SCREEN) {
-                            //var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
-                            this.element._screenToWorld.mul2(screen.getWorldTransform(), this.element._screenToWorld);
+                            var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
+                            this.element._screenToWorld.mul2(screenWorldTransform, this.element._screenToWorld);
                         }
 
                         // world transform if effectively the same as model transform,
                         // BUT should account screen transformations applied on top of it
                         this.worldTransform.copy( this.element._screenToWorld );
-                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform ).mul( this.element._fromPivotTransform );
+                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform );//.mul( this.element._fromPivotTransform );
+                        
+                        if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
+                            this.element._pivotGraph.localTransform.copy( this.element._fromPivotTransform );
+                            this.element._pivotGraph.dirtyWorld = true;
+                            this.element._pivotGraph.sync();
+                        } else {
+                            this.worldTransform.mul( this.element._fromPivotTransform );
+                        }
                     } else {
                         this.worldTransform.copy(element._modelTransform);
                     }

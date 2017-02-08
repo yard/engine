@@ -23,7 +23,8 @@ pc.extend(pc, function () {
 
     var ImageElement = function ImageElement (element) {
         this._element = element;
-        this._entity = element.entity;
+        //this._entity = element.entity;
+        this._entity = element._pivotGraph;
         this._system = element.system;
 
         // public

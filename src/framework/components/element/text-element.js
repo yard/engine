@@ -31,7 +31,8 @@ pc.extend(pc, function () {
     var TextElement = function TextElement (element) {
         this._element = element;
         this._system = element.system;
-        this._entity = element.entity;
+        //this._entity = element.entity;
+        this._entity = element._pivotGraph;
 
         // public
         this._text = "";
