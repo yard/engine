@@ -123,9 +123,9 @@ pc.extend(pc, function () {
         syncDrawOrder: function () {
             var i = this._baseDrawOrder;
 
-            if (this.screenType == pc.SCREEN_TYPE_SCREEN) {
-                i = 0;
-            }
+            // if (this.screenType == pc.SCREEN_TYPE_SCREEN) {
+            //     i = 1000 * 1000 * 1000;
+            // }
 
             var recurse = function (e) {
                 if (e.element) {

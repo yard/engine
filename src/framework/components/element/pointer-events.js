@@ -144,15 +144,6 @@ pc.extend(pc, function() {
             this._pointerEventMove( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
         },
 
-        // Mouse-specific event handler.
-        _onMouseMove: function(mouseEvent) {
-            if (!this.entity || !this.entity.enabled) {
-                return false;
-            }
-
-            this._pointerEventMove( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
-        },
-
         // Touch-specific event handler.
         _onMouseWheel: function(mouseEvent) {
             if (!this.entity || !this.entity.enabled) {

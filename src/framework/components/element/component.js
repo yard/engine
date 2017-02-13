@@ -152,6 +152,7 @@ pc.extend(pc, function () {
 
         _setPosition: function () {
             var position = new pc.Vec3();
+            var localPosition = new pc.Vec3();
             var invParentWtm = new pc.Mat4();
 
             return function (x, y, z) {
@@ -163,14 +164,21 @@ pc.extend(pc, function () {
 
                 this.getWorldTransform(); // ensure hierarchy is up to date
                 invParentWtm.copy(this.element._screenToWorld).invert();
-                invParentWtm.transformPoint(position, this.localPosition);
+                invParentWtm.transformPoint(position, localPosition);
 
-                this.dirtyLocal = true;
+                if (!localPosition.equals(this.localPosition)) {
+                    this.localPosition.copy( localPosition );
+                    this.dirtyLocal = true;
+                }
             };
         }(),
 
         // this method overwrites GraphNode#sync and so operates in scope of the Entity.
         _sync: function () {
+            if (!this.dirtyLocal && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+                return;
+            }
+
             var element = this.element;
             var parent = this.element._parent;
 

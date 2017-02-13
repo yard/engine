@@ -201,8 +201,8 @@ pc.extend(pc, function () {
                 var minScale = this._minFontSize / this._fontSize;
                 var maxScale = this._maxFontSize / this._fontSize;
 
-                var scale = Math.min(xScale, yScale);
-                var scale = Math.min( maxScale, Math.max( minScale, scale ) );
+                scale = Math.min( xScale, yScale );
+                scale = Math.min( maxScale, Math.max( minScale, scale ) );
 
                 this._node.setLocalScale(scale, scale, scale);
             }
@@ -407,7 +407,7 @@ pc.extend(pc, function () {
 
                 var leftIndex   = lineIndices[0] * 4 * 3;
                 var rightIndex  = lineIndices[ lineIndices.length - 1 ] * 4 * 3 + 9;
-                var width       = this._positions[ rightIndex ] - this._positions[ leftIndex ];
+                width           = this._positions[ rightIndex ] - this._positions[ leftIndex ];
                 var wd          = this._element.width - width;
 
                 if (this._align == pc.TEXT_ALIGN_CENTER) {

@@ -210,6 +210,7 @@ pc.extend(pc, function () {
         clone.blendSrc = this.blendSrc;
         clone.blendDst = this.blendDst;
         clone.blendEquation = this.blendEquation;
+        clone.renderQueue = this.renderQueue;
 
         clone.cull = this.cull;
 
