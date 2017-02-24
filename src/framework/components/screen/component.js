@@ -43,8 +43,6 @@ pc.extend(pc, function () {
      * @property {pc.Camera} camera The camera to use for screen positioning (only for pc.SCREEN_TYPE_WORLD mode).
      */
 
-    var baseDrawOrder = 1000 * 1000;
-
     var ScreenComponent = function ScreenComponent (system, entity) {
         this._resolution = new pc.Vec2(this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height);
         this._referenceResolution = new pc.Vec2(640,320);
@@ -53,9 +51,6 @@ pc.extend(pc, function () {
         this.scale = 1;
         this._scaleBlend = 0.5;
         this._debugColor = null;
-        
-        this._baseDrawOrder = baseDrawOrder;
-        baseDrawOrder += 1000 * 1000;
 
         this._screenType = pc.SCREEN_TYPE_CAMERA;
         this._screenDistance = 1.0;
@@ -78,9 +73,11 @@ pc.extend(pc, function () {
                 var element = this.entity._children[i].element;
 
                 if (element) {
-                    element._updateScreen( this.entity );
+                    element._updateScreen( this.entity, true );
                 }
             }
+
+            this.syncDrawOrder();
         },
 
         // Draws a debug box transforming local-spaced corners using current transformation matrix.
@@ -121,11 +118,7 @@ pc.extend(pc, function () {
         },
 
         syncDrawOrder: function () {
-            var i = this._baseDrawOrder;
-
-            // if (this.screenType == pc.SCREEN_TYPE_SCREEN) {
-            //     i = 1000 * 1000 * 1000;
-            // }
+            var i = this.drawOrder;
 
             var recurse = function (e) {
                 if (e.element) {

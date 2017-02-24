@@ -124,9 +124,12 @@ pc.extend(pc, function () {
 
         _onDrawOrderChange: function (order) {
             this._drawOrder = order;
+
             if (this._meshInstance) {
                 this._meshInstance.drawOrder = order;
             }
+
+            this._setLayerFromScreen();
         },
 
         _updateText: function (text) {
@@ -189,6 +192,8 @@ pc.extend(pc, function () {
                 this._updateMesh(this._mesh, text);
                 this._meshInstance.setParameter("texture_msdfMap", this._font.texture);
             }
+
+            this._setLayerFromScreen();
         },
 
         _updateAligns: function() {
@@ -234,6 +239,22 @@ pc.extend(pc, function () {
             this._node.setLocalPosition( new pc.Vec3( wd, hd, 0 ).sub(bottomLeftCorner) );
         },
 
+        _setLayerFromScreen: function () {
+            if (!this._meshInstance) {
+                return;
+            }
+
+            if (this._meshInstance.screenSpace) {
+                return this._meshInstance.layer = pc.scene.LAYER_HUD;
+            } 
+
+            if (this._element.screen) {
+                this._meshInstance.layer = this._element.screen.screen.layer;
+            } else {
+                this._meshInstance.layer = pc.scene.LAYER_WORLD;
+            }
+        },
+
         _updateMaterial: function (screenSpace) {
             this._material = this._textMaterial;
 
@@ -241,10 +262,11 @@ pc.extend(pc, function () {
             this._material.update();
 
             if (this._meshInstance) {
-                this._meshInstance.layer = screenSpace ? pc.scene.LAYER_HUD : pc.scene.LAYER_WORLD;
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
             }
+
+            this._setLayerFromScreen();
         },
 
         // build the mesh for the text
@@ -532,6 +554,11 @@ pc.extend(pc, function () {
 
         set: function (value) {
             var str = value.toString();
+
+            if (this._text == str) {
+                return;
+            }
+
             if (this._font) {
                 this._updateText(str);
             }

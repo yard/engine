@@ -131,9 +131,27 @@ pc.extend(pc, function () {
 
         _onDrawOrderChange: function (order) {
             this._drawOrder = order;
+
             if (this._meshInstance) {
-                this._meshInstance._screen = this._element.screen;
                 this._meshInstance.drawOrder = order;
+            }
+
+            this._setLayerFromScreen();
+        },
+
+        _setLayerFromScreen: function () {
+            if (!this._meshInstance) {
+                return;
+            } 
+
+            if (this._meshInstance.screenSpace) {
+                return this._meshInstance.layer = pc.scene.LAYER_HUD;
+            } 
+
+            if (this._element.screen) {
+                this._meshInstance.layer = this._element.screen.screen.layer;
+            } else {
+                this._meshInstance.layer = pc.scene.LAYER_WORLD;
             }
         },
 
@@ -146,10 +164,11 @@ pc.extend(pc, function () {
             this._material.update();
 
             if (this._meshInstance) {
-                this._meshInstance.layer = screenSpace ? pc.scene.LAYER_HUD : pc.scene.LAYER_WORLD;
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
             }
+
+            this._setLayerFromScreen();
         },
 
         _createMesh: function () {

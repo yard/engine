@@ -403,7 +403,7 @@ pc.extend(pc, function () {
         //     this._sizeDirty = false;
         // },
 
-        _updateScreen: function (screen) {
+        _updateScreen: function (screen, skipOrderUpdate) {
             if (this.screen && this.screen !== screen) {
                 this.screen.screen.off('set:resolution', this._onScreenResize, this);
                 this.screen.screen.off('set:referenceresolution', this._onScreenResize, this);
@@ -431,11 +431,13 @@ pc.extend(pc, function () {
             // update all child screens
             var children = this.entity.getChildren();
             for (var i = 0, l = children.length; i < l; i++) {
-                if (children[i].element) children[i].element._updateScreen(screen);
+                if (children[i].element) children[i].element._updateScreen(screen, skipOrderUpdate);
             }
 
             // calculate draw order
-            if (this.screen) this.screen.screen.syncDrawOrder();
+            if (this.screen && !skipOrderUpdate) {
+                this.screen.screen.syncDrawOrder();
+            }
         },
 
         _findScreen: function () {

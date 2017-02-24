@@ -35,6 +35,8 @@ pc.extend(pc, function () {
             if (data.scaleBlend !== undefined) component.scaleBlend = data.scaleBlend;
             if (data.debugColor !== undefined) component.debugColor = data.debugColor;
             if (data.screenDistance !== undefined) component.screenDistance = data.screenDistance;
+            if (data.layer !== undefined) component.layer = data.layer;
+            if (data.drawOrder !== undefined) component.drawOrder = data.drawOrder;
             if (data.resolution !== undefined) {
                 if (data.resolution instanceof pc.Vec2){
                     component._resolution.copy(data.resolution);
