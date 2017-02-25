@@ -110,6 +110,39 @@ pc.extend(pc, function () {
         // #endif
     };
 
+    var slots = {};
+    
+    slots[ pc.SEMANTIC_POSITION ] =           0;
+    slots[ pc.SEMANTIC_NORMAL ] =             1;
+    slots[ pc.SEMANTIC_TANGENT ] =            2;
+    slots[ pc.SEMANTIC_BLENDWEIGHT ] =        3;
+    slots[ pc.SEMANTIC_BLENDINDICES ] =       4;
+    slots[ pc.SEMANTIC_COLOR ] =              5;
+    slots[ pc.SEMANTIC_TEXCOORD0 ] =          6;
+    slots[ pc.SEMANTIC_TEXCOORD1 ] =          7;
+    slots[ pc.SEMANTIC_TEXCOORD2 ] =          8;
+    slots[ pc.SEMANTIC_TEXCOORD3 ] =          9;
+    slots[ pc.SEMANTIC_TEXCOORD4 ] =          10;
+    slots[ pc.SEMANTIC_TEXCOORD5 ] =          11;
+    slots[ pc.SEMANTIC_TEXCOORD6 ] =          12;
+    slots[ pc.SEMANTIC_TEXCOORD7 ] =          13;
+    slots[ pc.SEMANTIC_ATTR0 ] =              14;
+    slots[ pc.SEMANTIC_ATTR1 ] =              15;
+    slots[ pc.SEMANTIC_ATTR2 ] =              16;
+    slots[ pc.SEMANTIC_ATTR3 ] =              17;
+    slots[ pc.SEMANTIC_ATTR4 ] =              18;
+    slots[ pc.SEMANTIC_ATTR5 ] =              19;
+    slots[ pc.SEMANTIC_ATTR6 ] =              20;
+    slots[ pc.SEMANTIC_ATTR7 ] =              21;
+    slots[ pc.SEMANTIC_ATTR8 ] =              22;
+    slots[ pc.SEMANTIC_ATTR9 ] =              23;
+    slots[ pc.SEMANTIC_ATTR10 ] =             24;
+    slots[ pc.SEMANTIC_ATTR11 ] =             25;
+    slots[ pc.SEMANTIC_ATTR12 ] =             26;
+    slots[ pc.SEMANTIC_ATTR13 ] =             27;
+    slots[ pc.SEMANTIC_ATTR14 ] =             28;
+    slots[ pc.SEMANTIC_ATTR15 ] =             29;
+
     Shader.prototype = {
         link: function () {
             var gl = this.device.gl;
@@ -123,12 +156,11 @@ pc.extend(pc, function () {
             // #endif
 
             // Performance fix: bind a non-color attribute to slot 0 to avoid performance slowdown
-            var slot = 1;
             for(var attribute in this.definition.attributes) {
-                // var semantic = this.definition.attributes[ attribute ];
-                // if (semantic != pc.SEMANTIC_COLOR) {
-                gl.bindAttribLocation(this.program, slot++, attribute);
-                // }
+                var semantic = this.definition.attributes[ attribute ];
+                var slot     = slots[ semantic ];
+
+                gl.bindAttribLocation(this.program, slot, attribute);
             }
 
             gl.linkProgram(this.program);
