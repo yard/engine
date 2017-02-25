@@ -15,6 +15,11 @@ pc.extend(pc, function() {
                 return true;
             }
 
+            if (!this._image) {
+                // only mask when we have a mask applied
+                return true;
+            }
+
             return (point.x >= 0) && (point.y >= 0) && (point.x <= this._width) && (point.y <= this._height);
         },
 
@@ -47,8 +52,6 @@ pc.extend(pc, function() {
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
         _pointerEventDown: function(point) {
-
-
             point = this._parentPointToLocalPoint(point);
 
             if (!this._testPointerEvent(point)) {
