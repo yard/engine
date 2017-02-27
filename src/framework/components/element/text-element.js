@@ -68,6 +68,7 @@ pc.extend(pc, function () {
         this._normals = [];
         this._uvs = [];
         this._indices = [];
+        this._spacings = new pc.Vec4(0, 0, 0, 0);
 
         this._noResize = false; // flag used to disable resizing events
 
@@ -235,8 +236,11 @@ pc.extend(pc, function () {
                 return;
             }
 
-            var bottomLeftCorner = this._mesh.aabb.getMin().scale(scale);
-            this._node.setLocalPosition( new pc.Vec3( wd, hd, 0 ).sub(bottomLeftCorner) );
+            var bottomLeftCorner = pc.Vec3.ZERO.clone();// this._mesh.aabb.getMin().scale(scale);
+            bottomLeftCorner.x += this._spacings.x * scale;
+            bottomLeftCorner.y += this._spacings.w * scale;
+
+            //this._node.setLocalPosition( new pc.Vec3( wd, hd, 0 ).sub(bottomLeftCorner) );
         },
 
         _setLayerFromScreen: function () {

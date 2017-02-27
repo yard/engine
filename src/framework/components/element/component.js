@@ -63,6 +63,8 @@ pc.extend(pc, function () {
 
         this._screenToWorld = new pc.Mat4();
 
+        this._inversePivotWorldTransform = new pc.Mat4();
+
         // the position of the element in canvas co-ordinate system. (0,0 = top left)
         this._canvasPosition = new pc.Vec2();
 
@@ -301,6 +303,9 @@ pc.extend(pc, function () {
                             this.element._pivotGraph.localTransform.copy( this.element._fromPivotTransform );
                             this.element._pivotGraph.dirtyWorld = true;
                             this.element._pivotGraph.sync();
+
+                            this.element._inversePivotWorldTransform.copy( this.element._pivotGraph.worldTransform );
+                            this.element._inversePivotWorldTransform.invert();
                         } else {
                             this.worldTransform.mul( this.element._fromPivotTransform );
                         }
