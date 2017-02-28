@@ -33,6 +33,7 @@ pc.extend(pc, function () {
         var context = null;
         options = options || {};
         options.stencil = true;
+        options.antialias = (window.devicePixelRatio < 2);
         for (var i = 0; i < names.length; i++) {
             try {
                 context = canvas.getContext(names[i], options);
