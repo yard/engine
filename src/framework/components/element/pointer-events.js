@@ -1,5 +1,9 @@
 pc.extend(pc, function() {
 
+    var POINTER_TEST_RESULT_PASS            = 0;
+    var POINTER_TEST_RESULT_PASS_THROUGH    = 1;
+    var POINTER_TEST_RESULT_FAIL            = 2;
+
     var PointEventsManager = {
 
         // Tests if the pointer event with coordinates passed (in local coord space)
@@ -7,20 +11,20 @@ pc.extend(pc, function() {
         // or its children.
         _testPointerEvent: function(point) {
             if (!this.entity || !this.entity.enabled) {
-                return false;
+                return POINTER_TEST_RESULT_FAIL;
             }
 
-            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
-                // FIXME this is kinda ignoring the common sense, but Cashman uses zero-sized containers for some reason.
-                return true;
+            var failureResult = POINTER_TEST_RESULT_FAIL;
+
+            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0 || !this._image) {
+                failureResult = POINTER_TEST_RESULT_PASS_THROUGH;
             }
 
-            if (!this._image) {
-                // only mask when we have a mask applied
-                return true;
+            if ((point.x >= 0) && (point.y >= 0) && (point.x <= this._width) && (point.y <= this._height)) {
+                return POINTER_TEST_RESULT_PASS;
+            } else {
+                return failureResult;
             }
-
-            return (point.x >= 0) && (point.y >= 0) && (point.x <= this._width) && (point.y <= this._height);
         },
 
         // Converts point in parent's coords into the local coordinate system.
@@ -54,12 +58,17 @@ pc.extend(pc, function() {
         _pointerEventDown: function(point) {
             point = this._parentPointToLocalPoint(point);
 
-            if (!this._testPointerEvent(point)) {
+            var testResult = this._testPointerEvent(point);
+
+            if (testResult == POINTER_TEST_RESULT_FAIL) {
                 return;
             }
 
             this._passPointerEventToChildren("_pointerEventDown", [ point ]);
-            this.fire(pc.POINTEREVENT_DOWN, point);
+
+            if (testResult == POINTER_TEST_RESULT_PASS) {
+                this.fire(pc.POINTEREVENT_DOWN, point);
+            }
         },
 
         // Handles "up" pointer event – might be coming from touch or
@@ -67,13 +76,18 @@ pc.extend(pc, function() {
         _pointerEventUp: function(point) {
             point = this._parentPointToLocalPoint(point);
 
-            if (!this._testPointerEvent(point)) {
+            var testResult = this._testPointerEvent(point);
+
+            if (testResult == POINTER_TEST_RESULT_FAIL) {
                 return;
             }
 
             this._passPointerEventToChildren("_pointerEventUp", [ point ]);
-            this.fire(pc.POINTEREVENT_CLICK, point);
-            this.fire(pc.POINTEREVENT_UP, point);
+
+            if (testResult == POINTER_TEST_RESULT_PASS) {
+                this.fire(pc.POINTEREVENT_CLICK, point);
+                this.fire(pc.POINTEREVENT_UP, point);
+            }
         },
 
         // Fires pointer leave event and also makes all children do so.
@@ -89,7 +103,9 @@ pc.extend(pc, function() {
         _pointerEventMove: function(point) {
             point = this._parentPointToLocalPoint(point);
 
-            if (!this._testPointerEvent(point)) {
+            var testResult = this._testPointerEvent(point);
+
+            if (testResult != POINTER_TEST_RESULT_PASS) {
                 if (this._pointerOver) {
                     this._ensurePointerLeaveEvent(point);            
                 }
@@ -112,12 +128,17 @@ pc.extend(pc, function() {
         _pointerEventScroll: function(point, amount) {
             point = this._parentPointToLocalPoint(point);
 
-            if (!this._testPointerEvent(point)) {
+            var testResult = this._testPointerEvent(point);
+
+            if (testResult == POINTER_TEST_RESULT_FAIL) {
                 return;
             }
 
             this._passPointerEventToChildren("_pointerEventScroll", [ point, amount ]);
-            this.fire(pc.POINTEREVENT_SCROLL, point, amount);
+
+            if (testResult == POINTER_TEST_RESULT_PASS) {
+                this.fire(pc.POINTEREVENT_SCROLL, point, amount);
+            }
         },
 
         // Mouse-specific event handler.
