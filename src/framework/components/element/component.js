@@ -301,14 +301,16 @@ pc.extend(pc, function () {
 
                         if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
                             this.element._pivotGraph.localTransform.copy( this.element._fromPivotTransform );
-                            this.element._pivotGraph.dirtyWorld = true;
-                            this.element._pivotGraph.sync();
-
-                            this.element._inversePivotWorldTransform.copy( this.element._pivotGraph.worldTransform );
-                            this.element._inversePivotWorldTransform.invert();
                         } else {
+                            this.element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
                             this.worldTransform.mul( this.element._fromPivotTransform );
                         }
+
+                        this.element._pivotGraph.dirtyWorld = true;
+                        this.element._pivotGraph.sync();
+
+                        this.element._inversePivotWorldTransform.copy( this.element._pivotGraph.worldTransform );
+                        this.element._inversePivotWorldTransform.invert();
                     } else {
                         this.worldTransform.copy(element._modelTransform);
                     }
