@@ -584,7 +584,7 @@ pc.extend(pc, function () {
             this._corners = value;
             this._cornerDirty = true;
 
-            this.getWorldTransform();
+            this.entity.getWorldTransform();
         }
     });
 
@@ -642,7 +642,7 @@ pc.extend(pc, function () {
             this._corners.x = value;
             this._cornerDirty = true;
 
-            this.getWorldTransform();
+            this.entity.getWorldTransform();
         }
     });
 
@@ -660,7 +660,7 @@ pc.extend(pc, function () {
             this._corners.z = value;
             this._cornerDirty = true;
 
-            this.getWorldTransform();
+            this.entity.getWorldTransform();
         }
     });
 
@@ -678,7 +678,7 @@ pc.extend(pc, function () {
             this._corners.w = value;
             this._cornerDirty = true;
 
-            this.getWorldTransform();
+            this.entity.getWorldTransform();
         }
     });
 
@@ -696,7 +696,7 @@ pc.extend(pc, function () {
             this._corners.y = value;
             this._cornerDirty = true;
 
-            this.getWorldTransform();
+            this.entity.getWorldTransform();
         }
     });
 
