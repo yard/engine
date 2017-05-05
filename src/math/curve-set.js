@@ -20,7 +20,8 @@ pc.extend(pc, (function () {
             }
         } else {
             if (arguments.length === 0) {
-                this.curves.push(new pc.Curve());
+                // FIXME the below causes default constructor to produce wierd errors during deserialization
+                // this.curves.push(new pc.Curve());
             } else {
                 var arg = arguments[0];
                 if (pc.type(arg) === 'number') {
