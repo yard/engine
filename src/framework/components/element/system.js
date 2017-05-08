@@ -93,8 +93,6 @@ pc.extend(pc, function () {
 
     pc.extend(ElementComponentSystem.prototype, {
         initializeComponentData: function (component, data, properties) {
-            if (data.width !== undefined) component.width = data.width;
-            if (data.height !== undefined) component.height = data.height
             if (data.anchor !== undefined) {
                 if (data.anchor instanceof pc.Vec4) {
                     component.anchor.copy(data.anchor);
@@ -197,11 +195,12 @@ pc.extend(pc, function () {
                 height: source.height,
                 anchor: source.anchor.clone(),
                 pivot: source.pivot.clone(),
+                margin: source.margin.clone(),
                 type: source.type,
                 rect: source.rect && source.rect.clone() || source.rect,
                 materialAsset: source.materialAsset,
                 material: source.material,
-                color: source.color.clone(),
+                color: source.color && source.color.clone() || source.color,
                 opacity: source.opacity,
                 textureAsset: source.textureAsset,
                 texture: source.texture,

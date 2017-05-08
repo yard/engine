@@ -2,12 +2,13 @@
 
 # HOW TO CONTRIBUTE
 
-1. Start a conversation in [Issues](https://github.com/playcanvas/engine/issues) to get help and advice from community on PR ideas.
-2. Read the coding standards below.
-3. Keep PR simple and focused - one PR per feature.
-4. Make a Pull Request.
-5. Complete the [Contributor License Agreement](https://docs.google.com/a/playcanvas.com/forms/d/1Ih69zQfJG-QDLIEpHr6CsaAs6fPORNOVnMv5nuo0cjk/viewform).
-6. Happy Days! :)
+1. Looking for ideas? Check out ["good first PR"](https://github.com/playcanvas/engine/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+PR%22) label.
+2. Or start a conversation in [Issues](https://github.com/playcanvas/engine/issues) to get help and advice from community on PR ideas.
+3. Read the coding standards below.
+4. Keep PR simple and focused - one PR per feature.
+5. Make a Pull Request.
+6. Complete the [Contributor License Agreement](https://docs.google.com/a/playcanvas.com/forms/d/1Ih69zQfJG-QDLIEpHr6CsaAs6fPORNOVnMv5nuo0cjk/viewform).
+7. Happy Days! :)
 
 #### Tips
 
@@ -15,7 +16,7 @@ Feel free to contribute bug fixes or documentation fixes as pull request.
 
 If you are looking for ideas what to work on, head to [Issues](https://github.com/playcanvas/engine/issues) and checkout out open tickets or start a conversation. It is best to start conversation if you are going to make major changes to the engine or add significant features to get advice on how to approach it. [Forum](http://forum.playcanvas.com/) is good place to have a chat with community as well.
 
-Try to keep PR focused on a single feature, small PR's are easier to review and will get merged faster. Too large PR's are better be breaken into smaller ones so they can be merged and tested on its own.
+Try to keep PR focused on a single feature, small PR's are easier to review and will get merged faster. Too large PR's are better be broken into smaller ones so they can be merged and tested on its own.
 
 # CODING STANDARDS
 

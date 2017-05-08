@@ -348,14 +348,14 @@ pc.extend(pc, function () {
         Object.defineProperty(StandardMaterial.prototype, privMapUv.substring(1), {
             get: function() { return this[privMapUv]; },
             set: function (value) {
-                this.dirtyShader = this[privMapUv] != value;
+                if (this[privMapUv] !== value) this.dirtyShader = true;
                 this[privMapUv] = value;
             }
         });
         Object.defineProperty(StandardMaterial.prototype, privMapChannel.substring(1), {
             get: function() { return this[privMapChannel]; },
             set: function (value) {
-                this.dirtyShader = this[privMapChannel] != value;
+                if (this[privMapChannel] !== value) this.dirtyShader = true;
                 this[privMapChannel] = value;
             }
         });
@@ -510,7 +510,7 @@ pc.extend(pc, function () {
         Object.defineProperty(StandardMaterial.prototype, name, {
             get: function() { return this[priv]; },
             set: function (value) {
-                this.dirtyShader = this[priv] != value;
+                if (this[priv] !== value) this.dirtyShader = true;
                 this[priv] = value;
             }
         });
@@ -849,7 +849,7 @@ pc.extend(pc, function () {
             return newID + 1;
         },
 
-        updateShader: function (device, scene, objDefs, staticLightList) {
+        updateShader: function (device, scene, objDefs, staticLightList, pass) {
             var i, c;
             if (!this._scene) {
                 this._scene = scene;
@@ -959,6 +959,7 @@ pc.extend(pc, function () {
                 emissiveTint:               emissiveTint,
                 opacityTint:                this.opacity!==1 && this.blendType!==pc.BLEND_NONE,
                 alphaTest:                  this.alphaTest > 0,
+                alphaToCoverage:            this.alphaToCoverage,
                 needsNormalFloat:           this.normalizeNormalMap,
 
                 sphereMap:                  !!this.sphereMap,
@@ -981,7 +982,6 @@ pc.extend(pc, function () {
                 shadingModel:               this.shadingModel,
                 fresnelModel:               this.fresnelModel,
                 packedNormal:               this.normalMap? (this.normalMap.format===pc.PIXELFORMAT_DXT5) : false,
-                shadowSampleType:           this.shadowSampleType,
                 forceFragmentPrecision:     this.forceFragmentPrecision,
                 fastTbn:                    this.fastTbn,
                 cubeMapProjection:          this.cubeMapProjection,
@@ -995,6 +995,11 @@ pc.extend(pc, function () {
                 useTexCubeLod:              useTexCubeLod,
                 msdf:                       !!this.msdfMap
             };
+
+            if (pass === pc.SHADER_FORWARDHDR) {
+                if (options.gamma) options.gamma = pc.GAMMA_SRGBHDR;
+                options.toneMap = pc.TONEMAP_LINEAR;
+            }
 
             var hasUv0 = false;
             var hasUv1 = false;
@@ -1010,7 +1015,7 @@ pc.extend(pc, function () {
                     options.lightMapChannel = "rgb";
                     options.lightMapUv = 1;
                     options.lightMapTransform = 0;
-                    options.lightMapWithoutAmbient = true;
+                    options.lightMapWithoutAmbient = !this.lightMap;
                     options.useRgbm = true;
                     if ((objDefs & pc.SHADERDEF_DIRLM) !== 0) {
                         options.dirLightMap = true;
@@ -1022,7 +1027,7 @@ pc.extend(pc, function () {
             }
 
             for (var p in pc._matTex2D) {
-                if (p==="opacity" && this.blendType===pc.BLEND_NONE && this.alphaTest===0.0) continue;
+                if (p==="opacity" && this.blendType===pc.BLEND_NONE && this.alphaTest===0.0 && !this.alphaToCoverage) continue;
                 var cname;
                 var mname = p + "Map";
                 var vname = mname + "VertexColor";
@@ -1068,6 +1073,9 @@ pc.extend(pc, function () {
                 options.lights = [];
             }
 
+            if (options.lights.length===0) {
+                options.noShadow = false;
+            }
 
             var library = device.getProgramLibrary();
             this.shader = library.getProgram('standard', options);
@@ -1152,7 +1160,6 @@ pc.extend(pc, function () {
         _defineFlag(obj, "shadingModel", pc.SPECULAR_BLINN);
         _defineFlag(obj, "fresnelModel", pc.FRESNEL_NONE);
         _defineFlag(obj, "cubeMapProjection", pc.CUBEPROJ_NONE);
-        _defineFlag(obj, "shadowSampleType", pc.SHADOWSAMPLE_PCF3X3);
         _defineFlag(obj, "customFragmentShader", null);
         _defineFlag(obj, "forceFragmentPrecision", null);
         _defineFlag(obj, "useFog", true);
