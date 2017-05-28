@@ -177,12 +177,17 @@ pc.extend(pc, function () {
 
         // this method overwrites GraphNode#sync and so operates in scope of the Entity.
         _sync: function () {
-            if (!this.dirtyLocal && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+            if (!this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
                 return;
             }
 
             var element = this.element;
             var parent = this.element._parent;
+
+            if (this.dirtyLocalEulerAngles) {
+                this.localRotation.setFromEulerAngles(this.localEulerAngles.x, this.localEulerAngles.y, this.localEulerAngles.z);
+                this.dirtyLocal = true;
+            }
 
             if (this.dirtyLocal) {
                 this.localTransform.setTRS(this.localPosition, this.localRotation, this.localScale);

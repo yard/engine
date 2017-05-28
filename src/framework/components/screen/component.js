@@ -215,6 +215,17 @@ pc.extend(pc, function () {
 
             this._width = w;
             this._height = h;
+            this.entity.dirtyLocal = true;
+            this.entity.dirtyWorld = true;
+
+            if (this.entity.parent && this.entity.parent.screen) {
+                var screen = this.entity.parent.screen;
+
+                this._screenMatrix = screen._screenMatrix.clone();
+                this._inverseScreenMatrix = screen._inverseScreenMatrix.clone();
+                this._width = screen._width;
+                this._height = screen._height;
+            }
         },
 
         _updateScale: function () {
@@ -358,8 +369,10 @@ pc.extend(pc, function () {
     Object.defineProperty(ScreenComponent.prototype, "referenceResolution", {
         set: function (value) {
             this._referenceResolution.set(value.x, value.y);
+
             this._updateScale();
             this._calcProjectionMatrix();
+
             this.fire("set:referenceresolution", this._resolution);
         },
         get: function () {

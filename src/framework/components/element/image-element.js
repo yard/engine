@@ -48,6 +48,7 @@ pc.extend(pc, function () {
         this._normals = [];
         this._uvs = [];
         this._indices = [];
+        this._colors = [];
 
         this._mesh = this._createMesh();
         this._node = new pc.GraphNode();
@@ -591,6 +592,10 @@ pc.extend(pc, function () {
 
             if (value) {
                 // default texture just uses emissive and opacity maps
+                this._meshInstance.setParameter("_MainTex", this._texture);
+                this._meshInstance.setParameter("_ScreenParams", [ 1000, 1000, 1, 1 ]);
+                this._meshInstance.setParameter("_Color", this._color.data);
+
                 this._meshInstance.setParameter("texture_emissiveMap", this._texture);
                 this._meshInstance.setParameter("texture_opacityMap", this._texture);
                 this._meshInstance.setParameter("material_emissive", this._color.data3);

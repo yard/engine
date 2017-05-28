@@ -2025,6 +2025,10 @@ pc.extend(pc, function () {
          * @param {Number} stream The stream index for the vertex buffer, indexed from 0 upwards.
          */
         setVertexBuffer: function (vertexBuffer, stream, vbOffset) {
+            if (vertexBuffer == null) {
+                return;
+            }
+
             if (this.vertexBuffers[stream] !== vertexBuffer || this.vbOffsets[stream] !== vbOffset) {
                 // Store the vertex buffer for this stream index
                 this.vertexBuffers[stream] = vertexBuffer;
