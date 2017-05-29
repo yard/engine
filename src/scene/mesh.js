@@ -138,7 +138,7 @@ pc.extend(pc, function () {
             if (!this._updateAabb) return this._aabb;
 
             if (this.skinInstance) {
-                var numBones = this.mesh.skin.boneNames.length;
+                var numBones = this.mesh.skin.boneNames.length + 5;
                 var i;
                 // Initialize local bone AABBs if needed
                 if (!this.mesh.boneAabb) {
