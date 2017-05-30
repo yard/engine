@@ -647,6 +647,19 @@ pc.extend(pc, (function () {
          */
         toString: function () {
             return "[" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "]";
+        },
+
+        /**
+         * @function
+         * @name pc.Quat#setLookAt
+         * @description Modifies the quaternion representing the rotation to look at the specified target.
+         * @returns {pc.Quat} The look rotation quaternion.
+         */
+        setLookAt: function (target, up) {
+            var m = new pc.Mat4().setLookAt(pc.Vec3.ZERO, target, up);
+            this.setFromMat4(m);
+
+            return this;
         }
     };
 

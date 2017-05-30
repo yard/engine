@@ -360,7 +360,7 @@ pc.extend(pc, function () {
      * @description Applies any changes made to the material's properties.
      */
     Material.prototype.update = function () {
-        throw Error("Not Implemented in base class");
+        //throw Error("Not Implemented in base class");
     };
 
     /**
