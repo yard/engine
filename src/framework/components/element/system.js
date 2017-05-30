@@ -61,13 +61,15 @@ pc.extend(pc, function () {
         this.defaultTextMaterial = new pc.StandardMaterial();
         this.defaultTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultTextMaterial.msdfMap = this._defaultTexture;
+        this.defaultTextMaterial.msdf = false;
+
         this.defaultTextMaterial.useLighting = false;
         this.defaultTextMaterial.useGammaTonemap = false;
         this.defaultTextMaterial.useFog = false;
         this.defaultTextMaterial.useSkybox = false;
         this.defaultTextMaterial.emissive = new pc.Color(1,1,1,1);
         this.defaultTextMaterial.opacity = 0.5;
-        this.defaultTextMaterial.blendType = pc.BLEND_PREMULTIPLIED;
+        this.defaultTextMaterial.blendType = pc.BLEND_NORMAL;
         this.defaultTextMaterial.depthWrite = false;
         this.defaultTextMaterial.update();
 
