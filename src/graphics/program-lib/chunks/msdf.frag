@@ -7,7 +7,8 @@ float median(float r, float g, float b) {
 vec4 applyMsdf(vec4 color) {
     //if (length(fwidth(vUv0)) < 1.) {
     // FIXME: temporary falling back to bitmap fonts all the time
-    return color * texture2D(texture_msdfMap, vUv0).a;
+    vec4 texColor = texture2D(texture_msdfMap, vUv0);
+    return texColor * color;
     //}
 
     vec3 sample = texture2D(texture_msdfMap, vUv0).rgb;
