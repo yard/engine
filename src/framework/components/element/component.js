@@ -120,27 +120,6 @@ pc.extend(pc, function () {
                 fail:  this._masked ? pc.STENCILOP_KEEP : pc.STENCILOP_REPLACE
             });
         },
-
-        // Updates children's stencil parameters to current value - 1 (if applyMask = true)
-        // or removes it. Effectively enables children to be masked by this element or
-        // removes this settings.
-        //
-        // _setMasksChildren: function(applyMask) {
-        //     this._masksChildren = applyMask;
-        //     var childStencilLayer = this._masksChildren ? (this._stencilLayer - 1) : this._stencilLayer;
-
-        //     var children = this.entity.getChildren();
-        //     for (var i = 0; i < children.length; i++) {
-        //         var element = children[i].element;
-
-        //         if (element) {
-        //             element._stencilLayer = childStencilLayer;
-        //             element._setMasksChildren( element._masksChildren );
-        //         }
-        //     }
-
-        //     this.fire("set:stencillayer", this._stencilLayer);
-        // },
  
         _patch: function () {
             this.entity.sync = this._sync;
@@ -197,14 +176,16 @@ pc.extend(pc, function () {
                 this._aabbVer++;
             }
 
-            var screen = this.element.screen;
+            var screen = this.element._findScreen();
             var rect = this.element._elementRect;
 
-            if (this._parent && this._parent.element) {
-                rect.x = this._parent.element._width  * this.element._anchor.x + this.element._corners.x,
-                rect.y = this._parent.element._height * this.element._anchor.y + this.element._corners.y,
-                rect.z = this._parent.element._width  * this.element._anchor.z + this.element._corners.z,
-                rect.w = this._parent.element._height * this.element._anchor.w + this.element._corners.w
+            var _parentWithElement = this.element._findParentElement();
+
+            if (_parentWithElement) {
+                rect.x = _parentWithElement.element._width  * this.element._anchor.x + this.element._corners.x,
+                rect.y = _parentWithElement.element._height * this.element._anchor.y + this.element._corners.y,
+                rect.z = _parentWithElement.element._width  * this.element._anchor.z + this.element._corners.z,
+                rect.w = _parentWithElement.element._height * this.element._anchor.w + this.element._corners.w
             } else if (screen) {
                 rect.x = screen.screen._width  * this.element._anchor.x + this.element._corners.x,
                 rect.y = screen.screen._height * this.element._anchor.y + this.element._corners.y,
@@ -252,10 +233,10 @@ pc.extend(pc, function () {
                     // ok, we have a parent. does it own an element?
                     // TODO: lookup up to the scene root would be more correct – what if there is a blank 
                     //       object between two elements?
-                    if (this._parent.element) {
+                    if (_parentWithElement) {
                         // our _screenToWorld starts off by offsetting current transform (which is parent's) by
                         // anchor offset – like we move the box to match the anchor settings first
-                        this.element._screenToWorld.mul2(this._parent.element._modelTransform, this.element._anchorTransform);
+                        this.element._screenToWorld.mul2(_parentWithElement.element._modelTransform, this.element._anchorTransform);
                     } else {
                         // no element means we start with plain anchoring transform
                         this.element._screenToWorld.copy(this.element._anchorTransform);
@@ -374,47 +355,6 @@ pc.extend(pc, function () {
             }
         },
 
-        // _updateSize: function () {
-        //     return;
-        //     if (this._sizeDirty && this._type === pc.ELEMENTTYPE_GROUP) {
-        //         var minX = 0;
-        //         var maxX = 0;
-        //         var minY = 0;
-        //         var maxY = 0;
-        //         var children = this.entity.getChildren();
-        //         var len = children.length;
-        //         if (len) {
-        //             for (var i = 0; i < len; i++) {
-        //                 var c = children[i];
-        //                 if (c.element) {
-        //                     var p = c.getLocalPosition();
-        //                     var pv = c.element.pivot;
-        //                     var w = c.element.width;
-        //                     var h = c.element.height;
-
-        //                     var l = p.x - w * pv.x;
-        //                     var r = p.x + w * (1-pv.x);
-        //                     var t = p.y + h * pv.y;
-        //                     var b = p.y - h * (1-pv.y);
-
-        //                     if (l < minX) minX = l;
-        //                     if (l > maxX) maxX = l;
-        //                     if (r < minX) minX = r;
-        //                     if (r > maxX) maxX = r;
-
-        //                     if (t < minY) minY = t;
-        //                     if (t > maxY) maxY = t;
-        //                     if (b < minY) minY = b;
-        //                     if (b > maxY) maxY = b;
-        //                 }
-        //             }
-        //             this.width = Math.max(Math.abs(minX), Math.abs(maxX))*2;
-        //             this.height = Math.max(Math.abs(minY), Math.abs(maxY))*2;
-        //         }
-        //     }
-        //     this._sizeDirty = false;
-        // },
-
         _updateScreen: function (screen, skipOrderUpdate) {
             if (this.screen && this.screen !== screen) {
                 this.screen.screen.off('set:resolution', this._onScreenResize, this);
@@ -453,13 +393,25 @@ pc.extend(pc, function () {
         },
 
         _findScreen: function () {
-            var screen = this.entity;//._parent;
+            var node = this.entity;
+            var screen = this.screen;
 
-            while(screen && !screen.screen) {
-                screen = screen._parent;
+            while (node) {
+                screen = node.screen || screen;
+                node = node._parent;
             }
 
-            return screen;
+            return screen ? screen.entity : null;
+        },
+
+        _findParentElement: function () {
+            var node = this.entity._parent;
+
+            while (node && !node.element) {
+                node = node._parent;
+            }
+
+            return node;
         },
 
         _onScreenResize: function (res) {

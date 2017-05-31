@@ -73,7 +73,7 @@ pc.extend(pc, function () {
                 var element = this.entity._children[i].element;
 
                 if (element) {
-                    element._updateScreen( this.entity, true );
+                    element._updateScreen( element._findScreen(), true );
                 }
             }
 
@@ -118,6 +118,11 @@ pc.extend(pc, function () {
         },
 
         syncDrawOrder: function () {
+            if (this.entity.parent && this.entity.parent.screen) { 
+                // parent screen will take care of setting drawing order
+                return this.entity.parent.screen.syncDrawOrder();
+            }
+
             var i = this.drawOrder;
 
             var recurse = function (e) {
