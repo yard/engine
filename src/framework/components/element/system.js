@@ -37,6 +37,7 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.useSkybox = false;
         this.defaultImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultImageMaterial.depthWrite = false;
+        this.defaultImageMaterial.renderQueue = 2000;
         this.defaultImageMaterial.update();
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
@@ -56,13 +57,14 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultScreenSpaceImageMaterial.depthTest = false;
         this.defaultScreenSpaceImageMaterial.depthWrite = false;
+        this.defaultScreenSpaceImageMaterial.renderQueue = 2000;
         this.defaultScreenSpaceImageMaterial.update();
 
         this.defaultTextMaterial = new pc.StandardMaterial();
         this.defaultTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultTextMaterial.msdfMap = this._defaultTexture;
         this.defaultTextMaterial.msdf = false;
-
+        this.defaultTextMaterial.renderQueue = 2000;
         this.defaultTextMaterial.useLighting = false;
         this.defaultTextMaterial.useGammaTonemap = false;
         this.defaultTextMaterial.useFog = false;
@@ -85,6 +87,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceTextMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultScreenSpaceTextMaterial.depthWrite = false;
         this.defaultScreenSpaceTextMaterial.depthTest = false;
+        this.defaultScreenSpaceTextMaterial.renderQueue = 2000;
         this.defaultScreenSpaceTextMaterial.update();
 
         this.on('beforeremove', this.onRemoveComponent, this);

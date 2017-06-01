@@ -118,12 +118,7 @@ pc.extend(pc, function () {
         },
 
         syncDrawOrder: function () {
-            if (this.entity.parent && this.entity.parent.screen) { 
-                // parent screen will take care of setting drawing order
-                return this.entity.parent.screen.syncDrawOrder();
-            }
-
-            var i = this.drawOrder;
+            var i = 0;
 
             var recurse = function (e) {
                 if (e.element) {
@@ -136,7 +131,7 @@ pc.extend(pc, function () {
                 }
             }
 
-            recurse(this.entity);
+            recurse(pc.Application.getApplication().root);
         },
 
         _calcProjectionMatrix: function () {

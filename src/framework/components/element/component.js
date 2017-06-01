@@ -176,7 +176,7 @@ pc.extend(pc, function () {
                 this._aabbVer++;
             }
 
-            var screen = this.element._findScreen();
+            var screen = this.element.screen;
             var rect = this.element._elementRect;
 
             var _parentWithElement = this.element._findParentElement();
@@ -363,7 +363,8 @@ pc.extend(pc, function () {
                 this.screen.screen.off('set:screentype', this._onScreenTypeChange, this);
             }
 
-            this.screen = screen;
+            this.screen = this._findScreen();
+
             if (this.screen) {
                 this.screen.screen.on('set:resolution', this._onScreenResize, this);
                 this.screen.screen.on('set:referenceresolution', this._onScreenResize, this);

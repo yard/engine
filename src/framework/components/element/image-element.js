@@ -132,28 +132,30 @@ pc.extend(pc, function () {
 
         _onDrawOrderChange: function (order) {
             this._drawOrder = order;
-
-            if (this._meshInstance) {
-                this._meshInstance.drawOrder = order;
-            }
-
             this._setLayerFromScreen();
         },
 
         _setLayerFromScreen: function () {
             if (!this._meshInstance) {
                 return;
-            } 
-
-            if (this._meshInstance.screenSpace) {
-                return this._meshInstance.layer = pc.scene.LAYER_HUD;
-            } 
-
-            if (this._element.screen) {
-                this._meshInstance.layer = this._element.screen.screen.layer;
-            } else {
-                this._meshInstance.layer = pc.scene.LAYER_WORLD;
             }
+            
+            if (this._element.screen) {
+                this._meshInstance.sortingLayerIndex = this._element.screen.screen.sortingLayerIndex;
+
+                if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
+                    this._meshInstance.sortingLayerIndex += 100;
+
+                    this._meshInstance.material.depthTest = false;
+                    this._meshInstance.material.depthWrite = false;
+
+                    this._meshInstance.material.update();
+                }
+
+                this._meshInstance.sortingOrder = this._element.screen.screen.sortingOrder;
+            }
+
+            this._meshInstance.drawOrder = this._drawOrder;
         },
 
         _updateMaterial: function (screenSpace) {
