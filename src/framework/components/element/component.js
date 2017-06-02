@@ -123,11 +123,13 @@ pc.extend(pc, function () {
  
         _patch: function () {
             this.entity.sync = this._sync;
+            this.entity.presync = this._presync;
             this.entity.setPosition = this._setPosition;
         },
 
         _unpatch: function () {
             this.entity.sync = pc.Entity.prototype.sync;
+            this.entity.presync = pc.Entity.prototype.presync;
             this.entity.setPosition = pc.Entity.prototype.setPosition;
         },
 
@@ -154,6 +156,20 @@ pc.extend(pc, function () {
             };
         }(),
 
+        _presync: function () {
+            if (!this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+                return;
+            }
+
+            if (this.element) {
+                var layoutElement = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutElement );
+                if (layoutElement != null) {
+                    layoutElement.calculateLayoutInputHorizontal();
+                    layoutElement.calculateLayoutInputVertical();
+                }
+            }
+        },
+
         // this method overwrites GraphNode#sync and so operates in scope of the Entity.
         _sync: function () {
             if (!this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
@@ -174,6 +190,12 @@ pc.extend(pc, function () {
                 this.dirtyLocal = false;
                 this.dirtyWorld = true;
                 this._aabbVer++;
+            }
+
+            var layoutController = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutController );
+            if (layoutController != null) {
+                layoutController.setLayoutHorizontal();
+                layoutController.setLayoutVertical();
             }
 
             var screen = this.element.screen;
