@@ -564,7 +564,7 @@ pc.extend(pc, function () {
             this._corners = value;
             this._cornerDirty = true;
 
-            this.entity.getWorldTransform();
+            // this.entity.getWorldTransform();
         }
     });
 
