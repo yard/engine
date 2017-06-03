@@ -1158,6 +1158,10 @@ pc.extend(pc, function () {
             return results;
         },
 
+        presync: function () {
+
+        },
+
         sync: function () {
             if (this.dirtyLocal) {
                 this.localTransform.setTRS(this.localPosition, this.localRotation, this.localScale);
@@ -1185,6 +1189,27 @@ pc.extend(pc, function () {
                 }
             }
         },
+
+        presyncHierarchy: (function () {
+            // cache this._children and the syncHierarchy method itself
+            // for optimization purposes
+            var F = function () {
+                if (!this._enabled) {
+                    return;
+                }
+
+                // presync the children
+                var c = this._children;
+                for(var i = 0, len = c.length;i < len;i++) {
+                    F.call(c[i]);
+                }
+
+                // presync this object
+                this.presync();
+            };
+
+            return F;
+       })(),
 
         /**
          * @function

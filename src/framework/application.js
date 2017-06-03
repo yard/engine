@@ -752,6 +752,7 @@ pc.extend(pc, function () {
             var camera = null;
             var renderer = this.renderer;
 
+            this.root.presyncHierarchy();
             this.root.syncHierarchy();
 
             // render the scene from each camera
