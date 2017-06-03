@@ -56,6 +56,7 @@ pc.extend(pc, function () {
         }
 
         pc.events.attach(this);
+
     };
     Entity = pc.inherits(Entity, pc.GraphNode);
 

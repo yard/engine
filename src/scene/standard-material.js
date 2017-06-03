@@ -368,6 +368,7 @@ pc.extend(pc, function () {
         });
 
         _propsSerial.push(privMap.substring(1));
+        _propsSerial.push(privMapBorders.substring(1));
         _propsSerial.push(privMapTiling.substring(1));
         _propsSerial.push(privMapOffset.substring(1));
         _propsSerial.push(privMapUv.substring(1));
@@ -579,7 +580,7 @@ pc.extend(pc, function () {
                 }
             }
 
-            if (! clone.shader)
+            if (!clone.shader)
                 clone.update();
 
             return clone;

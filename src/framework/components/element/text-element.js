@@ -98,6 +98,15 @@ pc.extend(pc, function () {
             this._element.off('set:stencillayer', this._onStencilLayerChange, this);
         },
 
+        update: function (dt) {
+            if (this.dirtyColor) {
+                this._meshInstance.setParameter("material_emissive", this._color.data3);
+                this._meshInstance.setParameter("material_opacity", this._color.data[3]);
+
+                this.dirtyColor = false;
+            }
+        },
+
         _onParentResize: function (width, height) {
             if (this._noResize) return;
             if (this._font) this._updateText(this._text);
@@ -256,10 +265,10 @@ pc.extend(pc, function () {
                 if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
                     this._meshInstance.sortingLayerIndex += 100;
 
-                    this._meshInstance.material.depthTest = false;
-                    this._meshInstance.material.depthWrite = false;
+                    // this._meshInstance.material.depthTest = false;
+                    // this._meshInstance.material.depthWrite = false;
 
-                    this._meshInstance.material.update();
+                    // this._meshInstance.material.update();
                 }
 
                 this._meshInstance.sortingOrder = this._element.screen.screen.sortingOrder;

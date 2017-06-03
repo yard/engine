@@ -54,6 +54,9 @@ pc.extend(pc, function () {
         this._corners = new pc.Vec4(0, 0, 0, 0);
         this._pivotGraph = new pc.Entity();
 
+        this._anchoredPosition = new pc.Vec2(0, 0);
+        this._sizeDelta = new pc.Vec2(0, 0);
+
         this.entity.addChild( this._pivotGraph );
 
         // the model transform used to render
@@ -154,9 +157,33 @@ pc.extend(pc, function () {
             };
         }(),
 
+        update: function (dt) {
+            if (this._image) {
+                this._image.update(dt);
+            }
+
+            if (this._text) {
+                this._text.update(dt);
+            }
+        },
+
+        _updateAnchoredPosition: function () {
+            this._anchoredPosition.set(
+                (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z,
+                (1.0 - this._pivot.y) * this._corners.y + this._pivot.y * this._corners.w
+            );
+        },
+
+        _updateSizeDelta: function () {
+            this._sizeDelta.set(
+                this._corners.z - this._corners.x,
+                this._corners.w - this._corners.y
+            );
+        },
+
         // this method overwrites GraphNode#sync and so operates in scope of the Entity.
         _sync: function () {
-            if (!this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+            if (!this.dirtyLocal && !this.element._sizeDeltaDirty && !this.element._anchoredPositionDirty && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
                 return;
             }
 
@@ -166,6 +193,7 @@ pc.extend(pc, function () {
             if (this.dirtyLocalEulerAngles) {
                 this.localRotation.setFromEulerAngles(this.localEulerAngles.x, this.localEulerAngles.y, this.localEulerAngles.z);
                 this.dirtyLocal = true;
+                this.dirtyLocalEulerAngles = false;
             }
 
             if (this.dirtyLocal) {
@@ -173,6 +201,41 @@ pc.extend(pc, function () {
 
                 this.dirtyLocal = false;
                 this.dirtyWorld = true;
+                this._aabbVer++;
+            }
+
+            if (this.element._anchoredPositionDirty) {
+                var eapX = (1.0 - this.element._pivot.x) * this.element._corners.x + this.element._pivot.x * this.element._corners.z;
+                var eapY = (1.0 - this.element._pivot.y) * this.element._corners.y + this.element._pivot.y * this.element._corners.w;
+
+                this.element._corners.set(
+                    this.element._corners.x + (this.element._anchoredPosition.x - eapX),
+                    this.element._corners.y + (this.element._anchoredPosition.y - eapY),
+                    this.element._corners.z + (this.element._anchoredPosition.x - eapX),
+                    this.element._corners.w + (this.element._anchoredPosition.y - eapY)
+                )
+
+                this.element._anchoredPositionDirty = false;
+
+                this.element._cornerDirty = true;
+                this.dirtyWorld = true;
+
+                this._aabbVer++;
+            }
+
+            if (this.element._sizeDeltaDirty) {
+                this.element._corners.set(
+                    this.element._anchoredPosition.x - this.element._pivot.x * this.element._sizeDelta.x,
+                    this.element._anchoredPosition.y - this.element._pivot.y * this.element._sizeDelta.y,
+                    this.element._anchoredPosition.x + this.element._pivot.x * this.element._sizeDelta.x,
+                    this.element._anchoredPosition.y + this.element._pivot.y * this.element._sizeDelta.y
+                )
+
+                this.element._sizeDeltaDirty = false;
+
+                this.element._cornerDirty = true;
+                this.dirtyWorld = true;
+
                 this._aabbVer++;
             }
 
@@ -202,6 +265,9 @@ pc.extend(pc, function () {
             } else {
                 return;
             }
+
+            this.element._updateAnchoredPosition();
+            this.element._updateSizeDelta();
 
             this.element._width = rect.z - rect.x;
             this.element._height = rect.w - rect.y;
@@ -542,6 +608,9 @@ pc.extend(pc, function () {
             this._corners = value;
             this._cornerDirty = true;
 
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
+
             this.entity.getWorldTransform();
         }
     });
@@ -600,6 +669,9 @@ pc.extend(pc, function () {
             this._corners.x = value;
             this._cornerDirty = true;
 
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
+
             this.entity.getWorldTransform();
         }
     });
@@ -617,6 +689,9 @@ pc.extend(pc, function () {
         set: function (value) {
             this._corners.z = value;
             this._cornerDirty = true;
+
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
 
             this.entity.getWorldTransform();
         }
@@ -636,6 +711,9 @@ pc.extend(pc, function () {
             this._corners.w = value;
             this._cornerDirty = true;
 
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
+
             this.entity.getWorldTransform();
         }
     });
@@ -653,6 +731,9 @@ pc.extend(pc, function () {
         set: function (value) {
             this._corners.y = value;
             this._cornerDirty = true;
+
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
 
             this.entity.getWorldTransform();
         }
@@ -680,6 +761,9 @@ pc.extend(pc, function () {
             } else {
                 this._pivot.set(value[0], value[1]);
             }
+
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
 
             this._onScreenResize();
             this.fire('set:pivot', this._pivot);
@@ -709,9 +793,34 @@ pc.extend(pc, function () {
                 this._anchor.set(value[0], value[1], value[2], value[3]);
             }
 
+            this._updateAnchoredPosition();
+            this._updateSizeDelta();
+
             this._anchorDirty = true;
             this.entity.dirtyWorld = true;
             this.fire('set:anchor', this._anchor);
+        }
+    });
+
+    Object.defineProperty(ElementComponent.prototype, "anchoredPosition", {
+        get: function () {
+            return this._anchoredPosition;
+        },
+
+        set: function (value) {
+            this._anchoredPosition.set( value.x, value.y );
+            this._anchoredPositionDirty = true;
+        }
+    });
+
+    Object.defineProperty(ElementComponent.prototype, "sizeDelta", {
+        get: function () {
+            return this._sizeDelta;
+        },
+
+        set: function (value) {
+            this._sizeDelta.set( value.x, value.y );
+            this._sizeDeltaDirty = true;
         }
     });
 

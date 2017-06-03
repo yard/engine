@@ -162,6 +162,7 @@ pc.extend(pc, function () {
 
             if (screenType == pc.SCREEN_TYPE_CAMERA) {
                 // camera case requires special consideration, however
+                //var camera = this.camera;
                 var camera = this.camera;
 
                 // first off, decide where the UI plane will end up in camera's sight
@@ -186,7 +187,7 @@ pc.extend(pc, function () {
                     clipSpaceToNearClipSpace.setTRS( pc.Vec3.ZERO, pc.Quat.IDENTITY, new pc.Vec3( nearClipHalfWidth, nearClipHalfHeight, 1 ) );
                 } else {
                     // we are in ortho camera
-                    clipSpaceToNearClipSpace.setTRS( pc.Vec3.ZERO, pc.Quat.IDENTITY, new pc.Vec3( camera.orthoHeight * w / h, camera.orthoHeight, 1 ) );
+                    clipSpaceToNearClipSpace.setTRS( pc.Vec3.ZERO, pc.Quat.IDENTITY, new pc.Vec3( camera.orthoHeight * w / h, camera.orthoHeight, 1 ) );    
                 }
 
                 // the clipOffset will be the transform to move from (0, 0, 0) onto the desired UI pane

@@ -16,14 +16,17 @@ pc.extend(pc, (function () {
             this.data[1] = v1;
             this.data[2] = v2;
             this.data[3] = v3;
+            
             this.data[4] = v4;
             this.data[5] = v5;
             this.data[6] = v6;
             this.data[7] = v7;
+
             this.data[8] = v8;
             this.data[9] = v9;
             this.data[10] = v10;
             this.data[11] = v11;
+            
             this.data[12] = v12;
             this.data[13] = v13;
             this.data[14] = v14;

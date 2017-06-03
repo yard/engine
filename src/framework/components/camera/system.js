@@ -17,7 +17,8 @@ pc.extend(pc, function () {
         'aspectRatio',
         'horizontalFov',
         'model',
-        'renderTarget'
+        'renderTarget',
+        'cullingMask'
     ];
 
     /**
@@ -71,7 +72,8 @@ pc.extend(pc, function () {
                 'clearDepthBuffer',
                 'clearStencilBuffer',
                 'frustumCulling',
-                'rect'
+                'rect',
+                'cullingMask'
             ];
 
             // duplicate data because we're modifying the data

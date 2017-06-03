@@ -70,6 +70,7 @@ pc.extend(pc, function () {
         this.on("set_rect", this.onSetRect, this);
         this.on("set_horizontalFov", this.onSetHorizontalFov, this);
         this.on("set_frustumCulling", this.onSetFrustumCulling, this);
+        this.on("set_cullingMask", this.onSetCullingMask, this);
     };
     CameraComponent = pc.inherits(CameraComponent, pc.Component);
 
@@ -200,6 +201,10 @@ pc.extend(pc, function () {
 
         onSetFov: function (name, oldValue, newValue) {
             this.data.camera.fov = newValue;
+        },
+
+        onSetCullingMask: function (name, oldValue, newValue) {
+            this.data.camera.cullingMask = newValue;
         },
 
         onSetOrthoHeight: function (name, oldValue, newValue) {

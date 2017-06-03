@@ -1,5 +1,11 @@
 pc.extend(pc, function () {
     var _schema = [ 'enabled' ];
+    var _defaultMapBorders = new pc.Mat4(
+        0, 0, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 1, 1
+    );
 
     /**
      * @name pc.ElementComponentSystem
@@ -19,7 +25,7 @@ pc.extend(pc, function () {
 
         this.schema = _schema;
 
-        this._defaultTexture = new pc.Texture(app.graphicsDevice, {width:4, height:4, format:pc.PIXELFORMAT_R8_G8_B8});
+        this._defaultTexture = new pc.Texture(app.graphicsDevice, {width:16, height:16, format:pc.PIXELFORMAT_R8_G8_B8});
 
         this.defaultImageMaterial = new pc.StandardMaterial();
         this.defaultImageMaterial.cull = pc.CULLFACE_NONE;
@@ -38,6 +44,9 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultImageMaterial.depthWrite = false;
         this.defaultImageMaterial.renderQueue = 2000;
+        this.defaultImageMaterial.emissiveMapBorders = _defaultMapBorders;
+        this.defaultImageMaterial.opacityMapBorders = _defaultMapBorders;
+        this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16);
         this.defaultImageMaterial.update();
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
@@ -58,6 +67,9 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.depthTest = false;
         this.defaultScreenSpaceImageMaterial.depthWrite = false;
         this.defaultScreenSpaceImageMaterial.renderQueue = 2000;
+        this.defaultScreenSpaceImageMaterial.emissiveMapBorders = _defaultMapBorders;
+        this.defaultScreenSpaceImageMaterial.opacityMapBorders = _defaultMapBorders;
+        this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16 | pc.SHADERDEF_SCREENSPACE );
         this.defaultScreenSpaceImageMaterial.update();
 
         this.defaultTextMaterial = new pc.StandardMaterial();
@@ -91,6 +103,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceTextMaterial.update();
 
         this.on('beforeremove', this.onRemoveComponent, this);
+        pc.ComponentSystem.on('update', this._onUpdate, this);
     };
     ElementComponentSystem = pc.inherits(ElementComponentSystem, pc.ComponentSystem);
 
@@ -217,7 +230,15 @@ pc.extend(pc, function () {
                 fontAsset: source.fontAsset,
                 font: source.font
             });
-        }
+        },
+
+        _onUpdate: function (dt) {
+            var components = this.store;
+
+            for (var id in components) {
+                if (components[id].entity.element.update) components[id].entity.element.update(dt);
+            }
+        },
     });
 
     return {

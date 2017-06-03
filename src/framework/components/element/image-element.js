@@ -1,5 +1,12 @@
 pc.extend(pc, function () {
 
+    var _defaultMapBorders = new pc.Mat4(
+        0, 0, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 1, 1
+    );
+
     /**
      * @name pc.ImageElement
      * @description Attaches image extension to an element.
@@ -34,6 +41,7 @@ pc.extend(pc, function () {
         this._material = null;
         this._masksChildren = false;
         this._alphaTest = 0.01;
+        this._ignoreMask = false;
 
         this._rect = new pc.Vec4(0,0,1,1); // x, y, w, h
         this._border = new pc.Vec4(0,0,0,0);
@@ -94,6 +102,15 @@ pc.extend(pc, function () {
             this._element.off('set:stencillayer', this._onStencilLayerChange, this);
         },
 
+        update: function (dt) {
+            if (this.dirtyColor) {
+                this._meshInstance.setParameter("material_emissive", this._color.data3);
+                this._meshInstance.setParameter("material_opacity", this._color.data[3]);
+
+                this.dirtyColor = false;
+            }
+        },
+
         _onResolutionChange: function (res) {
         },
 
@@ -145,11 +162,10 @@ pc.extend(pc, function () {
 
                 if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
                     this._meshInstance.sortingLayerIndex += 100;
+                    // this._meshInstance.material.depthTest = false;
+                    // this._meshInstance.material.depthWrite = false;
 
-                    this._meshInstance.material.depthTest = false;
-                    this._meshInstance.material.depthWrite = false;
-
-                    this._meshInstance.material.update();
+                    // this._meshInstance.material.update();
                 }
 
                 this._meshInstance.sortingOrder = this._element.screen.screen.sortingOrder;
@@ -160,7 +176,12 @@ pc.extend(pc, function () {
 
         _updateMaterial: function (screenSpace) {
             this._material.alphaTest = this._alphaTest;
-            this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
+
+            if (this._ignoreMask) {
+                this._material.stencilBack = this._material.stencilFront = null;
+            } else {
+                this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
+            }
 
             this._updateBorders();
 
@@ -233,23 +254,19 @@ pc.extend(pc, function () {
             var w = this._element.width;
             var h = this._element.height;
 
-            var bordersWereEmpty = !!this._material.emissiveMapBorders;
+            var mapBorders = _defaultMapBorders;
 
             if (this._texture) {
-                this._material.emissiveMapBorders = new pc.Mat4(
+                mapBorders = new pc.Mat4(
                     this._rect.x, (this._border.x / this._texture.width) + this._rect.x, (this._rect.z - this._border.z / this._texture.width) + this._rect.x, this._rect.x + this._rect.z,
                     this._rect.y, (this._border.y / this._texture.height) + this._rect.y, (this._rect.w - this._border.w / this._texture.height) + this._rect.y, this._rect.y + this._rect.w,
                     0, (this._border.x / w), (1 - this._border.z / w), 1,
                     0, (this._border.y / h), (1 - this._border.w / h), 1
                 );
-
-                this._material.opacityMapBorders = this._material.emissiveMapBorders;
-            } else {
-                this._material.emissiveMapBorders = null;
-                this._material.opacityMapBorders = null;
             }
 
-            this._material.update();
+            this._meshInstance.setParameter("emissiveMapBorders", mapBorders);
+            this._meshInstance.setParameter("opacityMapBorders", mapBorders);
         },
 
         _updateMesh: function (mesh) {
@@ -660,6 +677,19 @@ pc.extend(pc, function () {
                     this.texture = null;
                 }
             }
+        }
+    });
+
+    Object.defineProperty(ImageElement.prototype, "ignoreMask", {
+        get: function () {
+            return this._ignoreMask;
+        },
+
+        set: function (value) {
+            this._ignoreMask = value;
+
+            var screenSpace = this._element.screen ? (this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN) : false;
+            this._updateMaterial( screenSpace );
         }
     });
 
