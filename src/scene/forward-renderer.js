@@ -1170,7 +1170,15 @@ pc.extend(pc, function () {
                     drawCall = drawCalls[i];
                     if (!drawCall.visible && !drawCall.command) continue;
 
-                    var mask = drawCall.node.parent.constructor == pc.Entity ? drawCall.node.parent.cullingLayer : drawCall.node.parent.parent.cullingLayer;
+                    var mask =  0xFFFFFFFF; 
+                    
+                    if (drawCall.node.parent && drawCall.node.parent.constructor == pc.Entity) {
+                        mask = drawCall.node.parent.cullingLayer;
+                    }
+
+                    if (drawCall.node.parent && drawCall.node.parent.parent) {
+                        mask = drawCall.node.parent.parent.cullingLayer;
+                    }
 
                     // if the object's mask AND the camera's cullingMask is zero then the game object will be invisible from the camera
                     if (mask && (mask & cullingMask) === 0) continue;
