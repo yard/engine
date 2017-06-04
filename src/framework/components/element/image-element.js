@@ -62,7 +62,10 @@ pc.extend(pc, function () {
         this._node = new pc.GraphNode();
         this._model = new pc.Model();
         this._model.graph = this._node;
+        
         this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
+        this._meshInstance.preRender = Bridge.fn.bind(this, this._onPreRender);
+
         this._model.meshInstances.push(this._meshInstance);
         this._drawOrder = 0;
 
@@ -112,6 +115,9 @@ pc.extend(pc, function () {
         },
 
         _onResolutionChange: function (res) {
+        },
+
+        _onPreRender: function () {
         },
 
         _onParentResize: function () {
@@ -185,11 +191,12 @@ pc.extend(pc, function () {
 
             this._updateBorders();
 
-            this._material.update();
+            //this._material.update();
 
             if (this._meshInstance) {
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
+                this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
             }
 
             this._setLayerFromScreen();
@@ -537,7 +544,7 @@ pc.extend(pc, function () {
             this._material = value;
             if (value) {
                 this._meshInstance.material = value;
-
+                
                 // if we are back to the default material
                 // and we have no texture then reset color properties
                 if (value === this._system.defaultScreenSpaceImageMaterial || value === this._system.defaultImageMaterial) {

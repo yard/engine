@@ -142,6 +142,9 @@ pc.extend(pc, function () {
             this._setLayerFromScreen();
         },
 
+        _onPreRender: function () {
+        },
+
         _updateText: function (text) {
             if (!this._font) {
                 return;
@@ -179,6 +182,7 @@ pc.extend(pc, function () {
                 this._model = new pc.Model();
                 this._model.graph = this._node;
                 this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
+                this._meshInstance.preRender = Bridge.fn.bind(this, this._onPreRender);
                 this._model.meshInstances.push(this._meshInstance);
 
                 this._meshInstance.drawOrder = this._drawOrder;
@@ -281,11 +285,12 @@ pc.extend(pc, function () {
             this._material = this._textMaterial;
 
             this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
-            this._material.update();
+            //this._material.update();
 
             if (this._meshInstance) {
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
+                this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
             }
 
             this._setLayerFromScreen();

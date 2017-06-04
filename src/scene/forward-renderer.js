@@ -2050,6 +2050,11 @@ pc.extend(pc, function () {
                         }
                     }
 
+                    // Pre-render callback
+                    if (drawCall.preRender) {
+                        drawCall.preRender();
+                    }
+
                     // Uniforms II: meshInstance overrides
                     parameters = drawCall.parameters;
                     for (paramName in parameters) {
