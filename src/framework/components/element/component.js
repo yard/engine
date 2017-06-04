@@ -220,6 +220,12 @@ pc.extend(pc, function () {
                 this._aabbVer++;
             }
 
+            var layoutController = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutController );
+            if (layoutController != null) {
+                layoutController.setLayoutHorizontal();
+                layoutController.setLayoutVertical();
+            }
+
             if (this.element._anchoredPositionDirty) {
                 var eapX = (1.0 - this.element._pivot.x) * this.element._corners.x + this.element._pivot.x * this.element._corners.z;
                 var eapY = (1.0 - this.element._pivot.y) * this.element._corners.y + this.element._pivot.y * this.element._corners.w;
@@ -243,8 +249,8 @@ pc.extend(pc, function () {
                 this.element._corners.set(
                     this.element._anchoredPosition.x - this.element._pivot.x * this.element._sizeDelta.x,
                     this.element._anchoredPosition.y - this.element._pivot.y * this.element._sizeDelta.y,
-                    this.element._anchoredPosition.x + this.element._pivot.x * this.element._sizeDelta.x,
-                    this.element._anchoredPosition.y + this.element._pivot.y * this.element._sizeDelta.y
+                    this.element._anchoredPosition.x + (1 - this.element._pivot.x) * this.element._sizeDelta.x,
+                    this.element._anchoredPosition.y + (1 - this.element._pivot.y) * this.element._sizeDelta.y
                 )
 
                 this.element._sizeDeltaDirty = false;
@@ -253,12 +259,6 @@ pc.extend(pc, function () {
                 this.dirtyWorld = true;
 
                 this._aabbVer++;
-            }
-
-            var layoutController = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutController );
-            if (layoutController != null) {
-                layoutController.setLayoutHorizontal();
-                layoutController.setLayoutVertical();
             }
 
             var screen = this.element.screen;
@@ -833,6 +833,16 @@ pc.extend(pc, function () {
             this._anchoredPosition.set( value.x, value.y );
             this._anchoredPositionDirty = true;
             this.entity.dirtyWorld = true;
+
+            var eapX = (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z;
+            var eapY = (1.0 - this._pivot.y) * this._corners.y + this._pivot.y * this._corners.w;
+
+            this._corners.set(
+                this._corners.x + (this._anchoredPosition.x - eapX),
+                this._corners.y + (this._anchoredPosition.y - eapY),
+                this._corners.z + (this._anchoredPosition.x - eapX),
+                this._corners.w + (this._anchoredPosition.y - eapY)
+            )
         }
     });
 
