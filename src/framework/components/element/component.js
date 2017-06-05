@@ -159,16 +159,6 @@ pc.extend(pc, function () {
             };
         }(),
 
-        update: function (dt) {
-            if (this._image) {
-                this._image.update(dt);
-            }
-
-            if (this._text) {
-                this._text.update(dt);
-            }
-        },
-
         _updateAnchoredPosition: function () {
             this._anchoredPosition.set(
                 (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z,
@@ -831,8 +821,6 @@ pc.extend(pc, function () {
 
         set: function (value) {
             this._anchoredPosition.set( value.x, value.y );
-            this._anchoredPositionDirty = true;
-            this.entity.dirtyWorld = true;
 
             var eapX = (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z;
             var eapY = (1.0 - this._pivot.y) * this._corners.y + this._pivot.y * this._corners.w;
@@ -842,7 +830,10 @@ pc.extend(pc, function () {
                 this._corners.y + (this._anchoredPosition.y - eapY),
                 this._corners.z + (this._anchoredPosition.x - eapX),
                 this._corners.w + (this._anchoredPosition.y - eapY)
-            )
+            );
+
+            this.entity.dirtyWorld = true;
+            this._cornerDirty = true;
         }
     });
 
@@ -853,8 +844,16 @@ pc.extend(pc, function () {
 
         set: function (value) {
             this._sizeDelta.set( value.x, value.y );
-            this._sizeDeltaDirty = true;
+
+            this._corners.set(
+                this._anchoredPosition.x - this._pivot.x * this._sizeDelta.x,
+                this._anchoredPosition.y - this._pivot.y * this._sizeDelta.y,
+                this._anchoredPosition.x + (1 - this._pivot.x) * this._sizeDelta.x,
+                this._anchoredPosition.y + (1 - this._pivot.y) * this._sizeDelta.y
+            )
+
             this.entity.dirtyWorld = true;
+            this._cornerDirty = true;
         }
     });
 

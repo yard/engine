@@ -2060,7 +2060,7 @@ pc.extend(pc, function () {
 
                     // Pre-render callback
                     if (drawCall.preRender) {
-                        drawCall.preRender();
+                        drawCall.preRender._onPreRender();
                     }
 
                     // Uniforms II: meshInstance overrides

@@ -103,7 +103,6 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceTextMaterial.update();
 
         this.on('beforeremove', this.onRemoveComponent, this);
-        pc.ComponentSystem.on('update', this._onUpdate, this);
     };
     ElementComponentSystem = pc.inherits(ElementComponentSystem, pc.ComponentSystem);
 

@@ -98,15 +98,6 @@ pc.extend(pc, function () {
             this._element.off('set:stencillayer', this._onStencilLayerChange, this);
         },
 
-        update: function (dt) {
-            if (this.dirtyColor) {
-                this._meshInstance.setParameter("material_emissive", this._color.data3);
-                this._meshInstance.setParameter("material_opacity", this._color.data[3]);
-
-                this.dirtyColor = false;
-            }
-        },
-
         _onParentResize: function (width, height) {
             if (this._noResize) return;
             if (this._font) this._updateText(this._text);
@@ -182,7 +173,8 @@ pc.extend(pc, function () {
                 this._model = new pc.Model();
                 this._model.graph = this._node;
                 this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
-                this._meshInstance.preRender = Bridge.fn.bind(this, this._onPreRender);
+                this._meshInstance.preRender = this;
+
                 this._model.meshInstances.push(this._meshInstance);
 
                 this._meshInstance.drawOrder = this._drawOrder;

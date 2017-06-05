@@ -64,7 +64,7 @@ pc.extend(pc, function () {
         this._model.graph = this._node;
         
         this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
-        this._meshInstance.preRender = Bridge.fn.bind(this, this._onPreRender);
+        this._meshInstance.preRender = this;
 
         this._model.meshInstances.push(this._meshInstance);
         this._drawOrder = 0;
@@ -103,15 +103,6 @@ pc.extend(pc, function () {
             this._element.off('set:draworder', this._onDrawOrderChange, this);
             this._element.off('screen:set:resolution', this._onResolutionChange, this);
             this._element.off('set:stencillayer', this._onStencilLayerChange, this);
-        },
-
-        update: function (dt) {
-            if (this.dirtyColor) {
-                this._meshInstance.setParameter("material_emissive", this._color.data3);
-                this._meshInstance.setParameter("material_opacity", this._color.data[3]);
-
-                this.dirtyColor = false;
-            }
         },
 
         _onResolutionChange: function (res) {
