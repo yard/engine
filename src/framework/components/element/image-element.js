@@ -49,7 +49,7 @@ pc.extend(pc, function () {
         this._color = new pc.Color(1,1,1,1);
 
         // clone material to safely modify the settings for this instance
-        this._material = this._system.defaultImageMaterial.clone();
+        this._material = this._system.defaultImageMaterial;
 
         // private
         this._positions = [];
@@ -65,6 +65,7 @@ pc.extend(pc, function () {
         
         this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
         this._meshInstance.preRender = this;
+        this._onStencilLayerChange();
 
         this._model.meshInstances.push(this._meshInstance);
         this._drawOrder = 0;
@@ -125,10 +126,15 @@ pc.extend(pc, function () {
         },
 
         _onStencilLayerChange: function(value) {
-            if (this._element.screen) {
-                this._updateMaterial(this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
-            } else {
-                this._updateMaterial(false);
+            if (this._meshInstance) {
+                if (this._ignoreMask) {
+                    this._meshInstance.stencilBack = null;
+                    this._meshInstance.stencilFront = null;
+                } else {
+                    var stencil = this._element._getStencilParameters();
+                    this._meshInstance.stencilBack = stencil;
+                    this._meshInstance.stencilFront = stencil;
+                }
             }
         },
 
@@ -174,15 +180,7 @@ pc.extend(pc, function () {
         _updateMaterial: function (screenSpace) {
             this._material.alphaTest = this._alphaTest;
 
-            if (this._ignoreMask) {
-                this._material.stencilBack = this._material.stencilFront = null;
-            } else {
-                this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
-            }
-
             this._updateBorders();
-
-            //this._material.update();
 
             if (this._meshInstance) {
                 this._meshInstance.material = this._material;
@@ -190,6 +188,7 @@ pc.extend(pc, function () {
                 this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
             }
 
+            this._onStencilLayerChange();
             this._setLayerFromScreen();
         },
 

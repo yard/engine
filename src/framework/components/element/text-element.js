@@ -55,7 +55,7 @@ pc.extend(pc, function () {
         this.width = 0;
         this.height = 0;
 
-        this._textMaterial = this._system.defaultTextMaterial.clone();
+        this._textMaterial = this._system.defaultTextMaterial;
 
         // private
         this._node = new pc.GraphNode();
@@ -104,10 +104,11 @@ pc.extend(pc, function () {
         },
 
         _onStencilLayerChange: function(value) {
-            if (this._element.screen) {
-                this._updateMaterial(this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
-            } else {
-                this._updateMaterial(false);
+            if (this._meshInstance) {
+                var stencil = this._element._getStencilParameters();;
+
+                this._meshInstance.stencilBack = stencil;
+                this._meshInstance.stencilFront = stencil;
             }
         },
 
@@ -172,8 +173,10 @@ pc.extend(pc, function () {
 
                 this._model = new pc.Model();
                 this._model.graph = this._node;
+
                 this._meshInstance = new pc.MeshInstance(this._node, this._mesh, this._material);
                 this._meshInstance.preRender = this;
+                this._onStencilLayerChange();
 
                 this._model.meshInstances.push(this._meshInstance);
 
@@ -260,11 +263,6 @@ pc.extend(pc, function () {
 
                 if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
                     this._meshInstance.sortingLayerIndex += 100;
-
-                    // this._meshInstance.material.depthTest = false;
-                    // this._meshInstance.material.depthWrite = false;
-
-                    // this._meshInstance.material.update();
                 }
 
                 this._meshInstance.sortingOrder = this._element.screen.screen.sortingOrder;
@@ -276,15 +274,13 @@ pc.extend(pc, function () {
         _updateMaterial: function (screenSpace) {
             this._material = this._textMaterial;
 
-            this._material.stencilBack = this._material.stencilFront = this._element._getStencilParameters();
-            //this._material.update();
-
             if (this._meshInstance) {
                 this._meshInstance.material = this._material;
                 this._meshInstance.screenSpace = screenSpace;
                 this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
             }
 
+            this._onStencilLayerChange();
             this._setLayerFromScreen();
         },
 

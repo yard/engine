@@ -1908,6 +1908,39 @@ pc.extend(pc, function () {
             // #endif
         },
 
+        setStencilState: function (device, stencilBack, stencilFront) {
+            if (stencilFront || stencilBack) {
+                device.setStencilTest(true);
+                if (stencilFront===stencilBack) {
+                    // identical front/back stencil
+                    device.setStencilFunc(stencilFront.func, stencilFront.ref, stencilFront.mask);
+                    device.setStencilOperation(stencilFront.fail, stencilFront.zfail, stencilFront.zpass);
+                } else {
+                    // separate
+                    if (stencilFront) {
+                        // set front
+                        device.setStencilFuncFront(stencilFront.func, stencilFront.ref, stencilFront.mask);
+                        device.setStencilOperationFront(stencilFront.fail, stencilFront.zfail, stencilFront.zpass);
+                    } else {
+                        // default front
+                        device.setStencilFuncFront(pc.FUNC_ALWAYS, 0, 0xFF);
+                        device.setStencilOperationFront(pc.STENCILOP_KEEP, pc.STENCILOP_KEEP, pc.STENCILOP_KEEP);
+                    }
+                    if (stencilBack) {
+                        // set back
+                        device.setStencilFuncBack(stencilBack.func, stencilBack.ref, stencilBack.mask);
+                        device.setStencilOperationBack(stencilBack.fail, stencilBack.zfail, stencilBack.zpass);
+                    } else {
+                        // default back
+                        device.setStencilFuncBack(pc.FUNC_ALWAYS, 0, 0xFF);
+                        device.setStencilOperationBack(pc.STENCILOP_KEEP, pc.STENCILOP_KEEP, pc.STENCILOP_KEEP);
+                    }
+                }
+            } else {
+                device.setStencilTest(false);
+            }
+        },
+
         renderForward: function(device, camera, drawCalls, scene) {
             var drawCallsCount = drawCalls.length;
             var vrDisplay = camera.vrDisplay;
@@ -2024,39 +2057,9 @@ pc.extend(pc, function () {
                         device.setCullMode(material.cull);
                         device.setDepthWrite(material.depthWrite);
                         device.setDepthTest(material.depthTest);
-                        stencilFront = material.stencilFront;
-                        stencilBack = material.stencilBack;
-                        if (stencilFront || stencilBack) {
-                            device.setStencilTest(true);
-                            if (stencilFront===stencilBack) {
-                                // identical front/back stencil
-                                device.setStencilFunc(stencilFront.func, stencilFront.ref, stencilFront.mask);
-                                device.setStencilOperation(stencilFront.fail, stencilFront.zfail, stencilFront.zpass);
-                            } else {
-                                // separate
-                                if (stencilFront) {
-                                    // set front
-                                    device.setStencilFuncFront(stencilFront.func, stencilFront.ref, stencilFront.mask);
-                                    device.setStencilOperationFront(stencilFront.fail, stencilFront.zfail, stencilFront.zpass);
-                                } else {
-                                    // default front
-                                    device.setStencilFuncFront(pc.FUNC_ALWAYS, 0, 0xFF);
-                                    device.setStencilOperationFront(pc.STENCILOP_KEEP, pc.STENCILOP_KEEP, pc.STENCILOP_KEEP);
-                                }
-                                if (stencilBack) {
-                                    // set back
-                                    device.setStencilFuncBack(stencilBack.func, stencilBack.ref, stencilBack.mask);
-                                    device.setStencilOperationBack(stencilBack.fail, stencilBack.zfail, stencilBack.zpass);
-                                } else {
-                                    // default back
-                                    device.setStencilFuncBack(pc.FUNC_ALWAYS, 0, 0xFF);
-                                    device.setStencilOperationBack(pc.STENCILOP_KEEP, pc.STENCILOP_KEEP, pc.STENCILOP_KEEP);
-                                }
-                            }
-                        } else {
-                            device.setStencilTest(false);
-                        }
                     }
+
+                    this.setStencilState( device, drawCall.stencilBack || material.stencilBack, drawCall.stencilFront || material.stencilFront );
 
                     // Pre-render callback
                     if (drawCall.preRender) {

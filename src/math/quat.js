@@ -656,7 +656,7 @@ pc.extend(pc, (function () {
          * @returns {pc.Quat} The look rotation quaternion.
          */
         setLookAt: function (target, up) {
-            var m = new pc.Mat4().setLookAt(pc.Vec3.ZERO, target, up);
+            var m = new pc.Mat4().setLookAt(pc.Vec3.ZERO, target.clone().scale(-1), up);
             this.setFromMat4(m);
 
             return this;

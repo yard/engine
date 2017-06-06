@@ -256,6 +256,10 @@ pc.extend(pc, function () {
             return this._material;
         },
         set: function (material) {
+            if (material == this._material) {
+                return;
+            }
+
             var i;
             for(i=0; i<this._shader.length; i++) {
                 this._shader[i] = null;
