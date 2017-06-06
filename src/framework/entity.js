@@ -55,6 +55,10 @@ pc.extend(pc, function () {
             }
         }
 
+        // UnityEngine.UI fields
+        this._layoutElements = [];
+        this._layoutControllers = [];
+
         pc.events.attach(this);
 
     };

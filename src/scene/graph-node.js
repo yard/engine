@@ -773,6 +773,10 @@ pc.extend(pc, function () {
          */
         setLocalPosition: function (x, y, z) {
             if (x instanceof pc.Vec3) {
+                if (x.x == this.localPosition.x && x.y == this.localPosition.y && x.z == this.localPosition.z) {
+                    return;
+                }
+
                 this.localPosition.copy(x);
             } else {
                 this.localPosition.set(x, y, z);
@@ -802,6 +806,10 @@ pc.extend(pc, function () {
          */
         setLocalRotation: function (x, y, z, w) {
             if (x instanceof pc.Quat) {
+                if (x.x == this.localRotation.x && x.y == this.localRotation.y && x.z == this.localRotation.z && x.w == this.localRotation.w) {
+                    return;
+                }
+
                 this.localRotation.copy(x);
             } else {
                 this.localRotation.set(x, y, z, w);

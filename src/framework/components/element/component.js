@@ -179,7 +179,7 @@ pc.extend(pc, function () {
             }
 
             if (this.element) {
-                var layoutElement = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutElement );
+                var layoutElement = this._layoutElements[ 0 ];
                 if (layoutElement != null) {
                     layoutElement.calculateLayoutInputHorizontal();
                     layoutElement.calculateLayoutInputVertical();
@@ -210,7 +210,7 @@ pc.extend(pc, function () {
                 this._aabbVer++;
             }
 
-            var layoutController = UnityEngine.Object.fromHandle( UnityEngine.GameObject, this ).getComponent( UnityEngine.UI.ILayoutController );
+            var layoutController = this._layoutControllers[ 0 ];
             if (layoutController != null) {
                 layoutController.setLayoutHorizontal();
                 layoutController.setLayoutVertical();
@@ -824,6 +824,10 @@ pc.extend(pc, function () {
 
             var eapX = (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z;
             var eapY = (1.0 - this._pivot.y) * this._corners.y + this._pivot.y * this._corners.w;
+
+            if (eapX == this._anchoredPosition.x && eapY == this._anchoredPosition.y) {
+                return;
+            }
 
             this._corners.set(
                 this._corners.x + (this._anchoredPosition.x - eapX),
