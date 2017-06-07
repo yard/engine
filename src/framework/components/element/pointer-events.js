@@ -143,6 +143,10 @@ pc.extend(pc, function() {
 
         // Mouse-specific event handler.
         _onMouseDown: function(mouseEvent) {
+            if (this.entity.parent && this.entity.parent.screen) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -152,6 +156,10 @@ pc.extend(pc, function() {
 
         // Mouse-specific event handler.
         _onMouseUp: function(mouseEvent) {
+            if (this.entity.parent && this.entity.parent.screen) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -161,6 +169,10 @@ pc.extend(pc, function() {
 
         // Mouse-specific event handler.
         _onMouseMove: function(mouseEvent) {
+            if (this.entity.parent && this.entity.parent.screen) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
