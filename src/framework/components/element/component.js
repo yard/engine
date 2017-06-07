@@ -174,7 +174,7 @@ pc.extend(pc, function () {
         },
 
         _presync: function () {
-            if (!this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+            if (!this.dirtyLocal && !this.element._sizeDeltaDirty && !this.element._anchoredPositionDirty && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
                 return;
             }
 
@@ -184,6 +184,25 @@ pc.extend(pc, function () {
                     layoutElement.calculateLayoutInputHorizontal();
                     layoutElement.calculateLayoutInputVertical();
                 }
+            }
+        },
+
+        _updateElementRect: function (container) {
+            if (!container) {
+                var parentElement = this._findParentElement();
+
+                if (parentElement) {
+                    container = parentElement.element;
+                } else if (this.screen) {
+                    container = this.screen.screen;
+                }
+            }
+            
+            if (container) {
+                this._elementRect.x = container._width  * this._anchor.x + this._corners.x;
+                this._elementRect.y = container._height * this._anchor.y + this._corners.y;
+                this._elementRect.z = container._width  * this._anchor.z + this._corners.z;
+                this._elementRect.w = container._height * this._anchor.w + this._corners.w;
             }
         },
 
@@ -208,12 +227,6 @@ pc.extend(pc, function () {
                 this.dirtyLocal = false;
                 this.dirtyWorld = true;
                 this._aabbVer++;
-            }
-
-            var layoutController = this._layoutControllers[ 0 ];
-            if (layoutController != null) {
-                layoutController.setLayoutHorizontal();
-                layoutController.setLayoutVertical();
             }
 
             if (this.element._anchoredPositionDirty) {
@@ -252,34 +265,23 @@ pc.extend(pc, function () {
             }
 
             var screen = this.element.screen;
-            var rect = this.element._elementRect;
-
             var _parentWithElement = this.element._findParentElement();
 
-            if (_parentWithElement) {
-                rect.x = _parentWithElement.element._width  * this.element._anchor.x + this.element._corners.x,
-                rect.y = _parentWithElement.element._height * this.element._anchor.y + this.element._corners.y,
-                rect.z = _parentWithElement.element._width  * this.element._anchor.z + this.element._corners.z,
-                rect.w = _parentWithElement.element._height * this.element._anchor.w + this.element._corners.w
-            } else if (screen) {
-                rect.x = screen.screen._width  * this.element._anchor.x + this.element._corners.x,
-                rect.y = screen.screen._height * this.element._anchor.y + this.element._corners.y,
-                rect.z = screen.screen._width  * this.element._anchor.z + this.element._corners.z,
-                rect.w = screen.screen._height * this.element._anchor.w + this.element._corners.w
-
-                // if (screen.screen.pivot) {
-                //     rect.x += screen.screen.pivot.x;
-                //     rect.z += screen.screen.pivot.x;
-
-                //     rect.y += screen.screen.pivot.y;
-                //     rect.w += screen.screen.pivot.y;
-                // }
-            } else {
+            if (!_parentWithElement && !screen) {
                 return;
             }
 
+            var rect = this.element._elementRect;
+
+            this.element._updateElementRect();
             this.element._updateAnchoredPosition();
             this.element._updateSizeDelta();
+
+            var layoutController = this._layoutControllers[ 0 ];
+            if (layoutController != null) {
+                layoutController.setLayoutHorizontal();
+                layoutController.setLayoutVertical();
+            }
 
             this.element._width = rect.z - rect.x;
             this.element._height = rect.w - rect.y;
@@ -807,6 +809,7 @@ pc.extend(pc, function () {
 
             this._updateAnchoredPosition();
             this._updateSizeDelta();
+            this._updateElementRect();
 
             this._anchorDirty = true;
             this.entity.dirtyWorld = true;
@@ -836,6 +839,8 @@ pc.extend(pc, function () {
                 this._corners.w + (this._anchoredPosition.y - eapY)
             );
 
+            this._updateElementRect();
+
             this.entity.dirtyWorld = true;
             this._cornerDirty = true;
         }
@@ -849,12 +854,21 @@ pc.extend(pc, function () {
         set: function (value) {
             this._sizeDelta.set( value.x, value.y );
 
+            var esdX = this._corners.z - this._corners.x;
+            var esdY = this._corners.w - this._corners.y;
+
+            if (esdX == this._sizeDelta.x && esdY == this._sizeDelta.y) {
+                return;
+            }
+
             this._corners.set(
                 this._anchoredPosition.x - this._pivot.x * this._sizeDelta.x,
                 this._anchoredPosition.y - this._pivot.y * this._sizeDelta.y,
                 this._anchoredPosition.x + (1 - this._pivot.x) * this._sizeDelta.x,
                 this._anchoredPosition.y + (1 - this._pivot.y) * this._sizeDelta.y
             )
+
+            this._updateElementRect();
 
             this.entity.dirtyWorld = true;
             this._cornerDirty = true;
