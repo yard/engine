@@ -179,10 +179,12 @@ pc.extend(pc, function () {
             }
 
             if (this.element) {
-                var layoutElement = this._layoutElements[ 0 ];
-                if (layoutElement != null) {
-                    layoutElement.calculateLayoutInputHorizontal();
-                    layoutElement.calculateLayoutInputVertical();
+                for (var i = 0; i < this._layoutElements.length; i++) {
+                    var layoutElement = this._layoutElements[ i ];
+                    if (layoutElement != null) {
+                        layoutElement.calculateLayoutInputHorizontal();
+                        layoutElement.calculateLayoutInputVertical();
+                    }
                 }
             }
         },
