@@ -685,6 +685,10 @@ pc.extend(pc, function () {
         set: function (value) {
             this._ignoreMask = value;
 
+            if (value) {
+                this.alphaTest = 0;
+            }
+
             var screenSpace = this._element.screen ? (this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN) : false;
             this._updateMaterial( screenSpace );
         }
