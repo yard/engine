@@ -16,7 +16,7 @@ pc.extend(pc, function() {
 
             var failureResult = POINTER_TEST_RESULT_FAIL;
 
-            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0 || !this._image) {
+            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
                 failureResult = POINTER_TEST_RESULT_PASS_THROUGH;
             }
 
