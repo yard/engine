@@ -156,7 +156,7 @@ pc.extend(pc, function () {
 
             var screenType = this._screenType;
 
-            if (!this.camera) {
+            if (!this.camera && screenType == pc.SCREEN_TYPE_CAMERA) {
                 screenType = pc.SCREEN_TYPE_SCREEN;
             }
 

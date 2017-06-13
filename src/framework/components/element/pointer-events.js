@@ -4,6 +4,9 @@ pc.extend(pc, function() {
     var POINTER_TEST_RESULT_PASS_THROUGH    = 1;
     var POINTER_TEST_RESULT_FAIL            = 2;
 
+    var ray = { origin: new pc.Vec3, direction: new pc.Vec3 };
+    var pointerPosition = new pc.Vec3;
+
     var PointEventsManager = {
 
         // Tests if the pointer event with coordinates passed (in local coord space)
@@ -27,20 +30,59 @@ pc.extend(pc, function() {
             }
         },
 
-        // Converts point in parent's coords into the local coordinate system.
-        _parentPointToLocalPoint: function(point) {
-            // check if we the screen component – do we have a camera on us?
-            if (this._rootPointerEventReceiver) {
-                // if so – we need to undergo camera-to-world transform first
-                var cameraZ = this._screenType == pc.SCREEN_TYPE_SCREEN ? this.camera.nearClip : this.screenDistance;
-                point = this.camera.screenToWorld( point.x, point.y, cameraZ, this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height );
-                // ... and then use inverse screen matrix to transform point from camera world space into local UI space
-                return this._inverseScreenMatrix.transformPoint(point);
+        // Converts supplied screen point to "world-space" ray. "World-space" is not literally
+        // worldspace as in case of screen space canvas it's in fact screen-space.
+        _screenPointToRay: function (point) {
+            // if we are screen-space guys, camera transforms will be no help – we are 
+            // using our own ortho matrix anyway
+            if (this._screenType == pc.SCREEN_TYPE_SCREEN) {
+                ray.origin.set(
+                    (point.x / this.system.app.graphicsDevice.width - 0.5) * 2, 
+                    (0.5 - point.y / this.system.app.graphicsDevice.height) * 2, 
+                    1000
+                );
+
+                ray.direction.set(
+                    0,
+                    0,
+                    -1
+                );
+            } else {
+                if (this.camera == null) {
+                    var app = pc.Application.getApplication();
+                    var cameraInstance = app.systems.camera.cameras[ app.systems.camera.cameras.length - 1 ];
+                    this.camera = cameraInstance ? cameraInstance.camera : null;
+                }
+
+                this.camera.screenToWorld( point.x, point.y, this.camera.farClip, this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height, ray.direction );
+                this.camera.screenToWorld( point.x, point.y, this.camera.nearClip, this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height, ray.origin );
+
+                ray.direction.sub( ray.origin );
+                ray.direction.normalize();
             }
 
-            // if we aren't a screen, we will use _localModelTransform which is constructed to transform points
-            // from parent's element coord system into the local one
-            return this._localModelTransform.transformPoint(point);
+            return ray;
+        },
+
+        // Raycasts the ray in "world-space" to local coordinates of the element.
+        _rayToLocalPoint: function (ray) {
+            if (!this.entity.element) {
+                return pointerPosition;
+            }
+
+            var wt  = this.entity.element._pivotGraph.getWorldTransform();
+            var iwt = this.entity.element._inversePivotWorldTransform;
+
+            var l0 = ray.origin.clone();
+            var l  = ray.direction.clone();
+
+            var p0 = this.entity.getPosition();
+            var n  = wt.transformVector( new pc.Vec3( 0, 0, -1 ) ).normalize();
+
+            var t  = p0.sub(l0).dot(n) / l.dot(n);
+            var p  = l0.add( l.scale(t) );
+
+            return iwt.transformPoint(p);
         },
 
         // Iterates over all children and passes the event through to them.
@@ -55,16 +97,16 @@ pc.extend(pc, function() {
 
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventDown: function(point) {
-            point = this._parentPointToLocalPoint(point);
+        _pointerEventDown: function( ray ) {
+            var point = this._rayToLocalPoint( ray );
 
-            var testResult = this._testPointerEvent(point);
+            var testResult = this._testPointerEvent( point );
 
             if (testResult == POINTER_TEST_RESULT_FAIL) {
                 return;
             }
 
-            this._passPointerEventToChildren("_pointerEventDown", [ point ]);
+            this._passPointerEventToChildren("_pointerEventDown", [ ray ]);
 
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_DOWN, point);
@@ -73,8 +115,8 @@ pc.extend(pc, function() {
 
         // Handles "up" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventUp: function(point) {
-            point = this._parentPointToLocalPoint(point);
+        _pointerEventUp: function( ray ) {
+            var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent(point);
 
@@ -82,7 +124,7 @@ pc.extend(pc, function() {
                 return;
             }
 
-            this._passPointerEventToChildren("_pointerEventUp", [ point ]);
+            this._passPointerEventToChildren("_pointerEventUp", [ ray ]);
 
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_CLICK, point);
@@ -91,29 +133,31 @@ pc.extend(pc, function() {
         },
 
         // Fires pointer leave event and also makes all children do so.
-        _ensurePointerLeaveEvent: function(point) {
+        _ensurePointerLeaveEvent: function( ray ) {
+            var point = this._rayToLocalPoint( ray );
+
             this._pointerOver = false;
             this.fire(pc.POINTEREVENT_LEAVE, point); 
 
-            this._passPointerEventToChildren( "_ensurePointerLeaveEvent", [ point ]);
+            this._passPointerEventToChildren( "_ensurePointerLeaveEvent", [ ray ]);
         },
 
         // Handles "move" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventMove: function(point) {
-            point = this._parentPointToLocalPoint(point);
+        _pointerEventMove: function( ray ) {
+            var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent(point);
 
-            if (testResult != POINTER_TEST_RESULT_PASS) {
+            if (testResult == POINTER_TEST_RESULT_FAIL) {
                 if (this._pointerOver) {
-                    this._ensurePointerLeaveEvent(point);            
+                    this._ensurePointerLeaveEvent( ray );            
                 }
 
                 return;
             }
 
-            this._passPointerEventToChildren("_pointerEventMove", [ point ]);
+            this._passPointerEventToChildren("_pointerEventMove", [ ray ]);
 
             if (!this._pointerOver) {
                 this._pointerOver = true;
@@ -125,8 +169,8 @@ pc.extend(pc, function() {
 
         // Handles "scroll" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventScroll: function(point, amount) {
-            point = this._parentPointToLocalPoint(point);
+        _pointerEventScroll: function( ray, amount ) {
+            var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent(point);
 
@@ -134,7 +178,7 @@ pc.extend(pc, function() {
                 return;
             }
 
-            this._passPointerEventToChildren("_pointerEventScroll", [ point, amount ]);
+            this._passPointerEventToChildren("_pointerEventScroll", [ ray, amount ]);
 
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_SCROLL, point, amount);
@@ -151,7 +195,8 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            this._pointerEventDown( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
+            pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
+            this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
         },
 
         // Mouse-specific event handler.
@@ -164,7 +209,8 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            this._pointerEventUp( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
+            pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
+            this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
         },
 
         // Mouse-specific event handler.
@@ -177,7 +223,8 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            this._pointerEventMove( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ) );
+            pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
+            this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
         },
 
         // Touch-specific event handler.
@@ -186,7 +233,8 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            this._pointerEventScroll( new pc.Vec3( mouseEvent.x, mouseEvent.y, 0 ), mouseEvent.wheel );
+            pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
+            this._pointerEventScroll( this._screenPointToRay( pointerPosition ), mouseEvent.wheel );
         },
 
         // Touch-specific event handler.
@@ -196,7 +244,21 @@ pc.extend(pc, function() {
             }
 
             var touch = touchEvent.changedTouches[0];
-            this._pointerEventUp( new pc.Vec3( touch.x, touch.y, 0 ) );
+            
+            pointerPosition.set( touch.x, touch.y, 0 );
+            this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+        },
+
+        // Touch-specific event handler.
+        _onTouchDown: function(touchEvent) {
+            if (!this.entity || !this.entity.enabled) {
+                return false;
+            }
+
+            var touch = touchEvent.changedTouches[0];
+            
+            pointerPosition.set( touch.x, touch.y, 0 );
+            this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
         },
 
         // Touch-specific event handler.
@@ -206,7 +268,9 @@ pc.extend(pc, function() {
             }
             
             var touch = touchEvent.changedTouches[0];
-            this._pointerEventMove( new pc.Vec3( touch.x, touch.y, 0 ) );
+            
+            pointerPosition.set( touch.x, touch.y, 0 );
+            this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
         },
 
         /**
