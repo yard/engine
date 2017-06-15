@@ -70,6 +70,11 @@ pc.extend(pc, function() {
                 return pointerPosition;
             }
 
+            // FIXME: A proper check for "inherit" screen type needed
+            if (this.entity.screen && this.entity.parent.screen) {
+                return pointerPosition;
+            }
+
             var wt  = this.entity.element._pivotGraph.getWorldTransform();
             var iwt = this.entity.element._inversePivotWorldTransform;
 
@@ -89,7 +94,7 @@ pc.extend(pc, function() {
         _passPointerEventToChildren: function(name, eventData) {
             for(var i = 0; i < this.entity.children.length; i++) {
                 var element =  this.entity.children[i];
-                if (element && element.element) {
+                if (element && element.element && element.enabled && (!element.screen || element.screen.enabled)) {
                     element.element[ name ].apply( element.element, eventData );
                 }
             }

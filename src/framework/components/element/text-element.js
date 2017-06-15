@@ -259,13 +259,13 @@ pc.extend(pc, function () {
             }
             
             if (this._element.screen) {
-                this._meshInstance.sortingLayerIndex = this._element.screen.screen.sortingLayerIndex;
+                this._meshInstance.sortingLayerIndex = this._element._nearestScreen.sortingLayerIndex + 100;
+                this._meshInstance.sortingOrder = this._element._nearestScreen.sortingOrder;
+                this._meshInstance._nearestScreen = this._element._nearestScreen;
 
-                if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
-                    this._meshInstance.sortingLayerIndex += 100;
-                }
-
-                this._meshInstance.sortingOrder = this._element.screen.screen.sortingOrder;
+                // if (this._element.screen.screenType != pc.SCREEN_TYPE_WORLD) {
+                //     this._meshInstance.sortingLayerIndex += 100;
+                // }
             }
 
             this._meshInstance.drawOrder = this._drawOrder;

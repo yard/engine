@@ -212,8 +212,6 @@ pc.extend(pc, function () {
                 this._screenMatrix = worldMatrix; 
             }
 
-            this._inverseScreenMatrix = this._screenMatrix.clone().invert();
-
             this._width = w;
             this._height = h;
             this.entity.dirtyLocal = true;
@@ -223,10 +221,11 @@ pc.extend(pc, function () {
                 var screen = this.entity.parent.screen;
 
                 this._screenMatrix = screen._screenMatrix.clone();
-                this._inverseScreenMatrix = screen._inverseScreenMatrix.clone();
                 this._width = screen._width;
                 this._height = screen._height;
             }
+
+            this._inverseScreenMatrix = this._screenMatrix.clone().invert();
         },
 
         _updateScale: function () {

@@ -479,7 +479,11 @@ pc.extend(pc, function () {
             var node = this.entity;
             var screen = this.screen;
 
+            this._nearestScreen = null;
+
             while (node) {
+                this._nearestScreen = this._nearestScreen || node.screen;
+                
                 screen = node.screen || screen;
                 node = node._parent;
             }
