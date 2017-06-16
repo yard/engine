@@ -36,6 +36,7 @@ pc.events = function () {
             target.hasEvent = ev.hasEvent;
             target.bind = ev.on;
             target.unbind = ev.off;
+            target.hasListeners = ev.hasListeners;
             return target;
         },
 
@@ -155,6 +156,10 @@ pc.events = function () {
             }
 
             return this;
+        },
+
+        hasListeners: function (name) {
+            return this._callbacks && this._callbacks[name] && this._callbacks[name].length > 0;
         },
 
         once: function (name, callback, scope) {

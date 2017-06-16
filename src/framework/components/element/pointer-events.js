@@ -17,6 +17,10 @@ pc.extend(pc, function() {
                 return POINTER_TEST_RESULT_FAIL;
             }
 
+            if (this._rootPointerEventReceiver) {
+                return POINTER_TEST_RESULT_PASS_THROUGH;
+            }
+
             var failureResult = POINTER_TEST_RESULT_FAIL;
 
             if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
@@ -95,9 +99,15 @@ pc.extend(pc, function() {
             for(var i = 0; i < this.entity.children.length; i++) {
                 var element =  this.entity.children[i];
                 if (element && element.element && element.enabled && (!element.screen || element.screen.enabled)) {
-                    element.element[ name ].apply( element.element, eventData );
+                    var result = element.element[ name ].apply( element.element, eventData );
+
+                    if (result) {
+                        return true;
+                    }
                 }
             }
+
+            return false;
         },
 
         // Handles "down" pointer event – might be coming from touch or
@@ -108,13 +118,18 @@ pc.extend(pc, function() {
             var testResult = this._testPointerEvent( point );
 
             if (testResult == POINTER_TEST_RESULT_FAIL) {
-                return;
+                return false;
             }
 
-            this._passPointerEventToChildren("_pointerEventDown", [ ray ]);
-
+            if ( this._passPointerEventToChildren("_pointerEventDown", [ ray ]) ) {
+                return true;
+            }
+            
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_DOWN, point);
+                return this.hasListeners( pc.POINTEREVENT_DOWN );
+            } else {
+                return false;
             }
         },
 
@@ -126,14 +141,20 @@ pc.extend(pc, function() {
             var testResult = this._testPointerEvent(point);
 
             if (testResult == POINTER_TEST_RESULT_FAIL) {
-                return;
+                return false;
             }
 
-            this._passPointerEventToChildren("_pointerEventUp", [ ray ]);
-
+            if ( this._passPointerEventToChildren("_pointerEventUp", [ ray ]) ) {
+                return true;
+            }
+            
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_CLICK, point);
                 this.fire(pc.POINTEREVENT_UP, point);
+
+                return this.hasListeners( pc.POINTEREVENT_UP ) || this.hasListeners( pc.POINTEREVENT_CLICK );
+            } else {
+                return false;
             }
         },
 
@@ -145,6 +166,8 @@ pc.extend(pc, function() {
             this.fire(pc.POINTEREVENT_LEAVE, point); 
 
             this._passPointerEventToChildren( "_ensurePointerLeaveEvent", [ ray ]);
+
+            return false;
         },
 
         // Handles "move" pointer event – might be coming from touch or
@@ -159,10 +182,12 @@ pc.extend(pc, function() {
                     this._ensurePointerLeaveEvent( ray );            
                 }
 
-                return;
+                return false;
             }
 
-            this._passPointerEventToChildren("_pointerEventMove", [ ray ]);
+            if ( this._passPointerEventToChildren("_pointerEventMove", [ ray ]) ) {
+                return true;
+            }
 
             if (!this._pointerOver) {
                 this._pointerOver = true;
@@ -170,6 +195,7 @@ pc.extend(pc, function() {
             }
 
             this.fire(pc.POINTEREVENT_MOVE, point);
+            return this.hasListeners( pc.POINTEREVENT_MOVE );
         },
 
         // Handles "scroll" pointer event – might be coming from touch or
@@ -180,56 +206,61 @@ pc.extend(pc, function() {
             var testResult = this._testPointerEvent(point);
 
             if (testResult == POINTER_TEST_RESULT_FAIL) {
-                return;
+                return false;
             }
 
-            this._passPointerEventToChildren("_pointerEventScroll", [ ray, amount ]);
+            if ( this._passPointerEventToChildren("_pointerEventScroll", [ ray, amount ]) ) {
+                return true;
+            }
 
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_SCROLL, point, amount);
+                return this.hasListeners( pc.POINTEREVENT_SCROLL );
+            } else {
+                return false;
             }
         },
 
         // Mouse-specific event handler.
         _onMouseDown: function(mouseEvent) {
-            if (this.entity.parent && this.entity.parent.screen) {
-                return;
-            }
+            // if (this.entity.parent && this.entity.parent.screen) {
+            //     return false;
+            // }
 
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
+            return this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
         },
 
         // Mouse-specific event handler.
         _onMouseUp: function(mouseEvent) {
-            if (this.entity.parent && this.entity.parent.screen) {
-                return;
-            }
+            // if (this.entity.parent && this.entity.parent.screen) {
+            //     return false;
+            // }
 
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            return this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
         },
 
         // Mouse-specific event handler.
         _onMouseMove: function(mouseEvent) {
-            if (this.entity.parent && this.entity.parent.screen) {
-                return;
-            }
+            // if (this.entity.parent && this.entity.parent.screen) {
+            //     return false;
+            // }
 
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
+            return this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
         },
 
         // Touch-specific event handler.
@@ -239,7 +270,7 @@ pc.extend(pc, function() {
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            this._pointerEventScroll( this._screenPointToRay( pointerPosition ), mouseEvent.wheel );
+            return this._pointerEventScroll( this._screenPointToRay( pointerPosition ), mouseEvent.wheel );
         },
 
         // Touch-specific event handler.
@@ -251,7 +282,7 @@ pc.extend(pc, function() {
             var touch = touchEvent.changedTouches[0];
             
             pointerPosition.set( touch.x, touch.y, 0 );
-            this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            return this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
         },
 
         // Touch-specific event handler.
@@ -263,7 +294,7 @@ pc.extend(pc, function() {
             var touch = touchEvent.changedTouches[0];
             
             pointerPosition.set( touch.x, touch.y, 0 );
-            this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
+            return this._pointerEventDown( this._screenPointToRay( pointerPosition ) );
         },
 
         // Touch-specific event handler.
@@ -275,35 +306,7 @@ pc.extend(pc, function() {
             var touch = touchEvent.changedTouches[0];
             
             pointerPosition.set( touch.x, touch.y, 0 );
-            this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
-        },
-
-        /**
-        * @function
-        * @name pc.ScreenComponent#enablePointerEvents
-        * @description Starts listening to mouse and touch events for the currenct {@link pc.ScreenComponent} instance.
-        * @example
-        * // On an entity with a screen component
-        * entity.screen.enablePointerEvents();
-        */
-        enablePointerEvents: function(_app) {
-            var app = _app || pc.Application.getApplication();
-
-            if (app.mouse) {
-                app.mouse.on(pc.EVENT_MOUSEDOWN,   this._onMouseDown,   this);
-                app.mouse.on(pc.EVENT_MOUSEUP,     this._onMouseUp,     this);
-                app.mouse.on(pc.EVENT_MOUSEMOVE,   this._onMouseMove,   this);
-                app.mouse.on(pc.EVENT_MOUSEWHEEL,  this._onMouseWheel,  this);
-            }
-
-            if (app.touch) {
-                app.touch.on(pc.EVENT_TOUCHSTART,  this._onTouchDown,   this);
-                app.touch.on(pc.EVENT_TOUCHEND,    this._onTouchUp,     this);
-                app.touch.on(pc.EVENT_TOUCHMOVE,   this._onTouchMove,   this);
-                app.touch.on(pc.EVENT_TOUCHCANCEL, this._onTouchUp,     this);
-            }
-
-            this._rootPointerEventReceiver = true;
+            return this._pointerEventMove( this._screenPointToRay( pointerPosition ) );
         }
 
     };
