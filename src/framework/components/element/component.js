@@ -182,6 +182,13 @@ pc.extend(pc, function () {
                         layoutElement.calculateLayoutInputVertical();
                     }
                 }
+
+                for (var i = 0; i < this._canvasElements.length; i++) {
+                    var canvasElement = this._canvasElements[ i ];
+                    if (canvasElement != null) {
+                        canvasElement.rebuild(0);
+                    }
+                }
             }
         },
 
