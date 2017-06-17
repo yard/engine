@@ -288,6 +288,13 @@ pc.extend(pc, function () {
                 layoutController.setLayoutVertical();
             }
 
+            for (var i = 0; i < this._canvasElements.length; i++) {
+                var canvasElement = this._canvasElements[ i ];
+                if (canvasElement != null) {
+                    canvasElement.rebuild(2);
+                }
+            }
+
             var aspectRatioFitter = this._aspectRatioFitters[ 0 ];
             if (aspectRatioFitter != null) {
                 aspectRatioFitter.updateRect();
