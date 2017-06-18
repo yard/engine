@@ -614,8 +614,9 @@ pc.extend(pc, function () {
                 this._meshInstance.setParameter("material_opacity", this._color.data[3]);
             } else {
                 // clear texture params
-                this._meshInstance.deleteParameter("texture_emissiveMap");
-                this._meshInstance.deleteParameter("texture_opacityMap");
+                this._meshInstance.setParameter("_MainTex", this._system.defaultImageMaterial.opacityMap);
+                this._meshInstance.setParameter("texture_emissiveMap", this._system.defaultImageMaterial.opacityMap);
+                this._meshInstance.setParameter("texture_opacityMap", this._system.defaultImageMaterial.opacityMap);
 
                 // if we are back to the default material then reset
                 // color parameters
