@@ -282,10 +282,12 @@ pc.extend(pc, function () {
             this.element._updateAnchoredPosition();
             this.element._updateSizeDelta();
 
-            var layoutController = this._layoutControllers[ 0 ];
-            if (layoutController != null) {
-                layoutController.setLayoutHorizontal();
-                layoutController.setLayoutVertical();
+            for (var i = 0; i < this._layoutControllers.length; i++) {
+                var layoutController = this._layoutControllers[ i ];
+                if (layoutController != null) {
+                    layoutController.setLayoutHorizontal();
+                    layoutController.setLayoutVertical();
+                }    
             }
 
             for (var i = 0; i < this._canvasElements.length; i++) {
