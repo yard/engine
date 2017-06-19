@@ -53,6 +53,7 @@ pc.extend(pc, function () {
         // corner offsets in relation to anchors
         this._corners = new pc.Vec4(0, 0, 0, 0);
         this._pivotGraph = new pc.Entity();
+        this._pivotGraph.isPivotGraphUntitledNode = true;
 
         this._anchoredPosition = new pc.Vec2(0, 0);
         this._sizeDelta = new pc.Vec2(0, 0);
