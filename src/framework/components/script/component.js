@@ -366,6 +366,7 @@ pc.extend(pc, function () {
                     return scriptInstance;
                 } else {
                     console.warn('script \'' + scriptName + '\' is already added to entity \'' + this.entity.name + '\'');
+                    return this._scriptsIndex[scriptType.__name].instance;
                 }
             } else {
                 this._scriptsIndex[scriptName] = {

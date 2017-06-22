@@ -118,20 +118,11 @@ pc.extend(pc, function () {
         },
 
         syncDrawOrder: function () {
-            var i = 0;
-
-            var recurse = function (e) {
-                if (e.element) {
-                    e.element.drawOrder = i++;
-                }
-
-                var children = e.getChildren();
-                for (var j = 0; j < children.length; j++) {
-                    recurse(children[j]);
-                }
+            var system = pc.Application.getApplication().systems.screen;
+            
+            if (system) {
+                system.dirtyOrder = true;
             }
-
-            recurse(pc.Application.getApplication().root);
         },
 
         _calcProjectionMatrix: function () {

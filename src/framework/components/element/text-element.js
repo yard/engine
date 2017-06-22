@@ -105,8 +105,7 @@ pc.extend(pc, function () {
 
         _onStencilLayerChange: function(value) {
             if (this._meshInstance) {
-                var stencil = this._element._getStencilParameters();;
-
+                var stencil = this._element._getStencilParameters();
                 this._meshInstance.stencilBack = stencil;
                 this._meshInstance.stencilFront = stencil;
             }

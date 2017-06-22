@@ -175,6 +175,10 @@ pc.extend(pc, function () {
         },
 
         _presync: function () {
+            if (!this.dirtyLocal && !this.element._sizeDeltaDirty && !this.element._anchoredPositionDirty && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+                return;
+            }
+
             if (this.element) {
                 for (var i = 0; i < this._layoutElements.length; i++) {
                     var layoutElement = this._layoutElements[ i ];

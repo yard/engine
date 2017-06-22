@@ -59,8 +59,30 @@ pc.extend(pc, function () {
             component._updateScreenInChildren();
         },
 
+        _syncDrawOrder: function () {
+            var i = 0;
+
+            var recurse = function (e) {
+                if (e.element) {
+                    e.element.drawOrder = i++;
+                }
+
+                var children = e.getChildren();
+                for (var j = 0; j < children.length; j++) {
+                    recurse(children[j]);
+                }
+            }
+
+            recurse(pc.Application.getApplication().root);
+        },
+
         _onUpdate: function (dt) {
             var components = this.store;
+
+            if (this.dirtyOrder) {
+                this._syncDrawOrder();
+                this.dirtyOrder = false;
+            }
 
             for (var id in components) {
                 if (components[id].entity.screen.update) components[id].entity.screen.update(dt);

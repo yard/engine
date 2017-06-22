@@ -43,7 +43,7 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.useSkybox = false;
         this.defaultImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultImageMaterial.depthWrite = false;
-        this.defaultImageMaterial.renderQueue = 2000;
+        this.defaultImageMaterial.renderQueue = 3000;
         this.defaultImageMaterial.emissiveMapBorders = _defaultMapBorders;
         this.defaultImageMaterial.opacityMapBorders = _defaultMapBorders;
         this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16);
@@ -66,7 +66,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultScreenSpaceImageMaterial.depthTest = false;
         this.defaultScreenSpaceImageMaterial.depthWrite = false;
-        this.defaultScreenSpaceImageMaterial.renderQueue = 2000;
+        this.defaultScreenSpaceImageMaterial.renderQueue = 3000;
         this.defaultScreenSpaceImageMaterial.emissiveMapBorders = _defaultMapBorders;
         this.defaultScreenSpaceImageMaterial.opacityMapBorders = _defaultMapBorders;
         this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16 | pc.SHADERDEF_SCREENSPACE );
@@ -76,7 +76,7 @@ pc.extend(pc, function () {
         this.defaultTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultTextMaterial.msdfMap = this._defaultTexture;
         this.defaultTextMaterial.msdf = false;
-        this.defaultTextMaterial.renderQueue = 2000;
+        this.defaultTextMaterial.renderQueue = 3000;
         this.defaultTextMaterial.useLighting = false;
         this.defaultTextMaterial.useGammaTonemap = false;
         this.defaultTextMaterial.useFog = false;
@@ -99,7 +99,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceTextMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultScreenSpaceTextMaterial.depthWrite = false;
         this.defaultScreenSpaceTextMaterial.depthTest = false;
-        this.defaultScreenSpaceTextMaterial.renderQueue = 2000;
+        this.defaultScreenSpaceTextMaterial.renderQueue = 3000;
         this.defaultScreenSpaceTextMaterial.update();
 
         this.on('beforeremove', this.onRemoveComponent, this);
