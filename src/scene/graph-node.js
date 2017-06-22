@@ -996,6 +996,8 @@ pc.extend(pc, function () {
             if (node._parent !== null)
                 throw new Error("GraphNode is already parented");
 
+            this.dirtyLocal = true;
+
             this._children.push(node);
             this._onInsertChild(node);
         },
@@ -1034,6 +1036,8 @@ pc.extend(pc, function () {
         insertChild: function (node, index) {
             if (node._parent !== null)
                 throw new Error("GraphNode is already parented");
+
+            this.dirtyLocal = true;
 
             this._children.splice(index, 0, node);
             this._onInsertChild(node);
@@ -1075,6 +1079,8 @@ pc.extend(pc, function () {
         removeChild: function (child) {
             var i;
             var length = this._children.length;
+
+            this.dirtyLocal = true;
 
             // Remove from child list
             for(i = 0; i < length; ++i) {
