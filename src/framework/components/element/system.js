@@ -49,6 +49,12 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16);
         this.defaultImageMaterial.update();
 
+        this.defaultMaskMaterial = this.defaultImageMaterial.clone();
+        this.defaultMaskMaterial.redWrite = false;
+        this.defaultMaskMaterial.greenWrite = false;
+        this.defaultMaskMaterial.blueWrite = false;
+        this.defaultMaskMaterial.update();
+
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
         this.defaultScreenSpaceImageMaterial.cull = pc.CULLFACE_NONE;
         this.defaultScreenSpaceImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
@@ -69,8 +75,14 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.renderQueue = 3000;
         this.defaultScreenSpaceImageMaterial.emissiveMapBorders = _defaultMapBorders;
         this.defaultScreenSpaceImageMaterial.opacityMapBorders = _defaultMapBorders;
-        this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16 | pc.SHADERDEF_SCREENSPACE );
+        this.defaultScreenSpaceImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16 | pc.SHADERDEF_SCREENSPACE );
         this.defaultScreenSpaceImageMaterial.update();
+
+        this.defaultScreenSpaceMaskMaterial = this.defaultScreenSpaceImageMaterial.clone();
+        this.defaultScreenSpaceMaskMaterial.redWrite = false;
+        this.defaultScreenSpaceMaskMaterial.greenWrite = false;
+        this.defaultScreenSpaceMaskMaterial.blueWrite = false;
+        this.defaultScreenSpaceMaskMaterial.update();
 
         this.defaultTextMaterial = new pc.StandardMaterial();
         this.defaultTextMaterial.cull = pc.CULLFACE_NONE;

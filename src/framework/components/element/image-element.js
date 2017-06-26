@@ -42,6 +42,7 @@ pc.extend(pc, function () {
         this._masksChildren = false;
         this._alphaTest = 0.01;
         this._ignoreMask = false;
+        this._showMaskGraphics = true;
 
         this._rect = new pc.Vec4(0,0,1,1); // x, y, w, h
         this._border = new pc.Vec4(0,0,0,0);
@@ -50,6 +51,7 @@ pc.extend(pc, function () {
 
         // clone material to safely modify the settings for this instance
         this._material = this._system.defaultImageMaterial;
+        this._maskMaterial = this._system.defaultMaskMaterial;
 
         // private
         this._positions = [];
@@ -179,7 +181,7 @@ pc.extend(pc, function () {
             this._updateBorders();
 
             if (this._meshInstance) {
-                this._meshInstance.material = this._material;
+                this._meshInstance.material = this._showMaskGraphics ? this._material : this._maskMaterial;
                 this._meshInstance.screenSpace = screenSpace;
                 this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
             }
@@ -686,6 +688,18 @@ pc.extend(pc, function () {
                 this.alphaTest = 0;
             }
 
+            var screenSpace = this._element.screen ? (this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN) : false;
+            this._updateMaterial( screenSpace );
+        }
+    });
+
+    Object.defineProperty(ImageElement.prototype, "showMaskGraphics", {
+        get: function () {
+            return this._showMaskGraphics;
+        },
+
+        set: function (value) {
+            this._showMaskGraphics = value;
             var screenSpace = this._element.screen ? (this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN) : false;
             this._updateMaterial( screenSpace );
         }
