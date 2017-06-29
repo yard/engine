@@ -255,6 +255,9 @@ pc.extend(pc, function () {
             this.c[name].enabled = false;
         }
 
+        this.sendMessageToScripts("OnDestroy");
+        this.sendMessageToScripts("DestroyInternal");
+
         // Remove all components
         for (name in this.c) {
             this.c[name].system.removeComponent(this);
