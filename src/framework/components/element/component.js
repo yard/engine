@@ -302,9 +302,11 @@ pc.extend(pc, function () {
                 }
             }
 
-            var aspectRatioFitter = this._aspectRatioFitters[ 0 ];
-            if (aspectRatioFitter != null) {
-                aspectRatioFitter.updateRect();
+            for (var i = 0; i < this._aspectRatioFitters.length; i++) {
+                var aspectRatioFitter = this._aspectRatioFitters[ i ];
+                if (aspectRatioFitter != null) {
+                    aspectRatioFitter.updateRect();
+                }   
             }
 
             this.element._width = rect.z - rect.x;
@@ -312,11 +314,11 @@ pc.extend(pc, function () {
 
             // the rect is going to be Vec4 storing the following values:
             // [ left offset, bottom offset, right offset, top offset ]
-            if (this.element._anchorDirty || this.element._cornerDirty) {               
-                this.element._anchorTransform.setTranslate(rect.x, rect.y, 0);
-                this.element._anchorDirty = false;
-                this.element._cornerDirty = false;
-            }
+            //if (this.element._anchorDirty || this.element._cornerDirty) {               
+            this.element._anchorTransform.setTranslate(rect.x, rect.y, 0);
+            this.element._anchorDirty = false;
+            this.element._cornerDirty = false;
+            //}
 
             if (this.dirtyWorld) {
                 // before recomputing the transforms let's agree on a few matrices used below:
