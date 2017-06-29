@@ -396,6 +396,7 @@ pc.extend(pc, function () {
                             this.worldTransform.mul( this.element._fromPivotTransform );
                         }
 
+                        this.element._pivotGraph.dirtyLocal = false;
                         this.element._pivotGraph.dirtyWorld = true;
                         this.element._pivotGraph.sync();
 
