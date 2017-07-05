@@ -43,6 +43,7 @@ pc.extend(pc, function () {
         this._alphaTest = 0.01;
         this._ignoreMask = false;
         this._showMaskGraphics = true;
+        this._enabled = true;
 
         this._rect = new pc.Vec4(0,0,1,1); // x, y, w, h
         this._border = new pc.Vec4(0,0,0,0);
@@ -702,6 +703,20 @@ pc.extend(pc, function () {
             this._showMaskGraphics = value;
             var screenSpace = this._element.screen ? (this._element.screen.screen.screenType == pc.SCREEN_TYPE_SCREEN) : false;
             this._updateMaterial( screenSpace );
+        }
+    });
+
+    Object.defineProperty(ImageElement.prototype, "enabled", {
+        get: function () {
+            return this._enabled;
+        },
+
+        set: function (value) {
+            this._enabled = value;
+
+            if (this._meshInstance) {
+                this._meshInstance.visible = value;
+            }
         }
     });
 

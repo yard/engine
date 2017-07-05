@@ -36,6 +36,7 @@ pc.extend(pc, function () {
 
         // public
         this._text = "";
+        this._enabled = true;
 
         this._align = pc.TEXT_ALIGN_CENTER;
         this._veticalAlign = pc.TEXT_VERTICAL_ALIGN_MIDDLE;
@@ -815,6 +816,20 @@ pc.extend(pc, function () {
             this._maxFontSize = value;
             if (this._font) {
                 this._updateText();
+            }
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "enabled", {
+        get: function () {
+            return this._enabled;
+        },
+
+        set: function (value) {
+            this._enabled = value;
+            
+            if (this._meshInstance) {
+                this._meshInstance.visible = value;
             }
         }
     });
