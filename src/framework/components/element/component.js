@@ -41,6 +41,7 @@ pc.extend(pc, function () {
     var ElementComponent = function ElementComponent (system, entity) {
         this._anchor = new pc.Vec4();
         this._localAnchor = new pc.Vec4();
+        this._canvasGroups = null;
 
         this._pivot = new pc.Vec2(0.5, 0.5);
 
@@ -312,13 +313,9 @@ pc.extend(pc, function () {
             this.element._width = rect.z - rect.x;
             this.element._height = rect.w - rect.y;
 
-            // the rect is going to be Vec4 storing the following values:
-            // [ left offset, bottom offset, right offset, top offset ]
-            //if (this.element._anchorDirty || this.element._cornerDirty) {               
             this.element._anchorTransform.setTranslate(rect.x, rect.y, 0);
             this.element._anchorDirty = false;
             this.element._cornerDirty = false;
-            //}
 
             if (this.dirtyWorld) {
                 // before recomputing the transforms let's agree on a few matrices used below:
@@ -460,6 +457,8 @@ pc.extend(pc, function () {
             if (screen) {
                 screen.screen._updateStencilParameters();
             }
+
+            this._canvasGroups = this._collectCanvasGroups();
         },
 
         _updateScreen: function (screen, skipOrderUpdate) {
@@ -536,6 +535,38 @@ pc.extend(pc, function () {
         _onScreenTypeChange: function () {
             this.entity.dirtyWorld = true;
             this.fire('screen:set:screentype', this.screen.screen.screenType);
+        },
+
+        _collectCanvasGroups: function () {
+            var node = this.entity._parent;
+
+            while (node && !node.element) {
+                node = node._parent;
+            }
+
+            if (!node) {
+                return [];
+            }
+
+            if (node.element._canvasGroups == null) {
+                node.element._canvasGroups = node.element._collectCanvasGroups();
+            }
+
+            return node.element._canvasGroups.concat( this.entity._canvasGroups );
+        },
+
+        notifyCanvasGroupChanged: function () {
+            var f = function (root) {
+                if (root.element) {
+                    root.element._canvasGroups = root.element._collectCanvasGroups()
+                }
+
+                for(var i = 0; i < root._children.length; i++) {
+                    f( root._children[ i ] )
+                }
+            };
+
+            f( this.entity );
         },
 
         // internal - apply offset x,y to local position and find point in world space

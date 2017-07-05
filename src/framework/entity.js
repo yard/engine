@@ -60,6 +60,7 @@ pc.extend(pc, function () {
         this._layoutControllers = [];
         this._aspectRatioFitters = [];
         this._canvasElements = [];
+        this._canvasGroups = [];
 
         pc.events.attach(this);
 
