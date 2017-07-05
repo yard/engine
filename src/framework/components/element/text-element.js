@@ -47,7 +47,7 @@ pc.extend(pc, function () {
 
         this._spacing = 1;
         this._fontSize = 32;
-        this._lineHeight = 32;
+        this._lineHeight = 1;
         this._bestFit = false;
         this._minFontSize = 0;
         this._maxFontSize = 1000;
