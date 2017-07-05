@@ -88,7 +88,7 @@ pc.extend(pc, function () {
             entity[this.id] = component;
             entity.c[this.id] = component;
 
-            if (!entity.$prefab) {
+            if (!entity.$prefab || (this.id == "element")) {
                 this.initializeComponentData(component, data, []);
             }
 
