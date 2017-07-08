@@ -37,6 +37,7 @@ pc.extend(pc, function () {
         // public
         this._text = "";
         this._enabled = true;
+        this._horizontalWrap = false;
 
         this._align = pc.TEXT_ALIGN_CENTER;
         this._veticalAlign = pc.TEXT_VERTICAL_ALIGN_MIDDLE;
@@ -718,6 +719,20 @@ pc.extend(pc, function () {
             this._fontSize = value;
             if (_prev !== value && this._font) {
                 this._updateText();
+            }
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "horizontalWrap", {
+        get: function() {
+            return this._horizontalWrap;
+        },
+
+        set: function(value) {
+            this._horizontalWrap = value;
+
+            if (this._mesh) {
+                this._updateMesh(this._mesh, this._text);
             }
         }
     });
