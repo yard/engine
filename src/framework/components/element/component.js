@@ -463,7 +463,7 @@ pc.extend(pc, function () {
             var screen = this._findScreen();
             this._updateScreen(screen);
 
-            propagateDirty();
+            this.propagateDirty();
 
             if (screen) {
                 screen.screen._updateStencilParameters();
@@ -597,7 +597,7 @@ pc.extend(pc, function () {
             if (this._image) this._image.onEnable();
             if (this._text) this._text.onEnable();
             if (this._group) this._group.onEnable();
-            propagateDirty();
+            this.propagateDirty();
         },
 
         onDisable: function () {
@@ -605,14 +605,14 @@ pc.extend(pc, function () {
             if (this._image) this._image.onDisable();
             if (this._text) this._text.onDisable();
             if (this._group) this._group.onDisable();
-            propagateDirty();
+            this.propagateDirty();
         },
 
         onRemove: function () {
             this._unpatch();
             if (this._image) this._image.destroy();
             if (this._text) this._text.destroy();
-            propagateDirty();
+            this.propagateDirty();
         }
     });
 
