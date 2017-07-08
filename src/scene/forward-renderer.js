@@ -1170,9 +1170,9 @@ pc.extend(pc, function () {
                     drawCall = drawCalls[i];
                     if (!drawCall.visible && !drawCall.command) continue;
 
-                    var mask =  0xFFFFFFFF; 
+                    var mask = drawCall.node.cullingLayer || 0xFFFFFFFF; 
                     
-                    if (drawCall.node.parent && drawCall.node.parent.constructor == pc.Entity) {
+                    if (!drawCall.node.cullingLayer && drawCall.node.parent && drawCall.node.parent.constructor == pc.Entity) {
                         mask = drawCall.node.parent.cullingLayer;
                     }
 
