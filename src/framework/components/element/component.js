@@ -449,10 +449,21 @@ pc.extend(pc, function () {
             }
         },
 
+        propagateDirty: function() {
+            var node = this.entity;
+            while (node) {
+                node.dirtyLocal = true;
+                node.dirtyWorld = true;
+                node = node.parent;
+            }
+        },
+
         _onInsert: function (parent) {
             // when the entity is reparented find a possible new screen
             var screen = this._findScreen();
             this._updateScreen(screen);
+
+            propagateDirty();
 
             if (screen) {
                 screen.screen._updateStencilParameters();
@@ -586,6 +597,7 @@ pc.extend(pc, function () {
             if (this._image) this._image.onEnable();
             if (this._text) this._text.onEnable();
             if (this._group) this._group.onEnable();
+            propagateDirty();
         },
 
         onDisable: function () {
@@ -593,12 +605,14 @@ pc.extend(pc, function () {
             if (this._image) this._image.onDisable();
             if (this._text) this._text.onDisable();
             if (this._group) this._group.onDisable();
+            propagateDirty();
         },
 
         onRemove: function () {
             this._unpatch();
             if (this._image) this._image.destroy();
             if (this._text) this._text.destroy();
+            propagateDirty();
         }
     });
 
