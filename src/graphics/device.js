@@ -1379,6 +1379,15 @@ pc.extend(pc, function () {
                     // Retrieve vertex element for this shader attribute
                     element = attribute.scopeId.value;
 
+                    // FIXME very dirty workaround for the case when a shader expects color attr,
+                    // but mesh doesn't provide it. One example is sprite renderer.
+                    // PC somehow leaks attribute bindings and the code below thinks the attribute
+                    // is present on the vertex stream when it fact it isn't
+                    if (element && attribute.scopeId.name == 'COLOR' && this.vertexBuffers[element.stream].format.size == 20) {
+                        element = null;
+                        attribute.scopeId.value = null;
+                    }
+
                     // Check the vertex element is valid
                     if (element !== null) {
                         // Retrieve the vertex buffer that contains this element
