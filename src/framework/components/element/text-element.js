@@ -186,7 +186,10 @@ pc.extend(pc, function () {
                     this._meshInstance.layer = pc.scene.LAYER_HUD;
                 }
                 this._meshInstance.screenSpace = screenSpace;
+                
                 this._meshInstance.setParameter("texture_msdfMap", this._font.texture);
+                this._meshInstance.setParameter("_MainTex", this._font.texture);
+
                 this._meshInstance.setParameter("sdfEnabled", this._font.data.info.bitmapFont ? 0 : 1);
                 this._meshInstance.setParameter("material_emissive", this._color.data3);
                 this._meshInstance.setParameter("material_opacity", this._color.data[3]);
@@ -202,6 +205,8 @@ pc.extend(pc, function () {
             } else {
                 this._updateMesh(this._mesh, text);
                 this._meshInstance.setParameter("texture_msdfMap", this._font.texture);
+                this._meshInstance.setParameter("_MainTex", this._font.texture);
+
                 this._meshInstance.setParameter("sdfEnabled", this._font.data.info.bitmapFont ? 0 : 1);
             }
 
@@ -845,6 +850,22 @@ pc.extend(pc, function () {
             
             if (this._meshInstance) {
                 this._meshInstance.visible = value;
+            }
+        }
+    });
+
+    Object.defineProperty(TextElement.prototype, "material", {
+        get: function () {
+            return this._textMaterial;
+        },
+
+        set: function (value) {
+            this._textMaterial = value || this._system.defaultTextMaterial;
+            
+            var screen = this._element.screen;
+            
+            if (screen && screen.screen) {
+                this._updateMaterial(screen.screen.screenType == pc.SCREEN_TYPE_SCREEN);
             }
         }
     });
