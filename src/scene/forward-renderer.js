@@ -1172,12 +1172,12 @@ pc.extend(pc, function () {
 
                     var mask = drawCall.node.cullingLayer || 0xFFFFFFFF; 
                     
-                    if (!drawCall.node.cullingLayer && drawCall.node.parent && drawCall.node.parent.constructor == pc.Entity) {
-                        mask = drawCall.node.parent.cullingLayer;
+                    if (!drawCall.node.cullingLayer && drawCall.node._parent && drawCall.node._parent.constructor == pc.Entity) {
+                        mask = drawCall.node._parent.cullingLayer;
                     }
 
-                    if (drawCall.node.parent && drawCall.node.parent.parent) {
-                        mask = drawCall.node.parent.parent.cullingLayer;
+                    if (drawCall.node._parent && drawCall.node._parent._parent) {
+                        mask = drawCall.node._parent._parent.cullingLayer;
                     }
 
                     // if the object's mask AND the camera's cullingMask is zero then the game object will be invisible from the camera
@@ -1222,15 +1222,18 @@ pc.extend(pc, function () {
             var sortTime = pc.now();
             // #endif
 
-            var i, drawCall, btype, meshPos;
+            var i, drawCall, renderQueue, meshPos;
             var tempx, tempy, tempz;
             var drawCallsCount = drawCalls.length;
 
             for (i = 0; i < drawCallsCount; i++) {
                 drawCall = drawCalls[i];
                 if (drawCall.command) continue;
-                if (drawCall.layer <= pc.scene.LAYER_FX) continue; // Only alpha sort mesh instances in the main world
+                
+                if (drawCall.material.renderQueue < 3000) continue; // Only alpha sort mesh instances in the main world
+                
                 btype = drawCall.material.blendType;
+
                 if (btype !== pc.BLEND_NONE) {
                     meshPos = drawCall.aabb.center.data;
                     tempx = meshPos[0] - camPos[0];
