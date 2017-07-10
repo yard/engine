@@ -191,6 +191,12 @@ pc.extend(pc, function () {
             this._setLayerFromScreen();
         },
 
+        _setConstantColor: function (color) {
+            if (this._meshInstance) {
+                this._meshInstance.setParameter( "COLOR", {const: color.data} );
+            }
+        },
+
         _createMesh: function () {
             var w = this._element.width;
             var h = this._element.height;
@@ -386,6 +392,7 @@ pc.extend(pc, function () {
 
             if (this._meshInstance) {
                 this._meshInstance.setParameter('material_emissive', this._color.data3);
+                this._setConstantColor( this._color );
             }
         }
     });
@@ -454,6 +461,7 @@ pc.extend(pc, function () {
         set: function (value) {
             this._color.data[3] = value;
             this._meshInstance.setParameter("material_opacity", value);
+            this._setConstantColor( this._color );
         }
     });
 
@@ -609,7 +617,6 @@ pc.extend(pc, function () {
                 // default texture just uses emissive and opacity maps
                 this._meshInstance.setParameter("_MainTex", this._texture);
                 this._meshInstance.setParameter("_ScreenParams", [ 1000, 1000, 1, 1 ]);
-                this._meshInstance.setParameter("_Color", this._color.data);
 
                 this._meshInstance.setParameter("texture_emissiveMap", this._texture);
                 this._meshInstance.setParameter("texture_opacityMap", this._texture);

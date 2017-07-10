@@ -1383,13 +1383,21 @@ pc.extend(pc, function () {
                     // but mesh doesn't provide it. One example is sprite renderer.
                     // PC somehow leaks attribute bindings and the code below thinks the attribute
                     // is present on the vertex stream when it fact it isn't
-                    if (element && attribute.scopeId.name == 'COLOR' && this.vertexBuffers[element.stream].format.size == 20) {
-                        element = null;
-                        attribute.scopeId.value = null;
-                    }
+                    // if (element && attribute.scopeId.name == 'COLOR' && this.vertexBuffers[element.stream].format.size == 20) {
+                    //     element = null;
+                    //     attribute.scopeId.value = null;
+                    // }
 
                     // Check the vertex element is valid
                     if (element !== null) {
+                        if (element.const) {
+                            this.enabledAttributes[attribute.locationId] = false;
+                            gl.disableVertexAttribArray(attribute.locationId);
+                            gl.vertexAttrib4fv(attribute.locationId, element.const);
+
+                            continue;
+                        }
+
                         // Retrieve the vertex buffer that contains this element
                         vertexBuffer = this.vertexBuffers[element.stream];
                         vbOffset = this.vbOffsets[element.stream] || 0;

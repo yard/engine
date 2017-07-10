@@ -528,6 +528,12 @@ pc.extend(pc, function () {
 
         },
 
+        _setConstantColor: function (color) {
+            if (this._meshInstance) {
+                this._meshInstance.setParameter( "COLOR", {const: color.data} );
+            }
+        },
+
         _getUv: function (char) {
             var data = this._font.data;
             var width = data.info.width;
@@ -584,7 +590,6 @@ pc.extend(pc, function () {
                 this._updateText(str);
             }
             this._text = str;
-
         }
     });
 
