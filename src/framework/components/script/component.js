@@ -221,7 +221,7 @@ pc.extend(pc, function () {
 
             for(var i = 0, len = scripts.length; i < len; i++) {
                 script = scripts[i];
-                if (! script._initialized && script.enabled) {
+                if (! script._initialized && script._enabled) {
                     script._initialized = true;
                     if (script.initialize)
                         this._scriptMethod(script, ScriptComponent.scriptMethods.initialize);
@@ -234,7 +234,7 @@ pc.extend(pc, function () {
 
             for(var i = 0, len = scripts.length; i < len; i++) {
                 script = scripts[i];
-                if (! script._postInitialized && script.enabled) {
+                if (! script._postInitialized && script._enabled) {
                     script._postInitialized = true;
                     if (script.postInitialize)
                         this._scriptMethod(script, ScriptComponent.scriptMethods.postInitialize);
@@ -247,7 +247,7 @@ pc.extend(pc, function () {
 
             for(var i = 0, len = scripts.length; i < len; i++) {
                 script = scripts[i];
-                if (script.update && script.enabled)
+                if (!script.$ui && script.update && script._enabled)
                     this._scriptMethod(script, ScriptComponent.scriptMethods.update, dt);
             }
         },
@@ -257,7 +257,7 @@ pc.extend(pc, function () {
 
             for(var i = 0, len = scripts.length; i < len; i++) {
                 script = scripts[i];
-                if (script.postUpdate && script.enabled)
+                if (!script.$ui && script.postUpdate && script._enabled)
                     this._scriptMethod(script, ScriptComponent.scriptMethods.postUpdate, dt);
             }
         },
