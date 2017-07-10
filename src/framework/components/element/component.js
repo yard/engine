@@ -176,24 +176,25 @@ pc.extend(pc, function () {
         },
 
         _presync: function () {
-            if (!this.dirtyLocal && !this.element._sizeDeltaDirty && !this.element._anchoredPositionDirty && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+            var element = this.element;
+
+            if (!element._anchorDirty && !element._sizeDeltaDirty && !element._anchoredPositionDirty && !element._cornerDirty &&
+                !this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld) {
                 return;
             }
 
-            if (this.element) {
-                for (var i = 0; i < this._layoutElements.length; i++) {
-                    var layoutElement = this._layoutElements[ i ];
-                    if (layoutElement != null) {
-                        layoutElement.calculateLayoutInputHorizontal();
-                        layoutElement.calculateLayoutInputVertical();
-                    }
+            for (var i = 0; i < this._layoutElements.length; i++) {
+                var layoutElement = this._layoutElements[ i ];
+                if (layoutElement != null) {
+                    layoutElement.calculateLayoutInputHorizontal();
+                    layoutElement.calculateLayoutInputVertical();
                 }
+            }
 
-                for (var i = 0; i < this._canvasElements.length; i++) {
-                    var canvasElement = this._canvasElements[ i ];
-                    if (canvasElement != null) {
-                        canvasElement.rebuild(0);
-                    }
+            for (var i = 0; i < this._canvasElements.length; i++) {
+                var canvasElement = this._canvasElements[ i ];
+                if (canvasElement != null) {
+                    canvasElement.rebuild(0);
                 }
             }
         },
@@ -210,21 +211,25 @@ pc.extend(pc, function () {
             }
             
             if (container) {
-                this._elementRect.x = container._width  * this._anchor.x + this._corners.x;
-                this._elementRect.y = container._height * this._anchor.y + this._corners.y;
-                this._elementRect.z = container._width  * this._anchor.z + this._corners.z;
-                this._elementRect.w = container._height * this._anchor.w + this._corners.w;
+                this._elementRect.set(
+                    container._width  * this._anchor.x + this._corners.x,
+                    container._height * this._anchor.y + this._corners.y,
+                    container._width  * this._anchor.z + this._corners.z,
+                    container._height * this._anchor.w + this._corners.w
+                );
             }
         },
 
         // this method overwrites GraphNode#sync and so operates in scope of the Entity.
         _sync: function () {
-            if (!this.dirtyLocal && !this.element._sizeDeltaDirty && !this.element._anchoredPositionDirty && !this.dirtyLocalEulerAngles && !this.dirtyWorld && !this.element._anchorDirty && !this.element._cornerDirty) {
+            var element = this.element;
+
+            if (!element._anchorDirty && !element._sizeDeltaDirty && !element._anchoredPositionDirty && !element._cornerDirty &&
+                !this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld) {
                 return;
             }
 
-            var element = this.element;
-            var parent = this.element._parent;
+            var parent = element._parent;
 
             if (this.dirtyLocalEulerAngles) {
                 this.localRotation.setFromEulerAngles(this.localEulerAngles.x, this.localEulerAngles.y, this.localEulerAngles.z);
@@ -240,53 +245,53 @@ pc.extend(pc, function () {
                 this._aabbVer++;
             }
 
-            if (this.element._anchoredPositionDirty) {
-                var eapX = (1.0 - this.element._pivot.x) * this.element._corners.x + this.element._pivot.x * this.element._corners.z;
-                var eapY = (1.0 - this.element._pivot.y) * this.element._corners.y + this.element._pivot.y * this.element._corners.w;
+            if (element._anchoredPositionDirty) {
+                var eapX = (1.0 - element._pivot.x) * element._corners.x + element._pivot.x * element._corners.z;
+                var eapY = (1.0 - element._pivot.y) * element._corners.y + element._pivot.y * element._corners.w;
 
-                this.element._corners.set(
-                    this.element._corners.x + (this.element._anchoredPosition.x - eapX),
-                    this.element._corners.y + (this.element._anchoredPosition.y - eapY),
-                    this.element._corners.z + (this.element._anchoredPosition.x - eapX),
-                    this.element._corners.w + (this.element._anchoredPosition.y - eapY)
+                element._corners.set(
+                    element._corners.x + (element._anchoredPosition.x - eapX),
+                    element._corners.y + (element._anchoredPosition.y - eapY),
+                    element._corners.z + (element._anchoredPosition.x - eapX),
+                    element._corners.w + (element._anchoredPosition.y - eapY)
                 )
 
-                this.element._anchoredPositionDirty = false;
+                element._anchoredPositionDirty = false;
 
-                this.element._cornerDirty = true;
+                element._cornerDirty = true;
                 this.dirtyWorld = true;
 
                 this._aabbVer++;
             }
 
-            if (this.element._sizeDeltaDirty) {
-                this.element._corners.set(
-                    this.element._anchoredPosition.x - this.element._pivot.x * this.element._sizeDelta.x,
-                    this.element._anchoredPosition.y - this.element._pivot.y * this.element._sizeDelta.y,
-                    this.element._anchoredPosition.x + (1 - this.element._pivot.x) * this.element._sizeDelta.x,
-                    this.element._anchoredPosition.y + (1 - this.element._pivot.y) * this.element._sizeDelta.y
+            if (element._sizeDeltaDirty) {
+                element._corners.set(
+                    element._anchoredPosition.x - element._pivot.x * element._sizeDelta.x,
+                    element._anchoredPosition.y - element._pivot.y * element._sizeDelta.y,
+                    element._anchoredPosition.x + (1 - element._pivot.x) * element._sizeDelta.x,
+                    element._anchoredPosition.y + (1 - element._pivot.y) * element._sizeDelta.y
                 )
 
-                this.element._sizeDeltaDirty = false;
+                element._sizeDeltaDirty = false;
 
-                this.element._cornerDirty = true;
+                element._cornerDirty = true;
                 this.dirtyWorld = true;
 
                 this._aabbVer++;
             }
 
-            var screen = this.element.screen;
-            var _parentWithElement = this.element._findParentElement();
+            var screen = element.screen;
+            var _parentWithElement = element._findParentElement();
 
             if (!_parentWithElement && !screen) {
                 return;
             }
 
-            var rect = this.element._elementRect;
+            var rect = element._elementRect;
 
-            this.element._updateElementRect();
-            this.element._updateAnchoredPosition();
-            this.element._updateSizeDelta();
+            element._updateElementRect();
+            element._updateAnchoredPosition();
+            element._updateSizeDelta();
 
             for (var i = 0; i < this._layoutControllers.length; i++) {
                 var layoutController = this._layoutControllers[ i ];
@@ -310,12 +315,12 @@ pc.extend(pc, function () {
                 }   
             }
 
-            this.element._width = rect.z - rect.x;
-            this.element._height = rect.w - rect.y;
+            element._width = rect.z - rect.x;
+            element._height = rect.w - rect.y;
 
-            this.element._anchorTransform.setTranslate(rect.x, rect.y, 0);
-            this.element._anchorDirty = false;
-            this.element._cornerDirty = false;
+            element._anchorTransform.setTranslate(rect.x, rect.y, 0);
+            element._anchorDirty = false;
+            element._cornerDirty = false;
 
             if (this.dirtyWorld) {
                 // before recomputing the transforms let's agree on a few matrices used below:
@@ -331,7 +336,7 @@ pc.extend(pc, function () {
                 //
                 if (this._parent === null) {
                     // no parent? _screenToWorld is basically the local transform
-                    this.element._screenToWorld.copy(this.localTransform);
+                    element._screenToWorld.copy(this.localTransform);
                 } else {
                     // ok, we have a parent. does it own an element?
                     // TODO: lookup up to the scene root would be more correct – what if there is a blank 
@@ -339,68 +344,68 @@ pc.extend(pc, function () {
                     if (_parentWithElement) {
                         // our _screenToWorld starts off by offsetting current transform (which is parent's) by
                         // anchor offset – like we move the box to match the anchor settings first
-                        this.element._screenToWorld.mul2(_parentWithElement.element._modelTransform, this.element._anchorTransform);
+                        element._screenToWorld.mul2(_parentWithElement.element._modelTransform, element._anchorTransform);
                     } else {
                         // no element means we start with plain anchoring transform
-                        this.element._screenToWorld.copy(this.element._anchorTransform);
+                        element._screenToWorld.copy(element._anchorTransform);
                     }
 
                     // let's compute the pivot point – remember it's local to element coord space
-                    this.element._pivotPoint.set( this.element._width * this.element.pivot.x, this.element._height * this.element.pivot.y, 0 );
+                    element._pivotPoint.set( element._width * element.pivot.x, element._height * element.pivot.y, 0 );
                     // and compose a transform to move TO the pivot – as all local transformations,
                     // i.e. rotation should happen around the pivot
-                    this.element._toPivotTransform.setTRS( this.element._pivotPoint, pc.Quat.IDENTITY, pc.Vec3.ONE );
-                    this.element._fromPivotTransform.copy( this.element._toPivotTransform );
-                    this.element._fromPivotTransform.invert();
+                    element._toPivotTransform.setTRS( element._pivotPoint, pc.Quat.IDENTITY, pc.Vec3.ONE );
+                    element._fromPivotTransform.copy( element._toPivotTransform );
+                    element._fromPivotTransform.invert();
 
                     // we will maintain parent-to-local transform for optimization purposes as well
-                    this.element._localModelTransform.copy(this.element._anchorTransform);
+                    //element._localModelTransform.copy(element._anchorTransform);
                     // ... then we move onto pivot point
-                    this.element._localModelTransform.mul( this.element._toPivotTransform );
+                    //element._localModelTransform.mul( element._toPivotTransform );
                     // ... then we transform the model using local transformation matrix
-                    this.element._localModelTransform.mul( this.localTransform )
+                    //element._localModelTransform.mul( this.localTransform )
                     // ... and get away from our pivot point
-                    this.element._localModelTransform.mul( this.element._fromPivotTransform );
+                    //element._localModelTransform.mul( element._fromPivotTransform );
                     // ... and finally invert the matrix
-                    this.element._localModelTransform.invert();
+                    //element._localModelTransform.invert();
 
                     // our model transform starts off with what we've got from parent
-                    this.element._modelTransform.copy( this.element._screenToWorld );
+                    element._modelTransform.copy( element._screenToWorld );
                     // ... then we move onto pivot point
-                    this.element._modelTransform.mul( this.element._toPivotTransform );
+                    element._modelTransform.mul( element._toPivotTransform );
                     // ... then we transform the model using local transformation matrix
-                    this.element._modelTransform.mul( this.localTransform )
+                    element._modelTransform.mul( this.localTransform )
                     // ... and get away from our pivot point
-                    this.element._modelTransform.mul( this.element._fromPivotTransform );
+                    element._modelTransform.mul( element._fromPivotTransform );
 
                     if (screen) {
                         // if we have the screen somewhere is our heirarchy we apply screen matrix
-                        this.element._screenToWorld.mul2(screen.screen._screenMatrix, this.element._screenToWorld);
+                        element._screenToWorld.mul2(screen.screen._screenMatrix, element._screenToWorld);
 
                         // unless it's screen-space we need to account screen's world transform as well
                         if (screen.screen.screenType != pc.SCREEN_TYPE_SCREEN) {
                             var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
-                            this.element._screenToWorld.mul2(screenWorldTransform, this.element._screenToWorld);
+                            element._screenToWorld.mul2(screenWorldTransform, element._screenToWorld);
                         }
 
                         // world transform if effectively the same as model transform,
                         // BUT should account screen transformations applied on top of it
-                        this.worldTransform.copy( this.element._screenToWorld );
-                        this.worldTransform.mul( this.element._toPivotTransform ).mul( this.localTransform );
+                        this.worldTransform.copy( element._screenToWorld );
+                        this.worldTransform.mul( element._toPivotTransform ).mul( this.localTransform );
 
                         if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
-                            this.element._pivotGraph.localTransform.copy( this.element._fromPivotTransform );
+                            element._pivotGraph.localTransform.copy( element._fromPivotTransform );
                         } else {
-                            this.element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
-                            this.worldTransform.mul( this.element._fromPivotTransform );
+                            element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
+                            this.worldTransform.mul( element._fromPivotTransform );
                         }
 
-                        this.element._pivotGraph.dirtyLocal = false;
-                        this.element._pivotGraph.dirtyWorld = true;
-                        this.element._pivotGraph.sync();
+                        element._pivotGraph.dirtyLocal = false;
+                        element._pivotGraph.dirtyWorld = true;
+                        element._pivotGraph.sync();
 
-                        this.element._inversePivotWorldTransform.copy( this.element._pivotGraph.worldTransform );
-                        this.element._inversePivotWorldTransform.invert();
+                        element._inversePivotWorldTransform.copy( element._pivotGraph.worldTransform );
+                        element._inversePivotWorldTransform.invert();
                     } else {
                         this.worldTransform.copy(element._modelTransform);
                     }
@@ -415,7 +420,7 @@ pc.extend(pc, function () {
                     child._aabbVer++;
                 }
 
-                this.element.fire("resize", this.element._width, this.element._height);
+                element.fire("resize", element._width, element._height);
             }
         },
 
@@ -450,11 +455,21 @@ pc.extend(pc, function () {
         },
 
         propagateDirty: function() {
+            var nodes = [];
             var node = this.entity;
+            var hasLayoutParents = this.entity.parent && this.entity.parent._layoutControllers.length > 0;
+
             while (node) {
-                node.dirtyLocal = true;
-                node.dirtyWorld = true;
+                nodes.push( node );
+//                hasLayoutParents = hasLayoutParents || (node && node._layoutControllers.length > 0);              
                 node = node.parent;
+            }
+
+            if (hasLayoutParents) {
+                for(var i = 0; i < nodes.length; i++) {
+                    nodes[ i ].dirtyLocal = true;
+                    nodes[ i ].dirtyWorld = true;
+                }
             }
         },
 
@@ -904,7 +919,7 @@ pc.extend(pc, function () {
             var eapX = (1.0 - this._pivot.x) * this._corners.x + this._pivot.x * this._corners.z;
             var eapY = (1.0 - this._pivot.y) * this._corners.y + this._pivot.y * this._corners.w;
 
-            if (eapX == this._anchoredPosition.x && eapY == this._anchoredPosition.y) {
+            if ((Math.abs(eapX - this._anchoredPosition.x) + Math.abs(eapY - this._anchoredPosition.y)) < 0.01) {
                 return;
             }
 
@@ -933,7 +948,7 @@ pc.extend(pc, function () {
             var esdX = this._corners.z - this._corners.x;
             var esdY = this._corners.w - this._corners.y;
 
-            if (esdX == this._sizeDelta.x && esdY == this._sizeDelta.y) {
+            if ( (Math.abs(esdX - this._sizeDelta.x) + Math.abs(esdY - this._sizeDelta.y)) < 0.01 ) {
                 return;
             }
 
