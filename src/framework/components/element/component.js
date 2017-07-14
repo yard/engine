@@ -473,6 +473,16 @@ pc.extend(pc, function () {
             }
         },
 
+        setVerticesDirty: function () {
+            if (this._image) {
+                this._image.setVerticesDirty();
+            }
+
+            if (this._text) {
+                this._text.setVerticesDirty();
+            }
+        },
+
         _onInsert: function (parent) {
             // when the entity is reparented find a possible new screen
             var screen = this._findScreen();

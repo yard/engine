@@ -514,6 +514,12 @@ pc.extend(pc, function () {
             }
         },
 
+        setVerticesDirty: function () {
+            if (this._mesh) {
+                this._updateMesh(this._mesh, text);
+            }
+        },
+
         _onFontLoad: function (asset) {
             if (this.font !== asset.resource) {
                 this.font = asset.resource;

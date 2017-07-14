@@ -128,6 +128,12 @@ pc.extend(pc, function () {
             }
         },
 
+        setVerticesDirty: function () {
+            if (this._mesh) {
+                this._updateMesh(this._mesh);
+            }
+        },
+
         _onStencilLayerChange: function(value) {
             if (this._meshInstance) {
                 if (this._ignoreMask) {

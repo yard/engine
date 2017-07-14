@@ -1383,7 +1383,7 @@ pc.extend(pc, function () {
                     // but mesh doesn't provide it. One example is sprite renderer.
                     // PC somehow leaks attribute bindings and the code below thinks the attribute
                     // is present on the vertex stream when it fact it isn't
-                    // if (element && attribute.scopeId.name == 'COLOR' && this.vertexBuffers[element.stream].format.size == 20) {
+                    // if (element && element.stream && attribute.scopeId.name == 'COLOR' && this.vertexBuffers[element.stream].format.size == 20) {
                     //     element = null;
                     //     attribute.scopeId.value = null;
                     // }
