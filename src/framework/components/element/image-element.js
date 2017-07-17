@@ -1,12 +1,5 @@
 pc.extend(pc, function () {
 
-    var _defaultMapBorders = new pc.Mat4(
-        0, 0, 1, 1,
-        0, 0, 1, 1,
-        0, 0, 1, 1,
-        0, 0, 1, 1
-    );
-
     /**
      * @name pc.ImageElement
      * @description Attaches image extension to an element.
@@ -185,8 +178,6 @@ pc.extend(pc, function () {
         _updateMaterial: function (screenSpace) {
             this._material.alphaTest = this._alphaTest;
 
-            this._updateBorders();
-
             if (this._meshInstance) {
                 this._meshInstance.material = this._showMaskGraphics ? this._material : this._maskMaterial;
                 this._meshInstance.screenSpace = screenSpace;
@@ -254,29 +245,6 @@ pc.extend(pc, function () {
             this._updateMesh( mesh );
         },
 
-        _updateBorders: function() {
-            if (!this._material) {
-                return;
-            }
-
-            var w = this._element.width;
-            var h = this._element.height;
-
-            var mapBorders = _defaultMapBorders;
-
-            if (this._texture) {
-                mapBorders = new pc.Mat4(
-                    this._rect.x, (this._border.x / this._texture.width) + this._rect.x, (this._rect.z - this._border.z / this._texture.width) + this._rect.x, this._rect.x + this._rect.z,
-                    this._rect.y, (this._border.y / this._texture.height) + this._rect.y, (this._rect.w - this._border.w / this._texture.height) + this._rect.y, this._rect.y + this._rect.w,
-                    0, (this._border.x / w), (1 - this._border.z / w), 1,
-                    0, (this._border.y / h), (1 - this._border.w / h), 1
-                );
-            }
-
-            this._meshInstance.setParameter("emissiveMapBorders", mapBorders);
-            this._meshInstance.setParameter("opacityMapBorders", mapBorders);
-        },
-
         _updateMesh: function (mesh) {
             var w = this._element.width;
             var h = this._element.height;
@@ -284,8 +252,6 @@ pc.extend(pc, function () {
             if (!w || !h) {
                 return;
             }
-
-            this._updateBorders();
 
             this._positions[0] = 0;
             this._positions[1] = 0;

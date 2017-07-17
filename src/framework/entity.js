@@ -61,6 +61,7 @@ pc.extend(pc, function () {
         this._aspectRatioFitters = [];
         this._canvasElements = [];
         this._canvasGroups = [];
+        this._meshModifiers = [];
 
         pc.events.attach(this);
 
@@ -172,6 +173,7 @@ pc.extend(pc, function () {
 
     Entity.prototype._onHierarchyStateChanged = function (enabled) {
         pc.Entity._super._onHierarchyStateChanged.call(this, enabled);
+        this.fire(enabled ? 'enable' : 'disable');
 
         // enable / disable all the components
         var component;

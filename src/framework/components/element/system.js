@@ -1,11 +1,5 @@
 pc.extend(pc, function () {
     var _schema = [ 'enabled' ];
-    var _defaultMapBorders = new pc.Mat4(
-        0, 0, 1, 1,
-        0, 0, 1, 1,
-        0, 0, 1, 1,
-        0, 0, 1, 1
-    );
 
     /**
      * @name pc.ElementComponentSystem
@@ -44,8 +38,6 @@ pc.extend(pc, function () {
         this.defaultImageMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultImageMaterial.depthWrite = false;
         this.defaultImageMaterial.renderQueue = 3000;
-        this.defaultImageMaterial.emissiveMapBorders = _defaultMapBorders;
-        this.defaultImageMaterial.opacityMapBorders = _defaultMapBorders;
         this.defaultImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16);
         this.defaultImageMaterial.update();
 
@@ -53,6 +45,7 @@ pc.extend(pc, function () {
         this.defaultMaskMaterial.redWrite = false;
         this.defaultMaskMaterial.greenWrite = false;
         this.defaultMaskMaterial.blueWrite = false;
+        this.defaultMaskMaterial.alphaTest = 1 / 255.0;
         this.defaultMaskMaterial.update();
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
@@ -73,8 +66,6 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceImageMaterial.depthTest = false;
         this.defaultScreenSpaceImageMaterial.depthWrite = false;
         this.defaultScreenSpaceImageMaterial.renderQueue = 3000;
-        this.defaultScreenSpaceImageMaterial.emissiveMapBorders = _defaultMapBorders;
-        this.defaultScreenSpaceImageMaterial.opacityMapBorders = _defaultMapBorders;
         this.defaultScreenSpaceImageMaterial.updateShader(pc.Application.getApplication().graphicsDevice, pc.Application.getApplication().scene, 1 << 16 | pc.SHADERDEF_SCREENSPACE );
         this.defaultScreenSpaceImageMaterial.update();
 
@@ -82,6 +73,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceMaskMaterial.redWrite = false;
         this.defaultScreenSpaceMaskMaterial.greenWrite = false;
         this.defaultScreenSpaceMaskMaterial.blueWrite = false;
+        this.defaultScreenSpaceMaskMaterial.alphaTest = 1 / 255.0;
         this.defaultScreenSpaceMaskMaterial.update();
 
         this.defaultTextMaterial = new pc.StandardMaterial();
