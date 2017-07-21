@@ -15,6 +15,7 @@ pc.extend(pc, function() {
         'intensity',
         'depthWrite',
         'noFog',
+        'bursts',
         'depthSoftening',
         'sort',
         'blendType',

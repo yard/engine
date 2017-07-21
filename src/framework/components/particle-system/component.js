@@ -425,6 +425,7 @@ pc.extend(pc, function() {
                     emitterExtents: this.data.emitterExtents,
                     emitterRadius: this.data.emitterRadius,
                     emitterShape: this.data.emitterShape,
+                    bursts: this.data.bursts,
                     initialVelocity: this.data.initialVelocity,
                     wrap: this.data.wrap,
                     localSpace: this.data.localSpace,

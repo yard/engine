@@ -228,6 +228,7 @@ pc.extend(pc, function() {
         setProperty("animNumFrames", 1);
         setProperty("animSpeed", 1);
         setProperty("animLoop", true);
+        setProperty("bursts", []);
 
         this.frameRandom = new pc.Vec3(0, 0, 0);
 
@@ -347,6 +348,12 @@ pc.extend(pc, function() {
 
     function calcEndTime(emitter) {
         var interval = (Math.max(emitter.rate, emitter.rate2) * emitter.numParticles + emitter.lifetime);
+
+        if (emitter.bursts.length > 0) {
+            var lastBurst = emitter.bursts[ emitter.bursts.length - 1 ];
+            interval = Math.max( interval, lastBurst[0] + emitter.lifetime );
+        }
+
         return Date.now() + interval * 1000;
     }
 
@@ -533,6 +540,20 @@ pc.extend(pc, function() {
             this.localBounds.setMinMax(bMin, bMax);
         },
 
+        cacheBursts: function () {
+            this._bursts = {};
+            var j = 0;
+
+            for(var i = 0; i < this.bursts.length; i++) {
+                var burst = this.bursts[ i ];
+                var count = burst[1] + Math.random( burst[2] - burst[1] );
+
+                for(var nj = 0; nj < count; nj++) {
+                    this._bursts[ j++ ] = -Math.max( burst[ 0 ], 0.001 );
+                }
+            }
+        },
+
         rebuild: function() {
             var i, len;
             var precision = this.precision;
@@ -547,6 +568,8 @@ pc.extend(pc, function() {
             gd.fragmentUniformsCount < 64 || // force CPU if can't use many uniforms; TODO: change to more realistic value (this one is iphone's)
             gd.forceCpuParticles ||
             !gd.extTextureFloat; // no float texture extension
+
+            this.cacheBursts();
 
             this.vertexBuffer = undefined; // force regen VB
 
@@ -598,7 +621,10 @@ pc.extend(pc, function() {
             }
             for (i = 0; i < this.numParticles; i++) {
                 this.calcSpawnPosition(emitterPos, i);
-                if (this.useCpu) this.particleTex[i * particleTexChannels + 3 + this.numParticlesPot * 2 * particleTexChannels] = 1; // hide/show
+
+                if (this.useCpu) {
+                    this.particleTex[i * particleTexChannels + 3 + this.numParticlesPot * 2 * particleTexChannels] = 1; // hide/show
+                }
             }
 
             this.particleTexStart = new Float32Array(this.numParticlesPot * particleTexHeight * particleTexChannels);
@@ -755,7 +781,7 @@ pc.extend(pc, function() {
                 this.particleTex[i * particleTexChannels + 3] = pc.math.lerp(this.startAngle * pc.math.DEG_TO_RAD, this.startAngle2 * pc.math.DEG_TO_RAD, rX);//this.particleNoize[i]);
 
                 var particleRate = pc.math.lerp(this.rate, this.rate2, rX);
-                var startSpawnTime = -particleRate * i;
+                var startSpawnTime = this._bursts[i] || particleRate * i;
                 this.particleTex[i * particleTexChannels + 3 + this.numParticlesPot * particleTexChannels] = startSpawnTime;
             }
         },
