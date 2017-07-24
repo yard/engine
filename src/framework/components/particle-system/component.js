@@ -426,6 +426,8 @@ pc.extend(pc, function() {
                     emitterRadius: this.data.emitterRadius,
                     emitterShape: this.data.emitterShape,
                     bursts: this.data.bursts,
+                    sortingLayerIndex: this.data.sortingLayerIndex,
+                    sortingOrder: this.data.sortingOrder,
                     initialVelocity: this.data.initialVelocity,
                     wrap: this.data.wrap,
                     localSpace: this.data.localSpace,

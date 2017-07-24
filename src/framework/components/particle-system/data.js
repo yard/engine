@@ -6,6 +6,8 @@ pc.extend(pc, function() {
         this.rate2 = null;
         this.startAngle = 0;
         this.startAngle2 = null;
+        this.bursts = [];
+        this.sortingLayerIndex = 0;
         this.lifetime = 50;                     // Particle lifetime
         this.emitterExtents = new pc.Vec3();       // Spawn point divergence
         this.emitterRadius = 0;

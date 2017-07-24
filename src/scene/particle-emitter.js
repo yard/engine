@@ -229,6 +229,8 @@ pc.extend(pc, function() {
         setProperty("animSpeed", 1);
         setProperty("animLoop", true);
         setProperty("bursts", []);
+        setProperty("sortingLayerIndex", 0);
+        setProperty("sortingOrder", 0);
 
         this.frameRandom = new pc.Vec3(0, 0, 0);
 
@@ -309,7 +311,7 @@ pc.extend(pc, function() {
 
         this.swapTex = false;
         this.useMesh = true;
-        this.useCpu = false;
+        this.useCpu = true;
 
         //this.pack8 = true;
         this.localBounds = new pc.BoundingBox();
@@ -696,6 +698,9 @@ pc.extend(pc, function() {
             this.meshInstance.updateKey(); // shouldn't be here?
             this.meshInstance.drawToDepth = false;
             this.meshInstance.cull = true;
+            this.meshInstance.sortingLayerIndex = this.sortingLayerIndex + 100;
+            this.meshInstance.sortingOrder = this.sortingOrder;
+            this.meshInstance.drawOrder = 0;
             this.meshInstance.aabb = this.worldBounds;
             this.meshInstance._updateAabb = false;
 

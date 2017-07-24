@@ -9,6 +9,8 @@ pc.extend(pc, function() {
         'startAngle',
         'startAngle2',
         'loop',
+        'sortingLayerIndex',
+        'sortingOrder',
         'preWarm',
         'lighting',
         'halfLambert',
