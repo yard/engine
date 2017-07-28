@@ -231,6 +231,7 @@ pc.extend(pc, function() {
         setProperty("bursts", []);
         setProperty("sortingLayerIndex", 0);
         setProperty("sortingOrder", 0);
+        setProperty("scalingMode", 0);
 
         this.frameRandom = new pc.Vec3(0, 0, 0);
 
@@ -735,7 +736,17 @@ pc.extend(pc, function() {
             randomPos.data[2] = rZ - 0.5;
 
             if (this.emitterShape === pc.EMITTERSHAPE_BOX) {
-                randomPosTformed.copy(emitterPos).add( spawnMatrix.transformPoint(randomPos) );
+                var v = spawnMatrix.transformPoint(randomPos);
+                // v.x = 0;
+                // v.y = 0;
+                // v.z = 0;
+                if (this.scalingMode == 0 && this.meshInstance) {
+                    var scale = this.meshInstance.node.worldTransform.getScale();
+                    v.x = v.x * scale.x;
+                    v.y = v.y * scale.y;
+                    v.z = v.z * scale.z;
+                }
+                randomPosTformed.copy(emitterPos).add(v);
             } else {
                 randomPos.normalize();
                 randomPosTformed.copy(emitterPos).add( randomPos.scale(rW * this.spawnBounds) );
@@ -1289,7 +1300,13 @@ pc.extend(pc, function() {
                     for (j = 0; j < 12; j++) {
                         rotMat.data[j] = fullMat.data[j];
                     }
-                    nonUniformScale = this.meshInstance.node.localScale;
+
+                    if (this.scalingMode == 0 && this.meshInstance) {
+                        nonUniformScale = this.meshInstance.node.worldTransform.getScale();
+                    } else {
+                        nonUniformScale = this.meshInstance.node.localScale;
+                    }
+
                     uniformScale = Math.max(Math.max(nonUniformScale.x, nonUniformScale.y), nonUniformScale.z);
                 }
 
@@ -1438,10 +1455,11 @@ pc.extend(pc, function() {
                         scale = (scale + (scale2 - scale) * ((rndFactor * 10000.0) % 1.0)) * uniformScale;
                         alphaDiv = (alpha2 - alpha) * ((rndFactor * 1000.0) % 1.0);
 
-                        if (this.meshInstance.node) {
-                            rotMat.transformPoint(localVelocityVec, localVelocityVec);
-                        }
-                        localVelocityVec.add(velocityVec.mul(nonUniformScale));
+                        // if (this.meshInstance.node) {
+                        //     rotMat.transformPoint(localVelocityVec, localVelocityVec);
+                        // }
+                        localVelocityVec.add(velocityVec.scale(1/uniformScale));//.mul(nonUniformScale));
+                        localVelocityVec.scale(uniformScale);
                         moveDirVec.copy(localVelocityVec);
 
                         particlePosPrev.data[0] = this.particleTex[id * particleTexChannels];

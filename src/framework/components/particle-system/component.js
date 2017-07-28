@@ -17,6 +17,7 @@ pc.extend(pc, function() {
         'lifetime',
         'rate',
         'rate2',
+        'scalingMode',
         'startAngle',
         'startAngle2',
         'lighting',
