@@ -283,10 +283,6 @@ pc.extend(pc, function () {
             var screen = element.screen;
             var _parentWithElement = element._findParentElement();
 
-            if (_parentWithElement) {
-                screen = screen || _parentWithElement.element.screen;
-            }
-
             if (!_parentWithElement && !screen) {
                 return;
             }
@@ -519,7 +515,7 @@ pc.extend(pc, function () {
 
                 this._patch();
             } else {
-                this._patch();
+                this._unpatch();
             }
 
             this.fire('set:screen', this.screen);
