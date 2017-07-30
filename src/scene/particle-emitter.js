@@ -744,8 +744,9 @@ pc.extend(pc, function() {
                     var scale = this.meshInstance.node.worldTransform.getScale();
                     v.x = v.x * scale.x;
                     v.y = v.y * scale.y;
-                    v.z = v.z * scale.z;
+                    // v.z = v.z * scale.z;
                 }
+                v.z = -0.1;
                 randomPosTformed.copy(emitterPos).add(v);
             } else {
                 randomPos.normalize();
@@ -877,6 +878,11 @@ pc.extend(pc, function() {
         _initializeTextures: function () {
             if (this.colorMap) {
                 this.material.setParameter('colorMap', this.colorMap);
+
+                // particle shader in playcanvas requires repeating addressing mode
+                this.colorMap.addressU = pc.ADDRESS_REPEATING;
+                this.colorMap.addressV = pc.ADDRESS_REPEATING;
+
                 if (this.lighting && this.normalMap) {
                     this.material.setParameter('normalMap', this.normalMap);
                 }
