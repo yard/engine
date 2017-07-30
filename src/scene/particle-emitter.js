@@ -736,17 +736,8 @@ pc.extend(pc, function() {
             randomPos.data[2] = rZ - 0.5;
 
             if (this.emitterShape === pc.EMITTERSHAPE_BOX) {
-                var v = spawnMatrix.transformPoint(randomPos);
-                // v.x = 0;
-                // v.y = 0;
-                // v.z = 0;
-                if (this.scalingMode == 0 && this.meshInstance) {
-                    var scale = this.meshInstance.node.worldTransform.getScale();
-                    v.x = v.x * scale.x;
-                    v.y = v.y * scale.y;
-                    // v.z = v.z * scale.z;
-                }
-                v.z = -0.1;
+                var v = spawnMatrix.transformVector(randomPos);
+                v.z = -0.1; // Because of some weird particle clipping bug
                 randomPosTformed.copy(emitterPos).add(v);
             } else {
                 randomPos.normalize();
@@ -1209,7 +1200,11 @@ pc.extend(pc, function() {
                 if (this.meshInstance.node === null){
                     spawnMatrix.setTRS(pc.Vec3.ZERO, pc.Quat.IDENTITY, this.emitterExtents);
                 } else {
-                    spawnMatrix.setTRS(pc.Vec3.ZERO, this.meshInstance.node.getRotation(), tmpVec3.copy(this.emitterExtents).mul(this.meshInstance.node.localScale));
+                    if (this.scalingMode == 0) {
+                        spawnMatrix.setTRS(pc.Vec3.ZERO, this.meshInstance.node.getRotation(), tmpVec3.copy(this.emitterExtents).mul(this.meshInstance.node.worldTransform.getScale()));
+                    } else {
+                        spawnMatrix.setTRS(pc.Vec3.ZERO, this.meshInstance.node.getRotation(), tmpVec3.copy(this.emitterExtents).mul(this.meshInstance.node.localScale));
+                    }
                 }
             }
 
