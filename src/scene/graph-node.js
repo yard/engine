@@ -694,6 +694,7 @@ pc.extend(pc, function () {
                 }
 
                 for (var i = syncList.length - 1; i >= 0; i--) {
+                    syncList[i].presync();
                     syncList[i].sync();
                 }
 
