@@ -393,12 +393,12 @@ pc.extend(pc, function () {
                         this.worldTransform.copy( element._screenToWorld );
                         this.worldTransform.mul( element._toPivotTransform ).mul( this.localTransform );
 
-                        if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
+                        //if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
                             element._pivotGraph.localTransform.copy( element._fromPivotTransform );
-                        } else {
-                            element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
-                            this.worldTransform.mul( element._fromPivotTransform );
-                        }
+                        //} else {
+                        //    element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
+                        //    this.worldTransform.mul( element._fromPivotTransform );
+                        //}
 
                         element._pivotGraph.dirtyLocal = false;
                         element._pivotGraph.dirtyWorld = true;
