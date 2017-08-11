@@ -119,7 +119,7 @@ pc.extend(pc, function() {
                         data[prop] = new pc.Vec3(data[prop][0], data[prop][1], data[prop][2]);
                     }
                 } else if (types[prop] === 'curve') {
-                    if (!(data[prop] instanceof pc.Curve) && !(data[prop] instanceof pc.AnimationCurve) && !(data[prop] instanceof pc.AnimationCurveBlend)) {
+                    if (!(data[prop] instanceof pc.Curve) && !(data[prop] instanceof pc.AnimationCurve) && !(data[prop] instanceof pc.AnimationCurveBlend) && !(data[prop] instanceof pc.AnimationCurveMultipliedBlend)) {
                         type = data[prop].type;
                         data[prop] = new pc.Curve(data[prop].keys);
                         data[prop].type = type;
