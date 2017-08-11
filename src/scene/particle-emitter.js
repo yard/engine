@@ -7,6 +7,10 @@ pc.extend(pc, function() {
         [-1, 1]
     ];
 
+    var SCALING_MODE_HIERARCHY = 0;
+    var SCALING_MODE_LOCAL = 1;
+    var SCALING_MODE_SHAPE = 2;
+
     var _createTexture = function(device, width, height, pixelData, format, mult8Bit, filter) {
         if (!format) format = pc.PIXELFORMAT_RGBA32F;
 
@@ -1200,7 +1204,7 @@ pc.extend(pc, function() {
                 if (this.meshInstance.node === null){
                     spawnMatrix.setTRS(pc.Vec3.ZERO, pc.Quat.IDENTITY, this.emitterExtents);
                 } else {
-                    if (this.scalingMode == 0) {
+                    if (this.scalingMode == SCALING_MODE_HIERARCHY) {
                         spawnMatrix.setTRS(pc.Vec3.ZERO, this.meshInstance.node.getRotation(), tmpVec3.copy(this.emitterExtents).mul(this.meshInstance.node.worldTransform.getScale()));
                     } else {
                         spawnMatrix.setTRS(pc.Vec3.ZERO, this.meshInstance.node.getRotation(), tmpVec3.copy(this.emitterExtents).mul(this.meshInstance.node.localScale));
@@ -1210,6 +1214,11 @@ pc.extend(pc, function() {
 
             var emitterPos;
             var emitterScale = this.meshInstance.node === null ? pc.Vec3.ONE.data : this.meshInstance.node.localScale.data;
+
+            // Only apply transform scale to the shape component, which controls where particles are spawned, but does not affect their size or movement.
+            if (this.scalingMode == SCALING_MODE_SHAPE) {
+                emitterScale = pc.Vec3.ONE.data;
+            }
 
             this.material.setParameter("emitterScale", emitterScale);
             if (this.localSpace && this.meshInstance.node) {
@@ -1302,8 +1311,10 @@ pc.extend(pc, function() {
                         rotMat.data[j] = fullMat.data[j];
                     }
 
-                    if (this.scalingMode == 0 && this.meshInstance) {
+                    if (this.scalingMode == SCALING_MODE_HIERARCHY && this.meshInstance) {
                         nonUniformScale = this.meshInstance.node.worldTransform.getScale();
+                    } else if (this.scalingMode == SCALING_MODE_SHAPE) {
+                        nonUniformScale = pc.Vec3.ONE;
                     } else {
                         nonUniformScale = this.meshInstance.node.localScale;
                     }
@@ -1610,7 +1621,11 @@ pc.extend(pc, function() {
     };
 
     return {
-        ParticleEmitter: ParticleEmitter
+        ParticleEmitter: ParticleEmitter,
+
+        SCALING_MODE_HIERARCHY: SCALING_MODE_HIERARCHY,
+        SCALING_MODE_LOCAL: SCALING_MODE_LOCAL,
+        SCALING_MODE_SHAPE: SCALING_MODE_SHAPE,
     };
 }());
 
