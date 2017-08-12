@@ -584,6 +584,10 @@ pc.extend(pc, function() {
         * @description Checks if simulation is in progress.
         */
         isPlaying: function() {
+            if (!this.emitter) {
+                return false;
+            }
+            
             if (this.data.paused) {
                 return false;
             } else {
