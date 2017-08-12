@@ -526,12 +526,27 @@ pc.extend(pc, function () {
             // update all child screens
             var children = this.entity.getChildren();
             for (var i = 0, l = children.length; i < l; i++) {
-                if (children[i].element) children[i].element._updateScreen(screen, skipOrderUpdate);
+                if (children[i].element) {
+                    children[i].element._updateScreen(screen, skipOrderUpdate);
+                } else {
+                    this._updateScreenForNonElement(children[i], screen, skipOrderUpdate);
+                }
             }
 
             // calculate draw order
             if (this.screen && !skipOrderUpdate) {
                 this.screen.screen.syncDrawOrder();
+            }
+        },
+
+        _updateScreenForNonElement: function (nonelement, screen, skipOrderUpdate) {
+            var children = nonelement.getChildren();
+            for (var i = 0, l = children.length; i < l; i++) {
+                if (children[i].element) {
+                    children[i].element._updateScreen(screen, skipOrderUpdate);
+                } else {
+                    this._updateScreenForNonElement(children[i], screen, skipOrderUpdate);
+                }
             }
         },
 
