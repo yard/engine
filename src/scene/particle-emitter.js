@@ -187,6 +187,7 @@ pc.extend(pc, function() {
         // Global system parameters
         setPropertyTarget = this;
         setPropertyOptions = options;
+        this.aliveParticleCount = 0;
         setProperty("numParticles", 1);                          // Amount of particles allocated (max particles = max GL texture width at this moment)
 
         if (this.numParticles > graphicsDevice.maxTextureSize) {
