@@ -44,6 +44,8 @@ pc.extend(pc, function () {
         this._canvasGroups = null;
 
         this._pivot = new pc.Vec2(0.5, 0.5);
+        this._width = 0;
+        this._height = 0;
 
         this._debugColor = null;
 
