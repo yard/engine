@@ -1172,12 +1172,13 @@ pc.extend(pc, function () {
 
                     var mask = drawCall.node.cullingLayer || 0xFFFFFFFF; 
                     
-                    if (!drawCall.node.cullingLayer && drawCall.node._parent && drawCall.node._parent.constructor == pc.Entity) {
+                    if (!drawCall.node.cullingLayer && drawCall.node._parent && (drawCall.node._parent.cullingLayer || drawCall.node._parent.constructor == pc.Entity)) {
                         mask = drawCall.node._parent.cullingLayer;
                     }
-
-                    if (drawCall.node._parent && drawCall.node._parent._parent) {
-                        mask = drawCall.node._parent._parent.cullingLayer;
+                    else {
+                        if (!drawCall.node.cullingLayer && drawCall.node._parent && drawCall.node._parent._parent) {
+                            mask = drawCall.node._parent._parent.cullingLayer;
+                        }
                     }
 
                     // if the object's mask AND the camera's cullingMask is zero then the game object will be invisible from the camera
