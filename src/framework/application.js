@@ -148,6 +148,7 @@ pc.extend(pc, function () {
         }
 
         this._inTools = false;
+        this._targetAspect = null;
 
         this._skyboxLast = 0;
 
@@ -857,7 +858,9 @@ pc.extend(pc, function () {
         */
         setCanvasFillMode: function (mode, width, height) {
             this._fillMode = mode;
-            this.resizeCanvas(width, height);
+
+            var result = this.resizeCanvas(width, height);
+            this.graphicsDevice.resizeCanvas(result.width, result.height);
         },
 
         /**
@@ -1009,7 +1012,7 @@ pc.extend(pc, function () {
                 this.graphicsDevice.resizeCanvas(width, height);
             } else {
                 if (this._fillMode === pc.FILLMODE_KEEP_ASPECT) {
-                    var r = this.graphicsDevice.canvas.width/this.graphicsDevice.canvas.height;
+                    var r = this._targetAspect || (this.graphicsDevice.canvas.width / this.graphicsDevice.canvas.height);
                     var winR = windowWidth / windowHeight;
 
                     if (r > winR) {
@@ -1018,6 +1021,13 @@ pc.extend(pc, function () {
                     } else {
                         height = windowHeight;
                         width = height * r;
+                    }
+
+                    if (this.minimumResolution) {
+                        if (width < this.minimumResolution.x || height < this.minimumResolution.y) {
+                            width = this.minimumResolution.x;
+                            height = this.minimumResolution.y;
+                        }
                     }
                 } else if (this._fillMode === pc.FILLMODE_FILL_WINDOW) {
                     width = windowWidth;
@@ -1238,6 +1248,17 @@ pc.extend(pc, function () {
             pc.destroyPostEffectQuad();
         }
     };
+
+    Object.defineProperty( Application.prototype, 'targetAspect', {
+        get: function () {
+            return this._targetAspect;
+        },
+
+        set: function (value) {
+            this._targetAspect = value;
+            this.setCanvasFillMode( this._fillMode, window.innerWidth, window.innerHeight );
+        }        
+    })
 
     // create tick function to be wrapped in closure
     var makeTick = function (_app) {
