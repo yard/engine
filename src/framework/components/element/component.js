@@ -297,7 +297,7 @@ pc.extend(pc, function () {
 
             for (var i = 0; i < this._layoutControllers.length; i++) {
                 var layoutController = this._layoutControllers[ i ];
-                if (layoutController != null) {
+                if (layoutController != null && layoutController.m_Enabled) {
                     layoutController.setLayoutHorizontal();
                     layoutController.setLayoutVertical();
                 }    
