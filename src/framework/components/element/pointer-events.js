@@ -17,17 +17,20 @@ pc.extend(pc, function() {
                 return POINTER_TEST_RESULT_FAIL;
             }
 
-            if (this._rootPointerEventReceiver) {
-                return POINTER_TEST_RESULT_PASS_THROUGH;
-            }
+            // if (this._rootPointerEventReceiver) {
+            //     return POINTER_TEST_RESULT_PASS_THROUGH;
+            // }
 
             var failureResult = POINTER_TEST_RESULT_FAIL;
 
-            if (this._width == 0 || this._height == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
+            var w = (this.entity.element ? this.entity.element._width : this._width);
+            var h = (this.entity.element ? this.entity.element._height : this._height);
+
+            if (w == 0 || h == 0 || this.entity.localScale.x < 0 || this.entity.localScale.y < 0) {
                 failureResult = POINTER_TEST_RESULT_PASS_THROUGH;
             }
 
-            if ((point.x >= 0) && (point.y >= 0) && (point.x <= this._width) && (point.y <= this._height)) {
+            if ((point.x >= 0) && (point.y >= 0) && (point.x <= w) && (point.y <= h)) {
                 return POINTER_TEST_RESULT_PASS;
             } else {
                 return failureResult;
@@ -111,6 +114,16 @@ pc.extend(pc, function() {
             return false;
         },
 
+        respondsTo: function () {
+            for(var i = 0; i < arguments.length; i++) {
+                var responds = this.hasListeners( arguments[i] ) || (this.entity.element && this.entity.element.hasListeners( arguments[i] ));
+
+                if (responds) {
+                    return true;
+                }
+            }
+        },
+
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
         _pointerEventDown: function( ray ) {
@@ -128,7 +141,7 @@ pc.extend(pc, function() {
             
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_DOWN, point);
-                return this.hasListeners( pc.POINTEREVENT_DOWN );
+                return this.respondsTo( pc.POINTEREVENT_DOWN );
             } else {
                 return false;
             }
@@ -153,7 +166,7 @@ pc.extend(pc, function() {
                 this.fire(pc.POINTEREVENT_CLICK, point);
                 this.fire(pc.POINTEREVENT_UP, point);
 
-                return this.hasListeners( pc.POINTEREVENT_UP ) || this.hasListeners( pc.POINTEREVENT_CLICK );
+                return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK ) ;
             } else {
                 return false;
             }
@@ -196,7 +209,7 @@ pc.extend(pc, function() {
             }
 
             this.fire(pc.POINTEREVENT_MOVE, point);
-            return this.hasListeners( pc.POINTEREVENT_MOVE );
+            return this.respondsTo( pc.POINTEREVENT_MOVE );
         },
 
         // Handles "scroll" pointer event – might be coming from touch or
@@ -216,7 +229,7 @@ pc.extend(pc, function() {
 
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 this.fire(pc.POINTEREVENT_SCROLL, point, amount);
-                return this.hasListeners( pc.POINTEREVENT_SCROLL );
+                return this.respondsTo( pc.POINTEREVENT_SCROLL );
             } else {
                 return false;
             }
