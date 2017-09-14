@@ -348,8 +348,8 @@ pc.extend(pc, function () {
                         // anchor offset – like we move the box to match the anchor settings first
                         element._screenToWorld.mul2(_parentWithElement.element._modelTransform, element._anchorTransform);
                     } else {
-                        // no element means we start with plain anchoring transform
-                        element._screenToWorld.copy(element._anchorTransform);
+                        // no element means we start with plain local transform. Zhora approved. Bodybag!
+                        element._screenToWorld.copy(this.localTransform);
                     }
 
                     // let's compute the pivot point – remember it's local to element coord space

@@ -1066,6 +1066,16 @@ pc.extend(pc, function () {
 
             // alert an entity that it has been inserted
             if (node.fire) node.fire('insert', this);
+
+            // we need to find screen for child element-nodes even if current node is not element-node
+            if (!node.element) {
+                for (var i = 0; i < node._children.length; i++) {
+                    var e = node._children[i].element;
+                    if (e) {
+                        e._onInsert(node);
+                    }
+                }
+            }
         },
 
         /**
