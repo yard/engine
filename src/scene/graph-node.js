@@ -1091,6 +1091,8 @@ pc.extend(pc, function () {
             var i;
             var length = this._children.length;
 
+            child._notifyHierarchyStateChanged(child, false);
+
             this.dirtyLocal = true;
 
             // Remove from child list
