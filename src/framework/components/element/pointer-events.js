@@ -135,6 +135,13 @@ pc.extend(pc, function() {
                 return false;
             }
 
+            if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
+                if (testResult == POINTER_TEST_RESULT_PASS) {    
+                    this.fire(pc.POINTEREVENT_DOWN, point);
+                    return this.respondsTo( pc.POINTEREVENT_DOWN );
+                }
+            }
+
             if ( this._passPointerEventToChildren("_pointerEventDown", [ ray ]) ) {
                 return true;
             }
@@ -158,6 +165,14 @@ pc.extend(pc, function() {
                 return false;
             }
 
+            if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
+                if (testResult == POINTER_TEST_RESULT_PASS) {    
+                    this.fire(pc.POINTEREVENT_CLICK, point);
+                    this.fire(pc.POINTEREVENT_UP, point);
+                    return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
+                }
+            }
+
             if ( this._passPointerEventToChildren("_pointerEventUp", [ ray ]) ) {
                 return true;
             }
@@ -166,7 +181,7 @@ pc.extend(pc, function() {
                 this.fire(pc.POINTEREVENT_CLICK, point);
                 this.fire(pc.POINTEREVENT_UP, point);
 
-                return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK ) ;
+                return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
             } else {
                 return false;
             }
