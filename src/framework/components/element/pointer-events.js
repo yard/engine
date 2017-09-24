@@ -40,6 +40,9 @@ pc.extend(pc, function() {
         // Converts supplied screen point to "world-space" ray. "World-space" is not literally
         // worldspace as in case of screen space canvas it's in fact screen-space.
         _screenPointToRay: function (point) {
+            point.x *= this.system.app.graphicsDevice.width / this.system.app.graphicsDevice.canvas.scrollWidth;
+            point.y *= this.system.app.graphicsDevice.height / this.system.app.graphicsDevice.canvas.scrollHeight;
+
             // if we are screen-space guys, camera transforms will be no help – we are 
             // using our own ortho matrix anyway
             if (this._screenType == pc.SCREEN_TYPE_SCREEN) {
