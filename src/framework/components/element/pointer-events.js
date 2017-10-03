@@ -129,7 +129,7 @@ pc.extend(pc, function() {
 
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventDown: function( ray ) {
+        _pointerEventDown: function( ray, nearestButton ) {
             var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent( point );
@@ -139,19 +139,19 @@ pc.extend(pc, function() {
             }
 
             if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
-                if (testResult == POINTER_TEST_RESULT_PASS) {    
-                    this.fire(pc.POINTEREVENT_DOWN, point);
-                    return this.respondsTo( pc.POINTEREVENT_DOWN );
-                }
+                nearestButton = this;
             }
 
-            if ( this._passPointerEventToChildren("_pointerEventDown", [ ray ]) ) {
+            if ( this._passPointerEventToChildren("_pointerEventDown", [ ray, nearestButton ]) ) {
                 return true;
             }
             
             if (testResult == POINTER_TEST_RESULT_PASS) {
-                this.fire(pc.POINTEREVENT_DOWN, point);
-                return this.respondsTo( pc.POINTEREVENT_DOWN );
+                var receiver = nearestButton || this;
+
+                receiver.fire(pc.POINTEREVENT_DOWN, point);
+
+                return receiver.respondsTo( pc.POINTEREVENT_DOWN );
             } else {
                 return false;
             }
@@ -159,7 +159,7 @@ pc.extend(pc, function() {
 
         // Handles "up" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventUp: function( ray ) {
+        _pointerEventUp: function( ray, nearestButton ) {
             var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent(point);
@@ -169,22 +169,20 @@ pc.extend(pc, function() {
             }
 
             if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
-                if (testResult == POINTER_TEST_RESULT_PASS) {    
-                    this.fire(pc.POINTEREVENT_CLICK, point);
-                    this.fire(pc.POINTEREVENT_UP, point);
-                    return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
-                }
+                nearestButton = this;
             }
 
-            if ( this._passPointerEventToChildren("_pointerEventUp", [ ray ]) ) {
+            if ( this._passPointerEventToChildren("_pointerEventUp", [ ray, nearestButton ]) ) {
                 return true;
             }
             
             if (testResult == POINTER_TEST_RESULT_PASS) {
-                this.fire(pc.POINTEREVENT_CLICK, point);
-                this.fire(pc.POINTEREVENT_UP, point);
+                var receiver = nearestButton || this;
 
-                return this.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
+                receiver.fire(pc.POINTEREVENT_CLICK, point);
+                receiver.fire(pc.POINTEREVENT_UP, point);
+
+                return receiver.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
             } else {
                 return false;
             }
