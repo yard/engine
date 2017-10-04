@@ -598,7 +598,7 @@ pc.extend(pc, function () {
             }
 
             if (!node) {
-                return [];
+                return this.entity._canvasGroups;
             }
 
             if (node.element._canvasGroups == null) {
