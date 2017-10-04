@@ -1001,6 +1001,13 @@ pc.extend(pc, function () {
 
             this._children.push(node);
             this._onInsertChild(node);
+
+            // When we add child to the node that has canvasGroups we should update canvas groups for this new child
+            if (node.element) {
+                if (node._parent.element && node._parent.element._canvasGroups && node._parent.element._canvasGroups.length > 0) {
+                    node.element.notifyCanvasGroupChanged();
+                }
+            }
         },
 
         addChildAndSaveTransform: function(node) {
