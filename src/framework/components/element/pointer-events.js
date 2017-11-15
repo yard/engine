@@ -129,7 +129,7 @@ pc.extend(pc, function() {
 
         // Handles "down" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventDown: function( ray, nearestButton ) {
+        _pointerEventDown: function( ray, nearestControl ) {
             var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent( point );
@@ -138,16 +138,16 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
-                nearestButton = this;
+            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'])) {
+                nearestControl = this;
             }
 
-            if ( this._passPointerEventToChildren("_pointerEventDown", [ ray, nearestButton ]) ) {
+            if ( this._passPointerEventToChildren("_pointerEventDown", [ ray, nearestControl ]) ) {
                 return true;
             }
             
             if (testResult == POINTER_TEST_RESULT_PASS) {
-                var receiver = nearestButton || this;
+                var receiver = nearestControl || this;
 
                 receiver.fire(pc.POINTEREVENT_DOWN, point);
 
@@ -159,7 +159,7 @@ pc.extend(pc, function() {
 
         // Handles "up" pointer event – might be coming from touch or
         // a mouse.
-        _pointerEventUp: function( ray, nearestButton ) {
+        _pointerEventUp: function( ray, nearestControl ) {
             var point = this._rayToLocalPoint( ray );
 
             var testResult = this._testPointerEvent(point);
@@ -168,16 +168,16 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            if (this.entity.element && this.entity.element['UnityEngine.UI.Button']) {
-                nearestButton = this;
+            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'])) {
+                nearestControl = this;
             }
 
-            if ( this._passPointerEventToChildren("_pointerEventUp", [ ray, nearestButton ]) ) {
+            if ( this._passPointerEventToChildren("_pointerEventUp", [ ray, nearestControl ]) ) {
                 return true;
             }
             
             if (testResult == POINTER_TEST_RESULT_PASS) {
-                var receiver = nearestButton || this;
+                var receiver = nearestControl || this;
 
                 receiver.fire(pc.POINTEREVENT_CLICK, point);
                 receiver.fire(pc.POINTEREVENT_UP, point);
