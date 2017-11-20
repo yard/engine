@@ -187,7 +187,7 @@ pc.extend(pc, function () {
 
             for (var i = 0; i < this._layoutElements.length; i++) {
                 var layoutElement = this._layoutElements[ i ];
-                if (layoutElement != null) {
+                if (layoutElement != null && layoutElement.m_Enabled) {
                     layoutElement.calculateLayoutInputHorizontal();
                     layoutElement.calculateLayoutInputVertical();
                 }
@@ -349,7 +349,7 @@ pc.extend(pc, function () {
                         element._screenToWorld.mul2(_parentWithElement.element._modelTransform, element._anchorTransform);
                     } else {
                         // no element means we start with plain local transform. Zhora approved. Bodybag!
-                        element._screenToWorld.copy(this.localTransform);
+                        element._screenToWorld.copy(element._anchorTransform);
                     }
 
                     // let's compute the pivot point – remember it's local to element coord space

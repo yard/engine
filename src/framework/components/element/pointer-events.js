@@ -30,6 +30,11 @@ pc.extend(pc, function() {
                 failureResult = POINTER_TEST_RESULT_PASS_THROUGH;
             }
 
+            // having NO single script means it's just a rect transform, which does nothing to raycasts
+            if (!this.entity.script) {
+                failureResult = POINTER_TEST_RESULT_PASS_THROUGH;   
+            }
+
             if ((point.x >= 0) && (point.y >= 0) && (point.x <= w) && (point.y <= h)) {
                 return POINTER_TEST_RESULT_PASS;
             } else {

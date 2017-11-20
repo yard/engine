@@ -186,6 +186,7 @@ pc.extend(pc, function () {
                     this._meshInstance.layer = pc.scene.LAYER_HUD;
                 }
                 this._meshInstance.screenSpace = screenSpace;
+                this._meshInstance.setParameter("screenSpaceFactor", screenSpace ? 1 : 0);
                 
                 this._meshInstance.setParameter("texture_msdfMap", this._font.texture);
                 this._meshInstance.setParameter("_MainTex", this._font.texture);
