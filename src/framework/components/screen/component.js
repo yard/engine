@@ -294,7 +294,7 @@ pc.extend(pc, function () {
         set: function (value) {
             if (this._screenType != pc.SCREEN_TYPE_SCREEN) {
                 this._resolution.set(value.x, value.y);
-            } else {
+            } else if (!this._camera || !this._camera.renderTarget) {
                 // ignore input when using screenspace.
                 this._resolution.set(this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height);
             }
@@ -476,6 +476,12 @@ pc.extend(pc, function () {
     Object.defineProperty(ScreenComponent.prototype, "camera", {
         set: function (value) {
             this._camera = value;
+
+            if (value && value.renderTarget != null) {
+                // for the case of a camera rendering to a render target, we actually need to update the resolution
+                this.resolution = new pc.Vec2( value.renderTarget.width, value.renderTarget.height );
+            }
+
             this._calcProjectionMatrix();
         },
         get: function () {
