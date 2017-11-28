@@ -385,7 +385,7 @@ pc.extend(pc, function () {
                         element._screenToWorld.mul2(screen.screen._screenMatrix, element._screenToWorld);
 
                         // unless it's screen-space we need to account screen's world transform as well
-                        if (screen.screen.screenType != pc.SCREEN_TYPE_SCREEN) {
+                        if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
                             var screenWorldTransform = screen.parent ? screen.parent.worldTransform : pc.Mat4.IDENTITY;
                             element._screenToWorld.mul2(screenWorldTransform, element._screenToWorld);
                         }
