@@ -1198,8 +1198,10 @@ pc.extend(pc, function () {
                     // if the object's mask AND the camera's cullingMask is zero then the game object will be invisible from the camera
                     if (drawCall.mask && (drawCall.mask & cullingMask) === 0) continue;
 
-                    // Don't cull fx/hud/gizmo
-                    if (drawCall.layer > pc.LAYER_FX) {
+                    // if the object belongs to a screen-space canvas, only cull it based on camera (in)equality
+                    if (drawCall.preRender && drawCall.preRender._element && drawCall.preRender._element.screen && drawCall.preRender._element.screen.screen._screenType == pc.SCREEN_TYPE_CAMERA) {
+                        visible = (drawCall.preRender._element.screen.screen._camera == camera);
+                    } else if (drawCall.layer > pc.LAYER_FX) {
                         if (drawCall.cull) {
                             visible = this._isVisible(camera, drawCall);
                         }
