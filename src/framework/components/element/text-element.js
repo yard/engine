@@ -586,7 +586,7 @@ pc.extend(pc, function () {
         },
 
         set: function (value) {
-            var str = value.toString();
+            var str = (value || "").toString();
 
             if (this._text == str) {
                 return;
