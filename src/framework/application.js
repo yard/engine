@@ -753,8 +753,7 @@ pc.extend(pc, function () {
             var camera = null;
             var renderer = this.renderer;
 
-            this.root.presyncHierarchy();
-            this.root.syncHierarchy();
+            this.presyncAndSyncHierarchy();
 
             // render the scene from each camera
             for (var i=0,len=cameras.length; i<len; i++) {
@@ -767,6 +766,11 @@ pc.extend(pc, function () {
             // #ifdef PROFILER
             this.stats.frame.renderTime = pc.now() - this.stats.frame.renderStart;
             // #endif
+        },
+
+        presyncAndSyncHierarchy: function () {
+            this.root.presyncHierarchy();
+            this.root.syncHierarchy();
         },
 
         _fillFrameStats: function(now, dt, ms) {
