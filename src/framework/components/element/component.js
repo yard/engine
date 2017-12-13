@@ -516,6 +516,10 @@ pc.extend(pc, function () {
                 this.screen.screen.on('set:screentype', this._onScreenTypeChange, this);
 
                 this._patch();
+
+                // Force ui layout upon insertion
+                this.entity.presync();
+                this.entity.sync();
             } else {
                 this._unpatch();
             }
