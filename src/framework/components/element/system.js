@@ -23,10 +23,10 @@ pc.extend(pc, function () {
 
         this.defaultImageMaterial = new pc.StandardMaterial();
         this.defaultImageMaterial.cull = pc.CULLFACE_NONE;
-        this.defaultImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
+        this.defaultImageMaterial.emissive = new pc.Color(0, 0, 0, 1); // use non-white to compile shader correctly
         this.defaultImageMaterial.emissiveMap = this._defaultTexture;
         this.defaultImageMaterial.emissiveMapTint = true;
-        this.defaultImageMaterial.diffuse = new pc.Color(0, 0, 0);
+        this.defaultImageMaterial.diffuse = new pc.Color(0, 0, 0, 1);
         this.defaultImageMaterial.opacityMap = this._defaultTexture;
         this.defaultImageMaterial.opacityMapChannel = "a";
         this.defaultImageMaterial.opacityTint = true;
@@ -50,8 +50,8 @@ pc.extend(pc, function () {
 
         this.defaultScreenSpaceImageMaterial = new pc.StandardMaterial();
         this.defaultScreenSpaceImageMaterial.cull = pc.CULLFACE_NONE;
-        this.defaultScreenSpaceImageMaterial.emissive = new pc.Color(0.5,0.5,0.5,1); // use non-white to compile shader correctly
-        this.defaultScreenSpaceImageMaterial.diffuse = new pc.Color(0, 0, 0);
+        this.defaultScreenSpaceImageMaterial.emissive = new pc.Color(0, 0, 0, 1); // use non-white to compile shader correctly
+        this.defaultScreenSpaceImageMaterial.diffuse = new pc.Color(0, 0, 0, 1);
         this.defaultScreenSpaceImageMaterial.emissiveMap = this._defaultTexture;
         this.defaultScreenSpaceImageMaterial.emissiveMapTint = true;
         this.defaultScreenSpaceImageMaterial.opacityMap = this._defaultTexture;
@@ -87,7 +87,7 @@ pc.extend(pc, function () {
         this.defaultTextMaterial.useSkybox = false;
         this.defaultTextMaterial.emissive = new pc.Color(1,1,1,1);
         this.defaultTextMaterial.opacity = 0.5;
-        this.defaultTextMaterial.blendType = pc.BLEND_NORMAL;
+        this.defaultTextMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultTextMaterial.depthWrite = false;
         this.defaultTextMaterial.update();
 

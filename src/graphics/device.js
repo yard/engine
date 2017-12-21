@@ -31,9 +31,13 @@ pc.extend(pc, function () {
     var _createContext = function (canvas, options) {
         var names = ["webgl", "experimental-webgl"];
         var context = null;
+        
         options = options || {};
         options.stencil = true;
         options.antialias = (window.devicePixelRatio < 2);
+        options.alpha = true;
+        options.premultipliedAlpha = false;
+
         for (var i = 0; i < names.length; i++) {
             try {
                 context = canvas.getContext(names[i], options);
@@ -42,6 +46,9 @@ pc.extend(pc, function () {
             if (context)
                 break;
         }
+
+        context.blendColor( 1, 1, 1, 1 );
+
         return context;
     };
 
@@ -1122,6 +1129,8 @@ pc.extend(pc, function () {
                             );
                         }
                     } else {
+                        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+                        
                         // Upload the byte array
                         resMult = 1 / Math.pow(2, mipLevel);
                         for (face = 0; face < 6; face++) {
@@ -1181,6 +1190,7 @@ pc.extend(pc, function () {
                     } else {
                         // Upload the byte array
                         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+                        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                         resMult = 1 / Math.pow(2, mipLevel);
                         if (texture._compressed) {
                             gl.compressedTexImage2D(
