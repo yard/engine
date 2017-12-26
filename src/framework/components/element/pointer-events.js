@@ -257,6 +257,11 @@ pc.extend(pc, function() {
             //     return false;
             // }
 
+            // We support only left mouse button
+            if (!mouseEvent.button == 0) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -271,6 +276,11 @@ pc.extend(pc, function() {
             //     return false;
             // }
 
+            // We support only left mouse button
+            if (!mouseEvent.button == 0) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -284,6 +294,11 @@ pc.extend(pc, function() {
             // if (this.entity.parent && this.entity.parent.screen) {
             //     return false;
             // }
+
+            // We support only left mouse button
+            if (!mouseEvent.button == 0) {
+                return;
+            }
 
             if (!this.entity || !this.entity.enabled) {
                 return false;
