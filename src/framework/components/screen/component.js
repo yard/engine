@@ -252,6 +252,7 @@ pc.extend(pc, function () {
                     element._masked = masking > 0;
 
                     if (element._image && element._image._masksChildren) {
+                        element._topMostMask = masking == 0;
                         masking++;
 
                         element._stencilLayer -= 1;
