@@ -102,11 +102,11 @@ pc.extend(pc, function() {
 
         // Iterates over all children and passes the event through to them.
         _passPointerEventToChildren: function(name, eventData) {
-            for(var i = this.entity.children.length - 1; i >= 0; i--) {
-                var element =  this.entity.children[i];
+            for (var i = this.entity.children.length - 1; i >= 0; i--) {
+                var child =  this.entity.children[i];
                 
-                if (element && element.element && element.enabled && (!element.screen || element.screen.enabled)) {
-                    var result = element.element[ name ].apply( element.element, eventData );
+                if (child && child.element && child.enabled && (!child.element.screen || child.element.screen.enabled)) {
+                    var result = child.element[ name ].apply( child.element, eventData );
 
                     if (result) {
                         return true;
@@ -225,7 +225,7 @@ pc.extend(pc, function() {
             }
 
             this.fire(pc.POINTEREVENT_MOVE, point);
-            return this.respondsTo( pc.POINTEREVENT_MOVE );
+            return this.respondsTo( pc.POINTEREVENT_MOVE, pc.POINTEREVENT_ENTER );
         },
 
         // Handles "scroll" pointer event – might be coming from touch or
