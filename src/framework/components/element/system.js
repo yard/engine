@@ -20,6 +20,9 @@ pc.extend(pc, function () {
         this.schema = _schema;
 
         this._defaultTexture = new pc.Texture(app.graphicsDevice, {width:16, height:16, format:pc.PIXELFORMAT_R8_G8_B8});
+        var buffer = this._defaultTexture.lock();
+        for(var i = 0; i < buffer.length; i++) { buffer[i] = 255 };
+        this._defaultTexture.unlock();
 
         this.defaultImageMaterial = new pc.StandardMaterial();
         this.defaultImageMaterial.cull = pc.CULLFACE_NONE;
@@ -79,6 +82,7 @@ pc.extend(pc, function () {
         this.defaultTextMaterial = new pc.StandardMaterial();
         this.defaultTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultTextMaterial.msdfMap = this._defaultTexture;
+        this.defaultTextMaterial.tintMap = this._defaultTexture;
         this.defaultTextMaterial.msdf = false;
         this.defaultTextMaterial.renderQueue = 3000;
         this.defaultTextMaterial.useLighting = false;
@@ -94,6 +98,7 @@ pc.extend(pc, function () {
         this.defaultScreenSpaceTextMaterial = new pc.StandardMaterial();
         this.defaultScreenSpaceTextMaterial.cull = pc.CULLFACE_NONE;
         this.defaultScreenSpaceTextMaterial.msdfMap = this._defaultTexture;
+        this.defaultScreenSpaceTextMaterial.tintMap = this._defaultTexture;
         this.defaultScreenSpaceTextMaterial.useLighting = false;
         this.defaultScreenSpaceTextMaterial.useGammaTonemap = false;
         this.defaultScreenSpaceTextMaterial.useFog = false;

@@ -1173,6 +1173,7 @@ pc.extend(pc, function () {
         _defineTex2D(obj, "ao", 0, 1);
         _defineTex2D(obj, "light", 1, 3);
         _defineTex2D(obj, "msdf", 0, 3);
+        _defineTex2D(obj, "tint", 1, 3);
 
         _defineObject(obj, "cubeMap");
         _defineObject(obj, "sphereMap");
