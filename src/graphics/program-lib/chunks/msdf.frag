@@ -13,7 +13,7 @@ vec4 applyMsdf(vec4 color) {
     // FIXME: temporary falling back to bitmap fonts all the time
     vec4 texColor = texture2D(texture_msdfMap, vUv0);
     vec4 tintColor = texture2D(texture_tintMap, vUv1);
-    return mix(tintColor * texColor, tintColor * texColor.a, sdfEnabled);
+    return mix(tintColor * texColor * color, tintColor * color * texColor.a, sdfEnabled);
 
     vec3 sample = texture2D(texture_msdfMap, vUv0).rgb;
     float distance = median(sample.r, sample.g, sample.b) - 0.5;
