@@ -91,7 +91,7 @@ pc.extend(pc, function () {
         this.defaultTextMaterial.useSkybox = false;
         this.defaultTextMaterial.emissive = new pc.Color(1,1,1,1);
         this.defaultTextMaterial.opacity = 0.5;
-        this.defaultTextMaterial.blendType = pc.BLEND_NORMAL;
+        this.defaultTextMaterial.blendType = pc.BLEND_PREMULTIPLIED;
         this.defaultTextMaterial.depthWrite = false;
         this.defaultTextMaterial.update();
 
