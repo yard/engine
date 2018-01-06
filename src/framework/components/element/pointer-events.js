@@ -215,6 +215,18 @@ pc.extend(pc, function() {
                 return false;
             }
 
+            if (this.entity.element) {
+                var control = (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle']);
+
+                if (control) {
+                    nearestControl = this;
+                }
+
+                if (control && control.m_Interactable) {
+                    document.body.style.cursor = 'pointer';
+                }
+            }
+
             if ( this._passPointerEventToChildren("_pointerEventMove", [ ray ]) ) {
                 return true;
             }
@@ -294,6 +306,8 @@ pc.extend(pc, function() {
             // if (this.entity.parent && this.entity.parent.screen) {
             //     return false;
             // }
+
+            document.body.style.cursor = 'default';
 
             if (!this.entity || !this.entity.enabled) {
                 return false;
