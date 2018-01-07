@@ -129,6 +129,8 @@ pc.extend(pc, function () {
         },
  
         _patch: function () {
+            this.entity.dirtyLocal = true;
+            
             this.entity.sync = this._sync;
             this.entity.presync = this._presync;
             this.entity.setPosition = this._setPosition;
