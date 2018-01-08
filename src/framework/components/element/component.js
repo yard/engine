@@ -358,7 +358,7 @@ pc.extend(pc, function () {
                     element._pivotPoint.set( element._width * element.pivot.x, element._height * element.pivot.y, 0 );
                     // and compose a transform to move TO the pivot – as all local transformations,
                     // i.e. rotation should happen around the pivot
-                    element._toPivotTransform.setTRS( element._pivotPoint, pc.Quat.IDENTITY, pc.Vec3.ONE );
+                    element._toPivotTransform.setTranslate( element._pivotPoint.x, element._pivotPoint.y, element._pivotPoint.z );
                     element._fromPivotTransform.copy( element._toPivotTransform );
                     element._fromPivotTransform.invert();
 
