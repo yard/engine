@@ -7,6 +7,16 @@ pc.extend(pc, function() {
     var ray = { origin: new pc.Vec3, direction: new pc.Vec3 };
     var pointerPosition = new pc.Vec3;
 
+    var _buttonsDown = {};
+
+    function cleanupDownButtons() {
+        for(var guid in _buttonsDown) {
+            _buttonsDown[ guid ].fire( pc.POINTEREVENT_UP, pointerPosition );
+        }
+
+        _buttonsDown = {};
+    }
+
     var PointEventsManager = {
 
         // Tests if the pointer event with coordinates passed (in local coord space)
@@ -149,6 +159,7 @@ pc.extend(pc, function() {
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 var receiver = nearestControl || this;
 
+                _buttonsDown[ receiver.entity._guid ] = receiver;
                 receiver.fire(pc.POINTEREVENT_DOWN, point);
 
                 return receiver.respondsTo( pc.POINTEREVENT_DOWN );
@@ -181,6 +192,8 @@ pc.extend(pc, function() {
 
                 receiver.fire(pc.POINTEREVENT_CLICK, point);
                 receiver.fire(pc.POINTEREVENT_UP, point);
+
+                delete _buttonsDown[ receiver.entity._guid ];
 
                 return receiver.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
             } else {
@@ -298,7 +311,11 @@ pc.extend(pc, function() {
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            return this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            
+            var result = this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            cleanupDownButtons();
+
+            return result;
         },
 
         // Mouse-specific event handler.
