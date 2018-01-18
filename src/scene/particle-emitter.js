@@ -620,6 +620,8 @@ pc.extend(pc, function() {
 
             this.particleTex = new Float32Array(this.numParticlesPot * particleTexHeight * particleTexChannels);
             var emitterPos = (this.node === null || this.localSpace) ? pc.Vec3.ZERO : this.node.getPosition();
+            emitterPos = emitterPos.clone().add(new pc.Vec3(0, 0, -1)); // Because of weird particle clip bug
+            
             if (this.emitterShape === pc.EMITTERSHAPE_BOX) {
                 if (this.node === null){
                     spawnMatrix.setTRS(pc.Vec3.ZERO, pc.Quat.IDENTITY, this.spawnBounds);
@@ -1258,6 +1260,7 @@ pc.extend(pc, function() {
                 }
 
                 emitterPos = (this.meshInstance.node === null || this.localSpace) ? pc.Vec3.ZERO.data : this.meshInstance.node.getPosition().data;
+
                 var emitterMatrix = this.meshInstance.node === null ? pc.Mat4.IDENTITY : this.meshInstance.node.getWorldTransform();
                 if (this.emitterShape === pc.EMITTERSHAPE_BOX) {
                     mat4ToMat3(spawnMatrix, spawnMatrix3);
@@ -1325,6 +1328,8 @@ pc.extend(pc, function() {
 
                 // Particle updater emulation
                 emitterPos = (this.meshInstance.node === null || this.localSpace) ? pc.Vec3.ZERO : this.meshInstance.node.getPosition();
+                emitterPos = emitterPos.clone().add(new pc.Vec3(0, 0, -1)); // Because of weird particle clip bug
+
                 var posCam = this.camera ? this.camera._node.getPosition() : pc.Vec3.ZERO;
 
                 var vertSize = 14;
