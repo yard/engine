@@ -520,6 +520,8 @@ pc.extend(pc, function() {
                     this.emitter.onDisableDepth();
                 }
             }
+            
+            this.emitter = null;
         },
 
         /**
