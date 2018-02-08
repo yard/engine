@@ -520,6 +520,8 @@ pc.extend(pc, function() {
                     this.emitter.onDisableDepth();
                 }
             }
+            
+            this.emitter = null;
         },
 
         /**
@@ -575,6 +577,10 @@ pc.extend(pc, function() {
                 this.emitter.meshInstance.visible = true;
                 this.emitter.loop = this.data.loop;
                 this.emitter.resetTime();
+
+                if (this.entity.name == 'Particle_CashmanHandLeft' || this.entity.name == 'Particle_CashmanHandRight') {
+                    this.emitter.addTime(1.0, true);
+                }
             }
         },
 

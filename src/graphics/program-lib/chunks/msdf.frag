@@ -1,4 +1,5 @@
 uniform sampler2D texture_msdfMap;
+uniform sampler2D texture_tintMap;
 uniform lowp float sdfEnabled;
 
 float median(float r, float g, float b) {
@@ -11,8 +12,8 @@ vec4 applyMsdf(vec4 color) {
     //if (length(fwidth(vUv0)) < 1.) {
     // FIXME: temporary falling back to bitmap fonts all the time
     vec4 texColor = texture2D(texture_msdfMap, vUv0);
-    return mix(color * texColor, color * texColor.a, sdfEnabled);
-    
+    vec4 tintColor = texture2D(texture_tintMap, vUv1);
+    return mix(tintColor * texColor * color, tintColor * color * texColor.a, sdfEnabled) * material_opacity;
 
     vec3 sample = texture2D(texture_msdfMap, vUv0).rgb;
     float distance = median(sample.r, sample.g, sample.b) - 0.5;

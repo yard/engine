@@ -7,6 +7,16 @@ pc.extend(pc, function() {
     var ray = { origin: new pc.Vec3, direction: new pc.Vec3 };
     var pointerPosition = new pc.Vec3;
 
+    var _buttonsDown = {};
+
+    function cleanupDownButtons() {
+        for(var guid in _buttonsDown) {
+            _buttonsDown[ guid ].fire( pc.POINTEREVENT_UP, pointerPosition );
+        }
+
+        _buttonsDown = {};
+    }
+
     var PointEventsManager = {
 
         // Tests if the pointer event with coordinates passed (in local coord space)
@@ -107,11 +117,11 @@ pc.extend(pc, function() {
 
         // Iterates over all children and passes the event through to them.
         _passPointerEventToChildren: function(name, eventData) {
-            for(var i = this.entity.children.length - 1; i >= 0; i--) {
-                var element =  this.entity.children[i];
+            for (var i = this.entity.children.length - 1; i >= 0; i--) {
+                var child =  this.entity.children[i];
                 
-                if (element && element.element && element.enabled && (!element.screen || element.screen.enabled)) {
-                    var result = element.element[ name ].apply( element.element, eventData );
+                if (child && child.element && child.enabled && (!child.element.screen || child.element.screen.enabled)) {
+                    var result = child.element[ name ].apply( child.element, eventData );
 
                     if (result) {
                         return true;
@@ -154,6 +164,7 @@ pc.extend(pc, function() {
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 var receiver = nearestControl || this;
 
+                _buttonsDown[ receiver.entity._guid ] = receiver;
                 receiver.fire(pc.POINTEREVENT_DOWN, point);
 
                 return receiver.respondsTo( pc.POINTEREVENT_DOWN );
@@ -186,6 +197,8 @@ pc.extend(pc, function() {
 
                 receiver.fire(pc.POINTEREVENT_CLICK, point);
                 receiver.fire(pc.POINTEREVENT_UP, point);
+
+                delete _buttonsDown[ receiver.entity._guid ];
 
                 return receiver.respondsTo( pc.POINTEREVENT_UP, pc.POINTEREVENT_CLICK );
             } else {
@@ -220,6 +233,18 @@ pc.extend(pc, function() {
                 return false;
             }
 
+            if (this.entity.element) {
+                var control = (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle']);
+
+                if (control) {
+                    nearestControl = this;
+                }
+
+                if (control && control.m_Interactable) {
+                    document.body.style.cursor = 'pointer';
+                }
+            }
+
             if ( this._passPointerEventToChildren("_pointerEventMove", [ ray ]) ) {
                 return true;
             }
@@ -230,7 +255,7 @@ pc.extend(pc, function() {
             }
 
             this.fire(pc.POINTEREVENT_MOVE, point);
-            return this.respondsTo( pc.POINTEREVENT_MOVE );
+            return this.respondsTo( pc.POINTEREVENT_MOVE, pc.POINTEREVENT_ENTER );
         },
 
         // Handles "scroll" pointer event – might be coming from touch or
@@ -262,6 +287,11 @@ pc.extend(pc, function() {
             //     return false;
             // }
 
+            // We support only left mouse button
+            if (!mouseEvent.button == 0) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -276,12 +306,21 @@ pc.extend(pc, function() {
             //     return false;
             // }
 
+            // We support only left mouse button
+            if (!mouseEvent.button == 0) {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
 
             pointerPosition.set( mouseEvent.x, mouseEvent.y, 0 );
-            return this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            
+            var result = this._pointerEventUp( this._screenPointToRay( pointerPosition ) );
+            cleanupDownButtons();
+
+            return result;
         },
 
         // Mouse-specific event handler.
@@ -289,6 +328,8 @@ pc.extend(pc, function() {
             // if (this.entity.parent && this.entity.parent.screen) {
             //     return false;
             // }
+
+            document.body.style.cursor = 'default';
 
             if (!this.entity || !this.entity.enabled) {
                 return false;

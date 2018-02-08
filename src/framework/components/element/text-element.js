@@ -535,9 +535,10 @@ pc.extend(pc, function () {
 
         },
 
-        _setConstantColor: function (color) {
+        _setConstantColor: function (color, alpha) {
+            // Alpha is set separately cause it can be modified by canvas group alpha modifiers
             if (this._meshInstance) {
-                this._meshInstance.setParameter( "COLOR", {const: color.data} );
+                this._meshInstance.setParameter( "COLOR", {const: [ color.r, color.g, color.b, alpha ]} );
             }
         },
 

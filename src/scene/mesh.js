@@ -103,6 +103,9 @@ pc.extend(pc, function () {
         this.drawToDepth = true;
         this.cull = true;
         this.pick = true;
+        this.drawOrder = 0;
+        this.sortingLayerIndex = 0;
+        this.sortingOrder = 0;
         this._updateAabb = true;
 
         // 64-bit integer key that defines render order of this mesh instance
