@@ -133,13 +133,15 @@ pc.extend(pc, function() {
         },
 
         respondsTo: function () {
-            for(var i = 0; i < arguments.length; i++) {
+            for (var i = 0; i < arguments.length; i++) {
                 var responds = this.hasListeners( arguments[i] ) || (this.entity.element && this.entity.element.hasListeners( arguments[i] ));
 
                 if (responds) {
                     return true;
                 }
             }
+
+            return false;
         },
 
         // Handles "down" pointer event – might be coming from touch or
