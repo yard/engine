@@ -1221,7 +1221,7 @@ pc.extend(pc, function () {
         },
 
         calculateSortDistances: function(drawCalls, camPos, camFwd, frontToBack) {
-            return;
+            // return;
 
             // #ifdef PROFILER
             var sortTime = pc.now();
