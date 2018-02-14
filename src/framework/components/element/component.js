@@ -182,6 +182,12 @@ pc.extend(pc, function () {
         _presync: function () {
             var element = this.element;
 
+            if (this.element.screen) {
+                if (this.element.screen.screen.camera._projMatDirty) { 
+                    this.element.screen.screen._calcProjectionMatrix();
+                }
+            }
+
             if (!element._anchorDirty && !element._sizeDeltaDirty && !element._anchoredPositionDirty && !element._cornerDirty &&
                 !this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld) {
                 return;
