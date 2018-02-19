@@ -92,7 +92,11 @@ pc.extend(pc, function() {
         // Raycasts the ray in "world-space" to local coordinates of the element.
         _rayToLocalPoint: function (ray) {
             if (!this.entity.element) {
-                return pointerPosition;
+                if (this.entity.screen) {
+                    return pointerPosition.clone().scale(1 / this.entity.screen.scale);
+                } else {
+                    return pointerPosition;
+                }
             }
 
             // FIXME: A proper check for "inherit" screen type needed
