@@ -159,7 +159,7 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'])) {
+            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'] || this.entity.element['UnityEngine.UI.Slider'])) {
                 nearestControl = this;
             }
 
@@ -190,7 +190,7 @@ pc.extend(pc, function() {
                 return false;
             }
 
-            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'])) {
+            if (this.entity.element && (this.entity.element['UnityEngine.UI.Button'] || this.entity.element['UnityEngine.UI.Toggle'] || this.entity.element['UnityEngine.UI.Slider'])) {
                 nearestControl = this;
             }
 
