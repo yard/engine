@@ -1009,6 +1009,16 @@ pc.extend(pc, function () {
             var windowWidth = window.innerWidth;
             var windowHeight = window.innerHeight;
 
+            // For Facebook Instant Games "blurred canvas" bug on android devices
+            if (windowWidth < 420) {
+                window.androidInstantGameScale = 2;
+                windowWidth = 2 * windowWidth;
+                windowHeight = 2 * windowHeight;
+                this.graphicsDevice.canvas.style = "zoom: 0.5";
+            } else {
+                window.androidInstantGameScale = 1;
+            }
+
             if (navigator.isCocoonJS) {
                 width = windowWidth;
                 height = windowHeight;
