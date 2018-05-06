@@ -1176,8 +1176,8 @@ pc.extend(pc, function () {
                         mask = drawCall.node._parent.cullingLayer;
                     }
                     else {
-                        if (!drawCall.node.cullingLayer && drawCall.node._parent && drawCall.node._parent._parent) {
-                            mask = drawCall.node._parent._parent.cullingLayer;
+                        if (!drawCall.node.cullingLayer && drawCall.node._parent && drawCall.node._parent) {
+                            mask = drawCall.node._parent.cullingLayer;
                         }
                     }
 

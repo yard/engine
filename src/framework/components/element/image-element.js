@@ -23,8 +23,8 @@ pc.extend(pc, function () {
 
     var ImageElement = function ImageElement (element) {
         this._element = element;
-        //this._entity = element.entity;
-        this._entity = element._pivotGraph;
+        this._entity = element.entity;
+        //this._entity = element._pivotGraph;
         this._system = element.system;
 
         // public
@@ -55,7 +55,11 @@ pc.extend(pc, function () {
         this._colors = [];
 
         this._mesh = this._createMesh();
+
         this._node = new pc.GraphNode();
+        this._node.localTransform = element._fromPivotTransform;
+        this._node.forcedLocalTransform = element._fromPivotTransform;
+
         this._model = new pc.Model();
         this._model.graph = this._node;
         
