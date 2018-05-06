@@ -160,6 +160,7 @@ pc.extend(pc, function() {
                 var receiver = nearestControl || this;
 
                 _buttonsDown[ receiver.entity._guid ] = receiver;
+                receiver._pointerDownFlag = true;
                 receiver.fire(pc.POINTEREVENT_DOWN, point);
 
                 return receiver.respondsTo( pc.POINTEREVENT_DOWN );
@@ -190,8 +191,11 @@ pc.extend(pc, function() {
             if (testResult == POINTER_TEST_RESULT_PASS) {
                 var receiver = nearestControl || this;
 
-                receiver.fire(pc.POINTEREVENT_CLICK, point);
+                if (receiver._pointerDownFlag) {
+                    receiver.fire(pc.POINTEREVENT_CLICK, point);
+                }
                 receiver.fire(pc.POINTEREVENT_UP, point);
+                receiver._pointerDownFlag = false;
 
                 delete _buttonsDown[ receiver.entity._guid ];
 
