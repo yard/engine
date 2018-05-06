@@ -55,13 +55,13 @@ pc.extend(pc, function () {
 
         // corner offsets in relation to anchors
         this._corners = new pc.Vec4(0, 0, 0, 0);
-        this._pivotGraph = new pc.Entity();
-        this._pivotGraph.isPivotGraphUntitledNode = true;
+        //this._pivotGraph = new pc.Entity();
+        //this._pivotGraph.isPivotGraphUntitledNode = true;
 
         this._anchoredPosition = new pc.Vec2(0, 0);
         this._sizeDelta = new pc.Vec2(0, 0);
 
-        this.entity.addChild( this._pivotGraph );
+        // this.entity.addChild( this._pivotGraph );
 
         // the model transform used to render
         this._modelTransform = new pc.Mat4();
@@ -71,6 +71,7 @@ pc.extend(pc, function () {
         this._screenToWorld = new pc.Mat4();
 
         this._inversePivotWorldTransform = new pc.Mat4();
+        this._pivotWorldTransform = new pc.Mat4();
 
         // the position of the element in canvas co-ordinate system. (0,0 = top left)
         this._canvasPosition = new pc.Vec2();
@@ -404,18 +405,14 @@ pc.extend(pc, function () {
                         this.worldTransform.copy( element._screenToWorld );
                         this.worldTransform.mul( element._toPivotTransform ).mul( this.localTransform );
 
-                        //if (screen.screen.screenType == pc.SCREEN_TYPE_WORLD) {
-                            element._pivotGraph.localTransform.copy( element._fromPivotTransform );
-                        //} else {
-                        //    element._pivotGraph.localTransform.copy( pc.Mat4.IDENTITY );
-                        //    this.worldTransform.mul( element._fromPivotTransform );
-                        //}
+                        // element._pivotGraph.localTransform.mul2( this.worldTransform, element._fromPivotTransform );
+                        
+                        // element._pivotGraph.dirtyLocal = false;
+                        // element._pivotGraph.dirtyWorld = true;
+                        // element._pivotGraph.sync();
 
-                        element._pivotGraph.dirtyLocal = false;
-                        element._pivotGraph.dirtyWorld = true;
-                        element._pivotGraph.sync();
-
-                        element._inversePivotWorldTransform.copy( element._pivotGraph.worldTransform );
+                        element._pivotWorldTransform.mul2( this.worldTransform, element._fromPivotTransform );
+                        element._inversePivotWorldTransform.copy( element._pivotWorldTransform );
                         element._inversePivotWorldTransform.invert();
                     } else {
                         this.worldTransform.copy(element._modelTransform);

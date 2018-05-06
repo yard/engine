@@ -107,7 +107,7 @@ pc.extend(pc, function() {
                 return pointerPosition;
             }
 
-            var wt  = this.entity.element._pivotGraph.getWorldTransform();
+            var wt  = this.entity.element._pivotWorldTransform;
             var iwt = this.entity.element._inversePivotWorldTransform;
 
             var l0 = ray.origin.clone();
