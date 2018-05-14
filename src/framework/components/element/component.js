@@ -183,7 +183,8 @@ pc.extend(pc, function () {
             var element = this.element;
 
             if (this.element.screen) {
-                if (this.element.screen.screen.camera._projMatDirty) { 
+                var camera = this.element.screen.screen.camera || UnityEngine.Camera.getmain().handle;
+                if (camera._projMatDirty) {
                     this.element.screen.screen._calcProjectionMatrix();
                 }
             }
