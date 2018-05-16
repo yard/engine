@@ -1435,12 +1435,12 @@ pc.extend(pc, function () {
                 modelMatrix = meshInstance.node.worldTransform;
                 this.modelMatrixId.setValue(modelMatrix.data);
 
-                // if (normal) {
-                //     normalMatrix = meshInstance.normalMatrix;
-                //     modelMatrix.invertTo3x3(normalMatrix); // TODO: cache
-                //     normalMatrix.transpose();
-                //     this.normalMatrixId.setValue(normalMatrix.data);
-                // }
+                if (normal) {
+                    normalMatrix = meshInstance.normalMatrix;
+                    modelMatrix.invertTo3x3(normalMatrix); // TODO: cache
+                    normalMatrix.transpose();
+                    this.normalMatrixId.setValue(normalMatrix.data);
+                }
 
                 device.draw(mesh.primitive[style]);
                 return 0;
