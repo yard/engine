@@ -1075,8 +1075,12 @@ pc.extend(pc, function () {
         */
         onLibrariesLoaded: function () {
             this._librariesLoaded = true;
-            this.systems.rigidbody.onLibraryLoaded();
-            this.systems.collision.onLibraryLoaded();
+            if (this.systems.rigidbody) {
+                this.systems.rigidbody.onLibraryLoaded();
+            }
+            if (this.systems.collision) {
+                this.systems.collision.onLibraryLoaded();
+            }
         },
 
         applySceneSettings: function (settings) {
