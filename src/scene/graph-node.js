@@ -712,7 +712,7 @@ pc.extend(pc, function () {
         reparent: function (parent, index) {
             var current = this._parent;
             if (current)
-                current.removeChild(this);
+                current.removeChild(this, true);
 
             if (parent) {
                 if (index >= 0) {
@@ -1094,11 +1094,13 @@ pc.extend(pc, function () {
          * var child = this.entity.children[0];
          * this.entity.removeChild(child);
          */
-        removeChild: function (child) {
+        removeChild: function (child, reparent) {
             var i;
             var length = this._children.length;
 
-            child._notifyHierarchyStateChanged(child, false);
+            if (!reparent) {
+                child._notifyHierarchyStateChanged(child, false);
+            }
 
             this.dirtyLocal = true;
 
