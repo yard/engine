@@ -887,9 +887,11 @@ pc.extend(pc, function () {
             // the callback is not fired synchronously
             // so only reset _suspendEndEvent to false when the
             // callback is fired
-            if (this._suspendEndEvent) {
-                this._suspendEndEvent = false;
-                return;
+            if (!pc.SoundInstance.doNotSuspendEndEvent) {
+                if (this._suspendEndEvent) {
+                    this._suspendEndEvent = false;
+                    return;
+                }
             }
 
             this.fire('end');
