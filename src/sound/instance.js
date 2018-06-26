@@ -135,6 +135,11 @@ pc.extend(pc, function () {
              * @returns {Boolean} True if the sound was started.
              */
             play: function () {
+                // On Facebook Instant Games platform context can be suspended or interrupted sometimes
+                if (this._manager.context.state != 'running') {
+                    this._manager.context.resume();
+                }
+
                 if (this._state !== STATE_STOPPED) {
                     this.stop();
                 }
