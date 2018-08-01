@@ -878,8 +878,8 @@ pc.extend(pc, function() {
                 this.material.setParameter('colorMap', this.colorMap);
 
                 // particle shader in playcanvas requires repeating addressing mode
-                this.colorMap.addressU = pc.ADDRESS_REPEATING;
-                this.colorMap.addressV = pc.ADDRESS_REPEATING;
+                this.colorMap.addressU = pc.ADDRESS_REPEAT;
+                this.colorMap.addressV = pc.ADDRESS_REPEAT;
 
                 if (this.lighting && this.normalMap) {
                     this.material.setParameter('normalMap', this.normalMap);
