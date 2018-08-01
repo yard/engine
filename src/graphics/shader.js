@@ -126,10 +126,13 @@ pc.extend(pc, function () {
     slots[ pc.SEMANTIC_TEXCOORD5 ] =          11;
     slots[ pc.SEMANTIC_TEXCOORD6 ] =          12;
     slots[ pc.SEMANTIC_TEXCOORD7 ] =          13;
-    slots[ pc.SEMANTIC_ATTR0 ] =              14;
-    slots[ pc.SEMANTIC_ATTR1 ] =              15;
-    slots[ pc.SEMANTIC_ATTR2 ] =              16;
-    slots[ pc.SEMANTIC_ATTR3 ] =              17;
+
+    // webgl limits the number of attrs at 16 (although gl.MAX_VERTEX_ATTRIBS reports 34921)
+    slots[ pc.SEMANTIC_ATTR0 ] =              10;
+    slots[ pc.SEMANTIC_ATTR1 ] =              11;
+    slots[ pc.SEMANTIC_ATTR2 ] =              12;
+    slots[ pc.SEMANTIC_ATTR3 ] =              13;
+
     slots[ pc.SEMANTIC_ATTR4 ] =              18;
     slots[ pc.SEMANTIC_ATTR5 ] =              19;
     slots[ pc.SEMANTIC_ATTR6 ] =              20;
