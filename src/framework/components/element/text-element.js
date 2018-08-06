@@ -31,8 +31,8 @@ pc.extend(pc, function () {
     var TextElement = function TextElement (element) {
         this._element = element;
         this._system = element.system;
-        //this._entity = element.entity;
-        this._entity = element._pivotGraph;
+        this._entity = element.entity;
+        //this._entity = element._pivotGraph;
 
         // public
         this._text = "";
@@ -60,7 +60,13 @@ pc.extend(pc, function () {
         this._textMaterial = this._system.defaultTextMaterial;
 
         // private
+        this._layoutNode = new pc.GraphNode();
+        this._layoutNode.localTransform = element._fromPivotTransform;
+        this._layoutNode.forcedLocalTransform = element._fromPivotTransform;
+
         this._node = new pc.GraphNode();
+        this._layoutNode.addChild( this._node );
+
         this._model = null;
         this._mesh = null;
         this._meshInstance = null;
@@ -168,8 +174,8 @@ pc.extend(pc, function () {
 
                 this._mesh = this._createMesh(text);
 
-                if (this._node.getParent()) {
-                    this._node.getParent().removeChild(this._node);
+                if (this._layoutNode.getParent()) {
+                    this._layoutNode.getParent().removeChild(this._layoutNode);
                 }
 
                 this._model = new pc.Model();
@@ -199,7 +205,7 @@ pc.extend(pc, function () {
                 if (this._entity.enabled) {
                     this._system.app.scene.addModel(this._model);
                 }
-                this._entity.addChild(this._model.graph);
+                this._entity.addChild(this._layoutNode);
                 this._model._entity = this._entity;
 
                 this._updateAligns();

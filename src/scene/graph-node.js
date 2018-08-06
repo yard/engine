@@ -22,6 +22,8 @@ pc.extend(pc, function () {
         this.rotation = new pc.Quat(0, 0, 0, 1);
         this.eulerAngles = new pc.Vec3(0, 0, 0);
 
+        this.forcedLocalTransform = null;
+
         this.localTransform = new pc.Mat4();
         this.dirtyLocal = false;
         this._aabbVer = 0;
@@ -616,6 +618,7 @@ pc.extend(pc, function () {
         getLocalTransform: function () {
             if (this.dirtyLocal) {
                 this.localTransform.setTRS(this.localPosition, this.localRotation, this.localScale);
+                this.localTransform = this.forcedLocalTransform || this.localTransform;
 
                 this.dirtyLocal = false;
                 this.dirtyWorld = true;
@@ -1201,6 +1204,7 @@ pc.extend(pc, function () {
         sync: function () {
             if (this.dirtyLocal) {
                 this.localTransform.setTRS(this.localPosition, this.localRotation, this.localScale);
+                this.localTransform = this.forcedLocalTransform || this.localTransform;
 
                 this.dirtyLocal = false;
                 this.dirtyWorld = true;
