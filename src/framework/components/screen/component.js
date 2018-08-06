@@ -147,14 +147,14 @@ pc.extend(pc, function () {
 
             var screenType = this._screenType;
 
-            if (!this.camera && screenType == pc.SCREEN_TYPE_CAMERA) {
+            if (!this._camera && screenType == pc.SCREEN_TYPE_CAMERA) {
                 screenType = pc.SCREEN_TYPE_SCREEN;
             }
 
             if (screenType == pc.SCREEN_TYPE_CAMERA) {
                 // camera case requires special consideration, however
                 //var camera = this.camera;
-                var camera = this.camera;
+                var camera = this._camera;
 
                 // first off, decide where the UI plane will end up in camera's sight
                 var nearClipOffset     = this._screenDistance;
@@ -233,6 +233,11 @@ pc.extend(pc, function () {
         },
 
         _onResize: function (width, height) {
+            if (this._camera && this._camera.renderTarget) {
+                width = this._camera.renderTarget.width;
+                height = this._camera.renderTarget.height;
+            }
+
             if (this._screenType != pc.SCREEN_TYPE_WORLD) {
                 this._resolution.set(width, height);
                 this.resolution = this._resolution; // force update
@@ -293,6 +298,10 @@ pc.extend(pc, function () {
     */
     Object.defineProperty(ScreenComponent.prototype, "resolution", {
         set: function (value) {
+            if (this.camera && this.camera.renderTarget) {
+                return;
+            }
+
             if (this._screenType != pc.SCREEN_TYPE_SCREEN) {
                 this._resolution.set(value.x, value.y);
             } else if (!this._camera || !this._camera.renderTarget) {
@@ -480,7 +489,7 @@ pc.extend(pc, function () {
 
             if (value && value.renderTarget != null) {
                 // for the case of a camera rendering to a render target, we actually need to update the resolution
-                this.resolution = new pc.Vec2( value.renderTarget.width, value.renderTarget.height );
+                this._resolution.set( value.renderTarget.width, value.renderTarget.height );
             }
 
             this._calcProjectionMatrix();

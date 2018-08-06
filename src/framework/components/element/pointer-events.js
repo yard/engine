@@ -77,8 +77,7 @@ pc.extend(pc, function() {
                 );
             } else {
                 if (this.camera == null) {
-                    var app = pc.Application.getApplication();
-                    var cameraInstance = app.systems.camera.cameras[ app.systems.camera.cameras.length - 1 ];
+                    var cameraInstance = UnityEngine.Camera.getmain().handle;
                     this.camera = cameraInstance ? cameraInstance.camera : null;
                 }
 
