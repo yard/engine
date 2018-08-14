@@ -167,7 +167,7 @@ pc.extend(pc, function () {
             }
             
             if (this._element.screen) {
-                this._meshInstance.sortingLayerIndex = this._element._nearestScreen.sortingLayerIndex + 100;
+                this._meshInstance.sortingLayerIndex = this._element._nearestScreen.sortingLayerIndex;
                 this._meshInstance.sortingOrder = this._element._nearestScreen.sortingOrder;
                 this._meshInstance._nearestScreen = this._element._nearestScreen;
 
