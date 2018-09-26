@@ -687,23 +687,21 @@ pc.extend(pc, function () {
         getWorldTransform: function () {
             var syncList = [];
 
-            return function () {
-                var current = this;
-                syncList.length = 0;
+            var current = this;
+            syncList.length = 0;
 
-                while (current !== null) {
-                    syncList.push(current);
-                    current = current._parent;
-                }
+            while (current !== null) {
+                syncList.push(current);
+                current = current._parent;
+            }
 
-                for (var i = syncList.length - 1; i >= 0; i--) {
-                    syncList[i].presync();
-                    syncList[i].sync();
-                }
+            for (var i = syncList.length - 1; i >= 0; i--) {
+                syncList[i].presync();
+                syncList[i].sync();
+            }
 
-                return this.worldTransform;
-            };
-        }(),
+            return this.worldTransform;
+        },
 
         /**
          * @function
