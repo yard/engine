@@ -247,8 +247,11 @@ pc.extend(pc, function () {
 
             for(var i = 0, len = scripts.length; i < len; i++) {
                 script = scripts[i];
-                if (!script.$ui && script.update && script._enabled)
+                if (!script.$ui && script.update && script._enabled) {
                     this._scriptMethod(script, ScriptComponent.scriptMethods.update, dt);
+                } else if (script.hasCoroutines) {
+                    this._scriptMethod(script, "handleCoroutines", dt);
+                }
             }
         },
 
