@@ -561,6 +561,7 @@ pc.extend(pc, function () {
             meshInstance.updateKey();
             meshInstance.cull = false;
             meshInstance.drawToDepth = false;
+            meshInstance.sortingLayerIndex = -1;
 
             var model = new pc.Model();
             model.graph = node;
