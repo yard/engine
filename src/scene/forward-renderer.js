@@ -1170,6 +1170,10 @@ pc.extend(pc, function () {
             var cullingMask = camera.cullingMask || 0xFFFFFFFF; // if missing assume camera's default value
 
             if (!camera.frustumCulling) {
+                if (cullingMask === 0xFFFFFFFF) {
+                    return drawCalls;
+                }
+
                 for (i = 0; i < drawCallsCount; i++) {
                     // need to copy array anyway because sorting will happen and it'll break original draw call order assumption
                     drawCall = drawCalls[i];
@@ -1346,9 +1350,13 @@ pc.extend(pc, function () {
                     mesh = meshInstance.mesh;
                     key = meshInstance._key[keyType];
 
+                    if (!meshInstance.node.static) {
+                        continue;
+                    }
+
                     next = i + 1;
                     autoInstances = 0;
-                    if (drawCalls[next].mesh===mesh && drawCalls[next]._key[keyType]===key) {
+                    if (drawCalls[next].mesh===mesh && drawCalls[next].mesh===mesh && drawCalls[next]._key[keyType]===key) {
                         for(j=0; j<16; j++) {
                             pc._autoInstanceBufferData[offset + j] = meshInstance.node.worldTransform.data[j];
                         }

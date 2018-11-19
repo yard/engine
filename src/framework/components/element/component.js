@@ -184,7 +184,7 @@ pc.extend(pc, function () {
             var element = this.element;
 
             if (this.element.screen) {
-                var camera = this.element.screen.screen.camera || UnityEngine.Camera.getmain().handle;
+                var camera = this.element.screen.screen.camera || pc.Application.getApplication().getMainCamera().camera;
                 if (camera._projMatDirty) {
                     this.element.screen.screen._calcProjectionMatrix();
                 }

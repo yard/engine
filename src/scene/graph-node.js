@@ -1228,7 +1228,40 @@ pc.extend(pc, function () {
             }
         },
 
-        presyncHierarchy: (function () {
+        presyncHierarchy: function () {
+            if (!this._enabled) {
+                return;
+            }
+
+            var c = this._children;
+
+            for(var i = 0, len = c.length;i < len;i++) {
+                c[i].presyncHierarchy();
+            }
+
+            this.presync();
+       },
+
+        /**
+         * @function
+         * @name pc.GraphNode#syncHierarchy
+         * @description Updates the world transformation matrices at this node and all of its descendants.
+         */
+        syncHierarchy: function () {
+            if (!this._enabled) {
+                return;
+            }
+
+            var c = this._children;
+
+            this.sync();
+
+            for(var i = 0, len = c.length;i < len;i++) {
+                c[i].syncHierarchy();
+            }
+        },
+
+        _presyncHierarchy: (function () {
             // cache this._children and the syncHierarchy method itself
             // for optimization purposes
             var F = function () {
@@ -1254,7 +1287,7 @@ pc.extend(pc, function () {
          * @name pc.GraphNode#syncHierarchy
          * @description Updates the world transformation matrices at this node and all of its descendants.
          */
-        syncHierarchy: (function () {
+        _syncHierarchy: (function () {
             // cache this._children and the syncHierarchy method itself
             // for optimization purposes
             var F = function () {

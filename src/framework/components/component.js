@@ -18,10 +18,7 @@ pc.extend(pc, function () {
             this.buildAccessors(this.system.schema);
         }
 
-        this.on("set", function (name, oldValue, newValue) {
-            this.fire("set_" + name, name, oldValue, newValue);
-        });
-
+        this.on("set", this.onFieldSet, this);
         this.on('set_enabled', this.onSetEnabled, this);
     };
 
@@ -66,6 +63,10 @@ pc.extend(pc, function () {
 
         buildAccessors: function (schema) {
             Component._buildAccessors(this, schema);
+        },
+
+        onFieldSet: function (name, oldValue, newValue) {
+            this.fire("set_" + name, name, oldValue, newValue);
         },
 
         onSetEnabled: function (name, oldValue, newValue) {

@@ -212,7 +212,7 @@ pc.extend(pc, function () {
         this.vertexBuffers = [ ];
         this.vbOffsets = [ ];
         this.precision = "highp";
-        this._enableAutoInstancing = false;
+        this._enableAutoInstancing = !false;
         this.autoInstancingMaxObjects = 16384;
         this.attributesInvalidated = true;
         this.boundBuffer = null;
