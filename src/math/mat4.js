@@ -32,7 +32,7 @@ pc.extend(pc, (function () {
             this.data[14] = v14;
             this.data[15] = v15;
         } else {
-            this.setIdentity();
+            this.setInitial();
         }
     };
 
@@ -392,6 +392,104 @@ pc.extend(pc, (function () {
             return res.set(x, y, z);
         },
 
+        transformVector3: function (v) {
+            // Technically this should compute the `w` term and divide the resulting vector
+            // components by `w` to homogenize but we don't scale so `w` is just `1`
+            var u = v.data,
+                x = u[0],
+                y = u[1],
+                z = u[2],
+                m = this.data;
+
+            u[0] = m[0] * x + m[1] * y + m[2] * z + m[3];
+            u[1] = m[4] * x + m[5] * y + m[6] * z + m[7];
+            u[2] = m[8] * x + m[9] * y + m[10] * z + m[11];
+
+            return v;
+        },
+
+        transformVector3Into: function(v, dest) {
+            // Technically this should compute the `w` term and divide the resulting vector
+            // components by `w` to homogenize but we don't scale so `w` is just `1`
+            v = v.data;
+            var x = v[0],
+                y = v[1],
+                z = v[2],
+                m = this.data,
+                dst = dest.data;
+
+            dst[0] = m[0] * x + m[1] * y + m[2] * z + m[3];
+            dst[1] = m[4] * x + m[5] * y + m[6] * z + m[7];
+            dst[2] = m[8] * x + m[9] * y + m[10] * z + m[11];
+
+            return dest;
+        },
+
+
+        makeTransform: function (rotation, translation) {
+            // Setup rotation
+            var x2 = rotation.x + rotation.x,
+                y2 = rotation.y + rotation.y,
+                z2 = rotation.z + rotation.z,
+                xx = rotation.x * x2,
+                xy = rotation.x * y2,
+                xz = rotation.x * z2,
+                yy = rotation.y * y2,
+                yz = rotation.y * z2,
+                zz = rotation.z * z2,
+                wx = rotation.w * x2,
+                wy = rotation.w * y2,
+                wz = rotation.w * z2,
+                m  = this.data;
+
+            m[0] = 1 - ( yy + zz );
+            m[4] = xy + wz;
+            m[8] = xz - wy;
+            m[12] = 0;
+            m[1] = xy - wz;
+            m[5] = 1 - (xx + zz);
+            m[9] = yz + wx;
+            m[13] = 0;
+            m[2] = xz + wy;
+            m[6] = yz - wx;
+            m[10] = 1 - (xx + yy);
+            m[14] = 0;
+
+            // Translation
+            m[3] = translation.x;
+            m[7] = translation.y;
+            m[11] = translation.z;
+            m[15] = 1;
+
+            return this;
+        },
+
+        rotateVector3: function (v) {
+            var u = v.data,
+                x = u[0],
+                y = u[1],
+                z = u[2],
+                m = this.data;
+            u[0] = m[0] * x + m[1] * y + m[2] * z;
+            u[1] = m[4] * x + m[5] * y + m[6] * z;
+            u[2] = m[8] * x + m[9] * y + m[10] * z;
+
+            return v;
+        },
+
+        rotateVector3Into: function (v, dest) {
+            v = v.data;
+            var x = v[0],
+                y = v[1],
+                z = v[2],
+                dst = dest.data;
+            dst[0] = m[0] * x + m[1] * y + m[2] * z;
+            dst[1] = m[4] * x + m[5] * y + m[6] * z;
+            dst[2] = m[8] * x + m[9] * y + m[10] * z;
+
+            return dest;
+        },
+
         /**
          * @function
          * @name pc.Mat4#setLookAt
@@ -699,7 +797,7 @@ pc.extend(pc, (function () {
                 b00, b01, b02, b03,
                 b04, b05, b06, b07,
                 b08, b09, b10, b11,
-                invDet, m;
+                d, invDet, m;
 
             m = this.data;
             a00 = m[0];
@@ -732,7 +830,11 @@ pc.extend(pc, (function () {
             b10 = a21 * a33 - a23 * a31;
             b11 = a22 * a33 - a23 * a32;
 
-            invDet = 1 / (b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06);
+            d = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+            if (!d) {
+                return null;
+            }
+            invDet = 1 / d;
 
             m[0] = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
             m[1] = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
@@ -752,6 +854,74 @@ pc.extend(pc, (function () {
             m[15] = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
 
             return this;
+        },
+
+        invertInto: function(n) {
+            var a00, a01, a02, a03,
+                a10, a11, a12, a13,
+                a20, a21, a22, a23,
+                a30, a31, a32, a33,
+                b00, b01, b02, b03,
+                b04, b05, b06, b07,
+                b08, b09, b10, b11,
+                d, invDet, m, k;
+
+            m = this.data;
+            k = n.data;
+            a00 = m[0];
+            a01 = m[1];
+            a02 = m[2];
+            a03 = m[3];
+            a10 = m[4];
+            a11 = m[5];
+            a12 = m[6];
+            a13 = m[7];
+            a20 = m[8];
+            a21 = m[9];
+            a22 = m[10];
+            a23 = m[11];
+            a30 = m[12];
+            a31 = m[13];
+            a32 = m[14];
+            a33 = m[15];
+
+            b00 = a00 * a11 - a01 * a10;
+            b01 = a00 * a12 - a02 * a10;
+            b02 = a00 * a13 - a03 * a10;
+            b03 = a01 * a12 - a02 * a11;
+            b04 = a01 * a13 - a03 * a11;
+            b05 = a02 * a13 - a03 * a12;
+            b06 = a20 * a31 - a21 * a30;
+            b07 = a20 * a32 - a22 * a30;
+            b08 = a20 * a33 - a23 * a30;
+            b09 = a21 * a32 - a22 * a31;
+            b10 = a21 * a33 - a23 * a31;
+            b11 = a22 * a33 - a23 * a32;
+
+            d = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+            if (!d) {
+                return null;
+            }
+            invDet = 1 / d;
+
+            k[0] = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
+            k[1] = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
+            k[2] = (a31 * b05 - a32 * b04 + a33 * b03) * invDet;
+            k[3] = (-a21 * b05 + a22 * b04 - a23 * b03) * invDet;
+            k[4] = (-a10 * b11 + a12 * b08 - a13 * b07) * invDet;
+            k[5] = (a00 * b11 - a02 * b08 + a03 * b07) * invDet;
+            k[6] = (-a30 * b05 + a32 * b02 - a33 * b01) * invDet;
+            k[7] = (a20 * b05 - a22 * b02 + a23 * b01) * invDet;
+            k[8] = (a10 * b10 - a11 * b08 + a13 * b06) * invDet;
+            k[9] = (-a00 * b10 + a01 * b08 - a03 * b06) * invDet;
+            k[10] = (a30 * b04 - a31 * b02 + a33 * b00) * invDet;
+            k[11] = (-a20 * b04 + a21 * b02 - a23 * b00) * invDet;
+            k[12] = (-a10 * b09 + a11 * b07 - a12 * b06) * invDet;
+            k[13] = (a00 * b09 - a01 * b07 + a02 * b06) * invDet;
+            k[14] = (-a30 * b03 + a31 * b01 - a32 * b00) * invDet;
+            k[15] = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
+
+            return n;
         },
 
         /**
@@ -1217,6 +1387,8 @@ pc.extend(pc, (function () {
             return t;
         }
     };
+
+    Mat4.prototype.setInitial = Mat4.prototype.setIdentity;
 
     /**
      * @field

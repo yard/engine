@@ -67,13 +67,18 @@ pc.extend(pc, (function () {
      * quat.w = 0;
      */
     var Quat = function (x, y, z, w) {
-        this.x = (x === undefined) ? 0 : x;
-        this.y = (y === undefined) ? 0 : y;
-        this.z = (z === undefined) ? 0 : z;
-        this.w = (w === undefined) ? 1 : w;
+        this.setInitial(x, y, z, w);
     };
 
     Quat.prototype = {
+
+        setInitial: function(x, y, z, w) {
+            this.x = (x === undefined) ? 0 : x;
+            this.y = (y === undefined) ? 0 : y;
+            this.z = (z === undefined) ? 0 : z;
+            this.w = (w === undefined) ? 1 : w;
+        },
+
         /**
          * @function
          * @name pc.Quat#clone

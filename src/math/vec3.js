@@ -128,10 +128,17 @@ pc.extend(pc, (function () {
          * console.log("The result of the cross product is: " + back.toString());
          */
         cross: function (lhs, rhs) {
+
             var a, b, r, ax, ay, az, bx, by, bz;
 
-            a = lhs.data;
-            b = rhs.data;
+            if (typeof rhs === 'undefined') {
+                a = this.data;
+                b = lhs.data;
+            } else {
+                a = lhs.data;
+                b = rhs.data;
+            }
+
             r = this.data;
 
             ax = a[0];
@@ -328,6 +335,32 @@ pc.extend(pc, (function () {
                 v[0] *= invLength;
                 v[1] *= invLength;
                 v[2] *= invLength;
+            } else {
+                v[0] = v[1] = v[2] = 0;
+            }
+
+            return this;
+        },
+
+        /**
+         * @function
+         * @name pc.Vec3#normalize
+         * @description Returns the specified 3-dimensional vector copied and converted to a unit vector.
+         * If the vector has a length of zero, the vector's elements will be set to zero.
+         * @returns {pc.Vec3} The result of the normalization.
+         */
+        normalize2: function( rhs ) {
+            var a = this.data,
+                b = rhs.data;
+
+            var lengthSq = b[0] * b[0] + b[1] * b[1] + b[2] * b[2];
+            if (lengthSq > 0) {
+                var invLength = 1 / Math.sqrt(lengthSq);
+                a[0] = b[0] * invLength;
+                a[1] = b[1] * invLength;
+                a[2] = b[2] * invLength;
+            } else {
+                a[0] = a[1] = a[2] = 0;
             }
 
             return this;
@@ -385,6 +418,26 @@ pc.extend(pc, (function () {
             v[0] *= scalar;
             v[1] *= scalar;
             v[2] *= scalar;
+
+            return this;
+        },
+
+        /**
+         * @function
+         * @name pc.Vec3#scale
+         * @description Scales each dimension of the specified 3-dimensional vector by the supplied
+         * scalar value.
+         * @param {pc.Vec3} rhs The 3-dimensional vector.
+         * @param {Number} scalar The value by which each vector component is multiplied.
+         * @returns {pc.Vec3} Self for chaining.
+         */
+        scale2: function(rhs, scalar) {
+            var a = this.data,
+                b = rhs.data;
+
+            a[0] = b[0] * scalar;
+            a[1] = b[1] * scalar;
+            a[2] = b[2] * scalar;
 
             return this;
         },
@@ -466,6 +519,23 @@ pc.extend(pc, (function () {
             r[2] = a[2] - b[2];
 
             return this;
+        },
+
+        /**
+         * @function
+         * @name pc.Vec3#distance
+         * @description Finds distance between two vectors.
+         * @param {pc.Vec3} rhs Second vector.
+         * @returns {Number} Distance between two vectors.
+         */
+        distance: function(rhs) {
+            var a = this.data,
+                b = rhs.data;
+
+            var x = b[0] - a[0],
+                y = b[1] - a[1],
+                z = b[2] - a[2];
+            return Math.sqrt( x * x + y * y + z * z );
         },
 
         /**
