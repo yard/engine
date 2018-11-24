@@ -1,4 +1,4 @@
-pc.extend(pc, function () {
+Object.assign(pc, function () {
     'use strict';
 
     // Public interface
@@ -29,11 +29,13 @@ pc.extend(pc, function () {
     ProgramLibrary.prototype.getProgram = function (name, options) {
         var generator = this._generators[name];
         if (generator === undefined) {
-            logERROR("No program library functions registered for: " + name);
+            // #ifdef DEBUG
+            console.warn("ProgramLibrary#getProgram: No program library functions registered for: " + name);
+            // #endif
             return null;
         }
         var gd = this._device;
-        var key = generator.generateKey(gd, options); // TODO: gd is never used in generateKey(), remove?
+        var key = generator.generateKey(options);
         var shader = this._cache[key];
         if (!shader) {
             var shaderDefinition = generator.createShaderDefinition(gd, options);
@@ -45,7 +47,7 @@ pc.extend(pc, function () {
     ProgramLibrary.prototype.clearCache = function () {
         var cache = this._cache;
         this._isClearingCache = true;
-        for(var key in cache) {
+        for (var key in cache) {
             if (cache.hasOwnProperty(key)) {
                 cache[key].destroy();
             }
@@ -54,12 +56,12 @@ pc.extend(pc, function () {
         this._isClearingCache = false;
     };
 
-    ProgramLibrary.prototype.removeFromCache = function(shader) {
+    ProgramLibrary.prototype.removeFromCache = function (shader) {
         if (this._isClearingCache) return; // don't delete by one when clearing whole cache
         var cache = this._cache;
-        for(var key in cache) {
+        for (var key in cache) {
             if (cache.hasOwnProperty(key)) {
-                if (cache[key]===shader) {
+                if (cache[key] === shader) {
                     delete cache[key];
                     break;
                 }

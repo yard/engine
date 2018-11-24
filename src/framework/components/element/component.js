@@ -39,6 +39,8 @@ pc.extend(pc, function () {
      */
 
     var ElementComponent = function ElementComponent (system, entity) {
+        pc.Component.call(this, system, entity);
+        
         this._anchor = new pc.Vec4();
         this._localAnchor = new pc.Vec4();
         this._canvasGroups = null;
@@ -102,8 +104,9 @@ pc.extend(pc, function () {
             _warning = true;
         }
     };
-    
-    ElementComponent = pc.inherits(ElementComponent, pc.Component);
+
+    ElementComponent.prototype = Object.create(pc.Component.prototype);
+    ElementComponent.prototype.constructor = ElementComponent;
 
     pc.extend(ElementComponent.prototype, {
         
@@ -130,16 +133,16 @@ pc.extend(pc, function () {
         },
  
         _patch: function () {
-            this.entity.dirtyLocal = true;
+            this.entity._dirtyLocal = true;
             
-            this.entity.sync = this._sync;
-            this.entity.presync = this._presync;
+            this.entity._sync = this._sync;
+            this.entity._presync = this._presync;
             this.entity.setPosition = this._setPosition;
         },
 
         _unpatch: function () {
-            this.entity.sync = pc.Entity.prototype.sync;
-            this.entity.presync = pc.Entity.prototype.presync;
+            this.entity._sync = pc.Entity.prototype._sync;
+            this.entity._presync = pc.Entity.prototype._presync;
             this.entity.setPosition = pc.Entity.prototype.setPosition;
         },
 
@@ -161,7 +164,7 @@ pc.extend(pc, function () {
 
                 if (!localPosition.equals(this.localPosition)) {
                     this.localPosition.copy( localPosition );
-                    this.dirtyLocal = true;
+                    this._dirtyLocal = true;
                 }
             };
         }(),
@@ -184,14 +187,14 @@ pc.extend(pc, function () {
             var element = this.element;
 
             if (this.element.screen) {
-                var camera = this.element.screen.screen.camera || UnityEngine.Camera.getmain().handle;
+                var camera = this.element.screen.screen.camera || pc.Application.getApplication().getMainCamera().camera;
                 if (camera._projMatDirty) {
                     this.element.screen.screen._calcProjectionMatrix();
                 }
             }
 
             if (!element._anchorDirty && !element._sizeDeltaDirty && !element._anchoredPositionDirty && !element._cornerDirty &&
-                !this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld) {
+                !this._dirtyLocal && !this._dirtyLocalEulerAngles && !this._dirtyWorld) {
                 return;
             }
 
@@ -237,23 +240,23 @@ pc.extend(pc, function () {
             var element = this.element;
 
             if (!element._anchorDirty && !element._sizeDeltaDirty && !element._anchoredPositionDirty && !element._cornerDirty &&
-                !this.dirtyLocal && !this.dirtyLocalEulerAngles && !this.dirtyWorld) {
+                !this._dirtyLocal && !this._dirtyLocalEulerAngles && !this._dirtyWorld) {
                 return;
             }
 
             var parent = element._parent;
 
-            if (this.dirtyLocalEulerAngles) {
+            if (this._dirtyLocalEulerAngles) {
                 this.localRotation.setFromEulerAngles(this.localEulerAngles.x, this.localEulerAngles.y, this.localEulerAngles.z);
-                this.dirtyLocal = true;
-                this.dirtyLocalEulerAngles = false;
+                this._dirtyLocal = true;
+                this._dirtyLocalEulerAngles = false;
             }
 
-            if (this.dirtyLocal) {
+            if (this._dirtyLocal) {
                 this.localTransform.setTRS(this.localPosition, this.localRotation, this.localScale);
 
-                this.dirtyLocal = false;
-                this.dirtyWorld = true;
+                this._dirtyLocal = false;
+                this._dirtyWorld = true;
                 this._aabbVer++;
             }
 
@@ -271,7 +274,7 @@ pc.extend(pc, function () {
                 element._anchoredPositionDirty = false;
 
                 element._cornerDirty = true;
-                this.dirtyWorld = true;
+                this._dirtyWorld = true;
 
                 this._aabbVer++;
             }
@@ -287,7 +290,7 @@ pc.extend(pc, function () {
                 element._sizeDeltaDirty = false;
 
                 element._cornerDirty = true;
-                this.dirtyWorld = true;
+                this._dirtyWorld = true;
 
                 this._aabbVer++;
             }
@@ -334,7 +337,7 @@ pc.extend(pc, function () {
             element._anchorDirty = false;
             element._cornerDirty = false;
 
-            if (this.dirtyWorld) {
+            if (this._dirtyWorld) {
                 // before recomputing the transforms let's agree on a few matrices used below:
                 //
                 //    * world: it's either clip box of the WebGL (for screen and camera screen types) OR
@@ -407,8 +410,8 @@ pc.extend(pc, function () {
 
                         // element._pivotGraph.localTransform.mul2( this.worldTransform, element._fromPivotTransform );
                         
-                        // element._pivotGraph.dirtyLocal = false;
-                        // element._pivotGraph.dirtyWorld = true;
+                        // element._pivotGraph._dirtyLocal = false;
+                        // element._pivotGraph._dirtyWorld = true;
                         // element._pivotGraph.sync();
 
                         element._pivotWorldTransform.mul2( this.worldTransform, element._fromPivotTransform );
@@ -419,12 +422,12 @@ pc.extend(pc, function () {
                     }
                 }
 
-                this.dirtyWorld = false;
+                this._dirtyWorld = false;
 
                 var child;
                 for (var i = 0, len = this._children.length; i < len; i++) {
                     child = this._children[i];
-                    child.dirtyWorld = true;
+                    child._dirtifyWorld();
                     child._aabbVer++;
                 }
 
@@ -469,14 +472,13 @@ pc.extend(pc, function () {
 
             while (node) {
                 nodes.push( node );
-//                hasLayoutParents = hasLayoutParents || (node && node._layoutControllers.length > 0);              
                 node = node.parent;
             }
 
             if (hasLayoutParents) {
                 for(var i = 0; i < nodes.length; i++) {
-                    nodes[ i ].dirtyLocal = true;
-                    nodes[ i ].dirtyWorld = true;
+                    nodes[ i ]._dirtifyLocal();
+                    nodes[ i ]._dirtifyWorld();
                 }
             }
         },
@@ -529,7 +531,7 @@ pc.extend(pc, function () {
             this.fire('set:screen', this.screen);
 
             this._anchorDirty = true;
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
 
             // update all child screens
             var children = this.entity.getChildren();
@@ -585,14 +587,14 @@ pc.extend(pc, function () {
         },
 
         _onScreenResize: function (res) {
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
             this._anchorDirty = true;
 
             this.fire('screen:set:resolution', res);
         },
 
         _onScreenTypeChange: function () {
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
             this.fire('screen:set:screentype', this.screen.screen.screenType);
         },
 
@@ -641,7 +643,7 @@ pc.extend(pc, function () {
         },
 
         onEnable: function () {
-            ElementComponent._super.onEnable.call(this);
+            pc.Component.prototype.onEnable.call(this);
             if (this._image) this._image.onEnable();
             if (this._text) this._text.onEnable();
             if (this._group) this._group.onEnable();
@@ -649,7 +651,7 @@ pc.extend(pc, function () {
         },
 
         onDisable: function () {
-            ElementComponent._super.onDisable.call(this);
+            pc.Component.prototype.onDisable.call(this);
             if (this._image) this._image.onDisable();
             if (this._text) this._text.onDisable();
             if (this._group) this._group.onDisable();
@@ -749,7 +751,7 @@ pc.extend(pc, function () {
             this._updateAnchoredPosition();
             this._updateSizeDelta();
 
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
         }
     });
 
@@ -936,7 +938,7 @@ pc.extend(pc, function () {
             this._updateElementRect();
 
             this._anchorDirty = true;
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
             this.fire('set:anchor', this._anchor);
         }
     });
@@ -965,7 +967,7 @@ pc.extend(pc, function () {
 
             this._updateElementRect();
 
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
             this._cornerDirty = true;
         }
     });
@@ -994,7 +996,7 @@ pc.extend(pc, function () {
 
             this._updateElementRect();
 
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyWorld = true;
             this._cornerDirty = true;
         }
     });

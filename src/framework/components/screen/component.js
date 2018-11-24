@@ -44,6 +44,8 @@ pc.extend(pc, function () {
      */
 
     var ScreenComponent = function ScreenComponent (system, entity) {
+        pc.Component.call(this, system, entity);
+        
         this._resolution = new pc.Vec2(this.system.app.graphicsDevice.width, this.system.app.graphicsDevice.height);
         this._referenceResolution = new pc.Vec2(640,320);
         this._offset = new pc.Vec2(0, 0);
@@ -59,7 +61,8 @@ pc.extend(pc, function () {
         system.app.graphicsDevice.on("resizecanvas", this._onResize, this);
     };
 
-    ScreenComponent = pc.inherits(ScreenComponent, pc.Component);
+    ScreenComponent.prototype = Object.create(pc.Component.prototype);
+    ScreenComponent.prototype.constructor = ScreenComponent;
 
     ScreenComponent.SCALEMODE_NONE = "none";
     ScreenComponent.SCALEMODE_BLEND = "blend";
@@ -121,7 +124,7 @@ pc.extend(pc, function () {
             var system = pc.Application.getApplication().systems.screen;
             
             if (system) {
-                system.dirtyOrder = true;
+                system._dirtyOrder = true;
             }
         },
 
@@ -205,8 +208,8 @@ pc.extend(pc, function () {
 
             this._width = w;
             this._height = h;
-            this.entity.dirtyLocal = true;
-            this.entity.dirtyWorld = true;
+            this.entity._dirtyLocal = true;
+            this.entity._dirtyWorld = true;
 
             if (this.entity.parent && this.entity.parent.screen) {
                 var screen = this.entity.parent.screen;

@@ -1,16 +1,20 @@
-pc.extend(pc, function () {
-    var _schema = [ 'enabled' ];
+Object.assign(pc, function () {
+    var _schema = ['enabled'];
 
     /**
-    * @name pc.AudioListenerComponentSystem
-    * @class Component System for adding and removing {@link pc.AudioComponent} objects to Enities.
-    * @description Create a new AudioListenerComponentSystem
-    * @extends pc.ComponentSystem
-    */
+     * @constructor
+     * @name pc.AudioListenerComponentSystem
+     * @classdesc Component System for adding and removing {@link pc.AudioComponent} objects to Entities.
+     * @description Create a new AudioListenerComponentSystem
+     * @param {pc.Application} app The application managing this system.
+     * @param {pc.SoundManager} manager A sound manager instance.
+     * @extends pc.ComponentSystem
+     */
     var AudioListenerComponentSystem = function (app, manager) {
+        pc.ComponentSystem.call(this, app);
+
         this.id = "audiolistener";
         this.description = "Specifies the location of the listener for 3D audio playback.";
-        app.systems.add(this.id, this);
 
         this.ComponentType = pc.AudioListenerComponent;
         this.DataType = pc.AudioListenerComponentData;
@@ -22,15 +26,16 @@ pc.extend(pc, function () {
 
         pc.ComponentSystem.on('update', this.onUpdate, this);
     };
-    AudioListenerComponentSystem = pc.inherits(AudioListenerComponentSystem, pc.ComponentSystem);
+    AudioListenerComponentSystem.prototype = Object.create(pc.ComponentSystem.prototype);
+    AudioListenerComponentSystem.prototype.constructor = AudioListenerComponentSystem;
 
     pc.Component._buildAccessors(pc.AudioListenerComponent.prototype, _schema);
 
-    pc.extend(AudioListenerComponentSystem.prototype, {
+    Object.assign(AudioListenerComponentSystem.prototype, {
         initializeComponentData: function (component, data, properties) {
             properties = ['enabled'];
 
-            AudioListenerComponentSystem._super.initializeComponentData.call(this, component, data, properties);
+            pc.ComponentSystem.prototype.initializeComponentData.call(this, component, data, properties);
         },
 
         onUpdate: function (dt) {
@@ -45,6 +50,6 @@ pc.extend(pc, function () {
     });
 
     return {
-        AudioListenerComponentSystem : AudioListenerComponentSystem
+        AudioListenerComponentSystem: AudioListenerComponentSystem
     };
 }());

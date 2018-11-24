@@ -1,28 +1,39 @@
-pc.extend(pc, function () {
+Object.assign(pc, function () {
     /**
+     * @constructor
      * @name pc.ModelHandler
-     * @class Resource Handler for creating pc.Model resources
+     * @classdesc Resource Handler for creating pc.Model resources
      * @description {@link pc.ResourceHandler} use to load 3D model resources
      * @param {pc.GraphicsDevice} device The graphics device that will be rendering
+     * @param {pc.StandardMaterial} defaultMaterial The shared default material that is used in any place that a material is not specified
      */
-    var ModelHandler = function (device) {
+    var ModelHandler = function (device, defaultMaterial) {
         this._device = device;
+        this._parsers = [];
+        this._defaultMaterial = defaultMaterial;
+
+        this.addParser(new pc.JsonModelParser(this._device), function (url, data) {
+            return (pc.path.getExtension(url) === '.json');
+        });
     };
 
-    ModelHandler.DEFAULT_MATERIAL = pc.Scene.defaultMaterial;
-
-    ModelHandler.prototype = {
+    Object.assign(ModelHandler.prototype, {
         /**
          * @function
          * @name pc.ModelHandler#load
          * @description Fetch model data from a remote url
+         * @param {String} url The URL of the model data.
+         * @param {Function} callback Callback function called when the load completes. The
+         * callback is of the form fn(err, response), where err is a String error message in
+         * the case where the load fails, and repsponse is the model data that has been
+         * successfully loaded.
          */
         load: function (url, callback) {
             pc.http.get(url, function (err, response) {
-                if (! callback)
+                if (!callback)
                     return;
 
-                if (! err) {
+                if (!err) {
                     callback(null, response);
                 } else {
                     callback(pc.string.format("Error loading model: {0} [{1}]", url, err));
@@ -30,36 +41,36 @@ pc.extend(pc, function () {
             });
         },
 
-         /**
+        /**
          * @function
          * @name pc.ModelHandler#open
-         * @description Process data in deserialized format into a pc.Model object
-         * @param {Object} data The data from model file deserialized into a Javascript Object
+         * @description Process data in deserialized format into a pc.Model object.
+         * @param {String} url The URL of the model data.
+         * @param {Object} data The data from model file deserialized into a JavaScript Object.
+         * @returns {pc.Model} The loaded model.
          */
         open: function (url, data) {
-            if (! data.model)
-                return;
+            for (var i = 0; i < this._parsers.length; i++) {
+                var p = this._parsers[i];
 
-            if (data.model.version <= 1) {
-                logERROR(pc.string.format("Asset: {0}, is an old model format. Upload source assets to re-import.", url));
-            } else if (data.model.version >= 2) {
-                var parser = new pc.JsonModelParser(this._device);
-                return parser.parse(data);
+                if (p.decider(url, data)) {
+                    return p.parser.parse(data);
+                }
             }
-
+            logWARNING(pc.string.format("No model parser found for: {0}", url));
             return null;
         },
 
         patch: function (asset, assets) {
-            if (! asset.resource)
+            if (!asset.resource)
                 return;
 
-            var resource = asset.resource;
             var data = asset.data;
 
-            resource.meshInstances.forEach(function (meshInstance, i) {
+            var self = this;
+            asset.resource.meshInstances.forEach(function (meshInstance, i) {
                 if (data.mapping) {
-                    var handleMaterial = function(asset) {
+                    var handleMaterial = function (asset) {
                         if (asset.resource) {
                             meshInstance.material = asset.resource;
                         } else {
@@ -67,14 +78,15 @@ pc.extend(pc, function () {
                             assets.load(asset);
                         }
 
-                        asset.once('remove', function(asset) {
-                            if (meshInstance.material === asset.resource)
-                                meshInstance.material = pc.ModelHandler.DEFAULT_MATERIAL;
+                        asset.once('remove', function (asset) {
+                            if (meshInstance.material === asset.resource) {
+                                meshInstance.material = self._defaultMaterial;
+                            }
                         });
                     };
 
-                    if (! data.mapping[i]) {
-                        meshInstance.material = pc.ModelHandler.DEFAULT_MATERIAL;
+                    if (!data.mapping[i]) {
+                        meshInstance.material = self._defaultMaterial;
                         return;
                     }
 
@@ -83,8 +95,8 @@ pc.extend(pc, function () {
                     var material;
 
                     if (id !== undefined) { // id mapping
-                        if (! id) {
-                            meshInstance.material = pc.ModelHandler.DEFAULT_MATERIAL;
+                        if (!id) {
+                            meshInstance.material = self._defaultMaterial;
                         } else {
                             material = assets.get(id);
                             if (material) {
@@ -93,7 +105,7 @@ pc.extend(pc, function () {
                                 assets.once('add:' + id, handleMaterial);
                             }
                         }
-                    } else if (url !== undefined && url) {
+                    } else if (url) {
                         // url mapping
                         var fileUrl = asset.getFileUrl();
                         var dirUrl = pc.path.getDirectory(fileUrl);
@@ -109,7 +121,24 @@ pc.extend(pc, function () {
                 }
             });
         },
-    };
+
+        /**
+         * @function
+         * @name pc.ModelHandler#addParser
+         * @description Add a parser that converts raw data into a {@link pc.Model}
+         * Default parser is for JSON models
+         * @param {Object} parser See JsonModelParser for example
+         * @param {Function} decider Function that decides on which parser to use.
+         * Function should take (url, data) arguments and return true if this parser should be used to parse the data into a {@link pc.Model}.
+         * The first parser to return true is used.
+         */
+        addParser: function (parser, decider) {
+            this._parsers.push({
+                parser: parser,
+                decider: decider
+            });
+        }
+    });
 
     return {
         ModelHandler: ModelHandler

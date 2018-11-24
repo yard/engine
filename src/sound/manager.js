@@ -1,4 +1,4 @@
-pc.extend(pc, function () {
+Object.assign(pc, function () {
     'use strict';
 
     /**
@@ -6,7 +6,7 @@ pc.extend(pc, function () {
      * @function
      * @name pc.SoundManager.hasAudio
      * @description Reports whether this device supports the HTML5 Audio tag API
-     * @returns true if HTML5 Audio tag API is supported and false otherwise
+     * @returns {Boolean} true if HTML5 Audio tag API is supported and false otherwise
      */
     function hasAudio() {
         return (typeof Audio !== 'undefined');
@@ -17,20 +17,20 @@ pc.extend(pc, function () {
      * @function
      * @name pc.SoundManager.hasAudioContext
      * @description Reports whether this device supports the Web Audio API
-     * @returns true if Web Audio is supported and false otherwise
+     * @returns {Boolean} true if Web Audio is supported and false otherwise
      */
     function hasAudioContext() {
         return !!(typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined');
     }
 
     /**
+     * @constructor
      * @name pc.SoundManager
-     * @class The SoundManager is used to load and play audio. As well as apply system-wide settings
+     * @classdesc The SoundManager is used to load and play audio. As well as apply system-wide settings
      * like global volume, suspend and resume.
      * @description Creates a new sound manager.
-     * @param {Object} [options]
+     * @param {Object} [options] Options options object.
      * @param {Boolean} [options.forceWebAudioApi] Always use the Web Audio API even check indicates that it if not available
-     * @property {pc.Listener} listener Gets / sets the audio listener
      * @property {Number} volume Global volume for the manager. All {@link pc.SoundInstance}s will scale their volume with this volume. Valid between [0, 1].
      */
     var SoundManager = function (options) {
@@ -43,9 +43,19 @@ pc.extend(pc, function () {
 
             if (this.context) {
                 var context = this.context;
+
+                // resume AudioContext on user interaction because of new Chrome autoplay policy
+                this.resumeContext = function () {
+                    this.context.resume();
+                    window.removeEventListener('mousedown', this.resumeContext);
+                    window.removeEventListener('touchend', this.resumeContext);
+                }.bind(this);
+
+                window.addEventListener('mousedown', this.resumeContext);
+                window.addEventListener('touchend', this.resumeContext);
+
                 // iOS only starts sound as a response to user interaction
-                var iOS = /iPad|iPhone|iPod/.test(navigator.platform);
-                if (iOS) {
+                if (pc.platform.ios) {
                     // Play an inaudible sound when the user touches the screen
                     // This only happens once
                     var unlock = function () {
@@ -67,9 +77,8 @@ pc.extend(pc, function () {
             console.warn('No support for 3D audio found');
         }
 
-        if (!hasAudio()) {
+        if (!hasAudio())
             console.warn('No support for 2D audio found');
-        }
 
         this.listener = new pc.Listener(this);
 
@@ -82,8 +91,7 @@ pc.extend(pc, function () {
     SoundManager.hasAudio = hasAudio;
     SoundManager.hasAudioContext = hasAudioContext;
 
-    SoundManager.prototype = {
-
+    Object.assign(SoundManager.prototype, {
         suspend: function  () {
             this.suspended = true;
             this.fire('suspend');
@@ -95,6 +103,9 @@ pc.extend(pc, function () {
         },
 
         destroy: function () {
+            window.removeEventListener('mousedown', this.resumeContext);
+            window.removeEventListener('touchend', this.resumeContext);
+
             this.fire('destroy');
             if (this.context && this.context.close) {
                 this.context.close();
@@ -118,15 +129,16 @@ pc.extend(pc, function () {
         },
 
         /**
-        * @private
-        * @function
-        * @name pc.SoundManager#playSound
-        * @description Create a new pc.Channel and begin playback of the sound.
-        * @param {pc.Sound} sound The Sound object to play.
-        * @param {Object} options
-        * @param {Number} [options.volume] The volume to playback at, between 0 and 1.
-        * @param {Boolean} [options.loop] Whether to loop the sound when it reaches the end.
-        */
+         * @private
+         * @function
+         * @name pc.SoundManager#playSound
+         * @description Create a new pc.Channel and begin playback of the sound.
+         * @param {pc.Sound} sound The Sound object to play.
+         * @param {Object} options Optional options object.
+         * @param {Number} [options.volume] The volume to playback at, between 0 and 1.
+         * @param {Boolean} [options.loop] Whether to loop the sound when it reaches the end.
+         * @returns {pc.Channel} The channel playing the sound.
+         */
         playSound: function (sound, options) {
             options = options || {};
             var channel = null;
@@ -138,16 +150,17 @@ pc.extend(pc, function () {
         },
 
         /**
-        * @private
-        * @function
-        * @name pc.SoundManager#playSound3d
-        * @description Create a new pc.Channel3d and begin playback of the sound at the position specified
-        * @param {pc.Sound} sound The Sound object to play.
-        * @param {pc.Vec3} position The position of the sound in 3D space.
-        * @param {Object} options
-        * @param {Number} [options.volume] The volume to playback at, between 0 and 1.
-        * @param {Boolean} [options.loop] Whether to loop the sound when it reaches the end.
-        */
+         * @private
+         * @function
+         * @name pc.SoundManager#playSound3d
+         * @description Create a new pc.Channel3d and begin playback of the sound at the position specified
+         * @param {pc.Sound} sound The Sound object to play.
+         * @param {pc.Vec3} position The position of the sound in 3D space.
+         * @param {Object} options Optional options object.
+         * @param {Number} [options.volume] The volume to playback at, between 0 and 1.
+         * @param {Boolean} [options.loop] Whether to loop the sound when it reaches the end.
+         * @returns {pc.Channel3d} The 3D channel playing the sound.
+         */
         playSound3d: function (sound, position, options) {
             options = options || {};
             var channel = null;
@@ -177,8 +190,8 @@ pc.extend(pc, function () {
             }
 
             return channel;
-        },
-    };
+        }
+    });
 
     Object.defineProperty(SoundManager.prototype, 'volume', {
         get: function () {

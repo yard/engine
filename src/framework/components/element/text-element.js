@@ -61,6 +61,7 @@ pc.extend(pc, function () {
 
         // private
         this._layoutNode = new pc.GraphNode();
+        this._layoutNode.immalayout = true;
         this._layoutNode.localTransform = element._fromPivotTransform;
         this._layoutNode.forcedLocalTransform = element._fromPivotTransform;
 

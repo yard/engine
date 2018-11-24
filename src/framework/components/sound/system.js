@@ -1,4 +1,4 @@
-pc.extend(pc, function () {
+Object.assign(pc, function () {
     var _schema = [
         'enabled',
         'volume',
@@ -12,8 +12,9 @@ pc.extend(pc, function () {
     ];
 
     /**
+     * @constructor
      * @name pc.SoundComponentSystem
-     * @class Manages creation of {@link pc.SoundComponent}s.
+     * @classdesc Manages creation of {@link pc.SoundComponent}s.
      * @description Create a SoundComponentSystem
      * @param {pc.Application} app The Application
      * @param {pc.SoundManager} manager The sound manager
@@ -24,9 +25,10 @@ pc.extend(pc, function () {
      * @extends pc.ComponentSystem
      */
     var SoundComponentSystem = function (app, manager) {
+        pc.ComponentSystem.call(this, app);
+
         this.id = "sound";
         this.description = "Allows an Entity to play sounds";
-        app.systems.add(this.id, this);
 
         this.ComponentType = pc.SoundComponent;
         this.DataType = pc.SoundComponentData;
@@ -39,22 +41,24 @@ pc.extend(pc, function () {
 
         this.on('beforeremove', this.onBeforeRemove, this);
     };
-    SoundComponentSystem = pc.inherits(SoundComponentSystem, pc.ComponentSystem);
+    SoundComponentSystem.prototype = Object.create(pc.ComponentSystem.prototype);
+    SoundComponentSystem.prototype.constructor = SoundComponentSystem;
 
     pc.Component._buildAccessors(pc.SoundComponent.prototype, _schema);
 
-    pc.extend(SoundComponentSystem.prototype, {
+    Object.assign(SoundComponentSystem.prototype, {
         initializeComponentData: function (component, data, properties) {
             properties = ['volume', 'pitch', 'positional', 'refDistance', 'maxDistance', 'rollOffFactor', 'distanceModel', 'slots', 'enabled'];
-            SoundComponentSystem._super.initializeComponentData.call(this, component, data, properties);
+            pc.ComponentSystem.prototype.initializeComponentData.call(this, component, data, properties);
         },
 
         cloneComponent: function (entity, clone) {
+            var key;
             var oldData = entity.sound.data;
             var newData = {};
 
             // copy old data to new data
-            for (var key in oldData) {
+            for (key in oldData) {
                 if (oldData.hasOwnProperty(key)) {
                     newData[key] = oldData[key];
                 }
@@ -64,7 +68,7 @@ pc.extend(pc, function () {
             // simple option objects
             newData.slots = {};
 
-            for (var key in oldData.slots) {
+            for (key in oldData.slots) {
                 var oldSlot = oldData.slots[key];
                 if (oldSlot instanceof pc.SoundSlot) {
                     newData.slots[key] = {
@@ -90,7 +94,7 @@ pc.extend(pc, function () {
             return this.addComponent(clone, newData);
         },
 
-        onUpdate: function(dt) {
+        onUpdate: function (dt) {
             var store = this.store;
 
             for (var id in store) {
@@ -115,7 +119,7 @@ pc.extend(pc, function () {
             var slots = component.slots;
             // stop non overlapping sounds
             for (var key in slots) {
-                if (! slots[key].overlap) {
+                if (!slots[key].overlap) {
                     slots[key].stop();
                 }
             }
@@ -133,7 +137,7 @@ pc.extend(pc, function () {
 
     Object.defineProperty(SoundComponentSystem.prototype, 'context', {
         get: function () {
-            if (! pc.SoundManager.hasAudioContext()) {
+            if (!pc.SoundManager.hasAudioContext()) {
                 console.warn('WARNING: Audio context is not supported on this browser');
                 return null;
             }

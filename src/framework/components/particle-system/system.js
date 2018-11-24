@@ -1,4 +1,4 @@
-pc.extend(pc, function() {
+Object.assign(pc, function () {
     var _schema = [
         'enabled',
         'autoPlay',
@@ -35,6 +35,7 @@ pc.extend(pc, function() {
         'colorMapAsset',
         'normalMapAsset',
         'mesh',
+        'meshAsset',
         'localVelocityGraph',
         'localVelocityGraph2',
         'velocityGraph',
@@ -53,20 +54,23 @@ pc.extend(pc, function() {
         'animTilesY',
         'animNumFrames',
         'animSpeed',
-        'animLoop'
+        'animLoop',
+        'layers'
     ];
 
-   /**
+    /**
+     * @constructor
      * @name pc.ParticleSystemComponentSystem
+     * @classdesc Allows an Entity to render a particle system
      * @description Create a new ParticleSystemComponentSystem
-     * @class Allows an Entity to render a particle system
      * @param {pc.Application} app The Application.
      * @extends pc.ComponentSystem
      */
     var ParticleSystemComponentSystem = function ParticleSystemComponentSystem(app) {
+        pc.ComponentSystem.call(this, app);
+
         this.id = 'particlesystem';
         this.description = "Updates and renders particle system in the scene.";
-        app.systems.add(this.id, this);
 
         this.ComponentType = pc.ParticleSystemComponent;
         this.DataType = pc.ParticleSystemComponentData;
@@ -94,18 +98,27 @@ pc.extend(pc, function() {
         this.on('beforeremove', this.onRemove, this);
         pc.ComponentSystem.on('update', this.onUpdate, this);
     };
-    ParticleSystemComponentSystem = pc.inherits(ParticleSystemComponentSystem, pc.ComponentSystem);
+    ParticleSystemComponentSystem.prototype = Object.create(pc.ComponentSystem.prototype);
+    ParticleSystemComponentSystem.prototype.constructor = ParticleSystemComponentSystem;
 
     pc.Component._buildAccessors(pc.ParticleSystemComponent.prototype, _schema);
 
-    pc.extend(ParticleSystemComponentSystem.prototype, {
+    Object.assign(ParticleSystemComponentSystem.prototype, {
 
-        initializeComponentData: function(component, _data, properties) {
+        initializeComponentData: function (component, _data, properties) {
             var data = {};
 
             properties = [];
             var types = this.propertyTypes;
             var type;
+
+            // we store the mesh asset id as "mesh" (it should be "meshAsset")
+            // this re-maps "mesh" into "meshAsset" if it is an asset or an asset id
+            if (_data.mesh instanceof pc.Asset || typeof _data.mesh === 'number') {
+                // migrate into meshAsset property
+                _data.meshAsset = _data.mesh;
+                delete _data.mesh;
+            }
 
             for (var prop in _data) {
                 if (_data.hasOwnProperty(prop)) {
@@ -131,9 +144,14 @@ pc.extend(pc, function() {
                         data[prop].type = type;
                     }
                 }
+
+                // duplicate layer list
+                if (data.layers && pc.type(data.layers) === 'array') {
+                    data.layers = data.layers.slice(0);
+                }
             }
 
-            ParticleSystemComponentSystem._super.initializeComponentData.call(this, component, data, properties);
+            pc.ComponentSystem.prototype.initializeComponentData.call(this, component, data, properties);
         },
 
         cloneComponent: function (entity, clone) {
@@ -151,6 +169,8 @@ pc.extend(pc, function() {
 
                     sourceProp = sourceProp.clone();
                     data[prop] = sourceProp;
+                } else if (prop === "layers") {
+                    data.layers = source.layers.slice(0);
                 } else {
                     if (sourceProp !== null && sourceProp !== undefined) {
                         data[prop] = sourceProp;
@@ -161,21 +181,52 @@ pc.extend(pc, function() {
             return this.addComponent(clone, data);
         },
 
-        onUpdate: function(dt) {
+        onUpdate: function (dt) {
             var components = this.store;
-            var currentCamera;
-            var numSteps, i;
+            var numSteps, i, j, c;
             var stats = this.app.stats.particles;
 
             for (var id in components) {
                 if (components.hasOwnProperty(id)) {
-                    var c = components[id];
+                    c = components[id];
                     var entity = c.entity;
                     var data = c.data;
 
                     if (data.enabled && entity.enabled) {
                         var emitter = data.model.emitter;
                         if (!emitter.meshInstance.visible) continue;
+
+                        // Bake ambient and directional lighting into one ambient cube
+                        // TODO: only do if lighting changed
+                        // TODO: don't do for every emitter
+                        if (emitter.lighting) {
+                            var layer, lightCube;
+                            var layers = data.layers;
+                            for (i = 0; i < layers.length; i++) {
+                                layer = this.app.scene.layers.getLayerById(layers[i]);
+                                if (!layer) continue;
+
+                                if (!layer._lightCube) {
+                                    layer._lightCube = new Float32Array(6 * 3);
+                                }
+                                lightCube = layer._lightCube;
+                                for (i = 0; i < 6; i++) {
+                                    lightCube[i * 3] = this.app.scene.ambientLight.r;
+                                    lightCube[i * 3 + 1] = this.app.scene.ambientLight.g;
+                                    lightCube[i * 3 + 2] = this.app.scene.ambientLight.b;
+                                }
+                                var dirs = layer._sortedLights[pc.LIGHTTYPE_DIRECTIONAL];
+                                for (j = 0; j < dirs.length; j++) {
+                                    for (c = 0; c < 6; c++) {
+                                        var weight = Math.max(emitter.lightCubeDir[c].dot(dirs[j]._direction), 0) * dirs[j]._intensity;
+                                        lightCube[c * 3] += dirs[j]._color.r * weight;
+                                        lightCube[c * 3 + 1] += dirs[j]._color.g * weight;
+                                        lightCube[c * 3 + 2] += dirs[j]._color.b * weight;
+                                    }
+                                }
+                            }
+                            emitter.constantLightCube.setValue(lightCube); // ?
+                        }
 
                         if (!data.paused) {
                             emitter.simTime += dt;
@@ -186,7 +237,7 @@ pc.extend(pc, function() {
                             }
                             if (numSteps) {
                                 numSteps = Math.min(numSteps, emitter.maxSubSteps);
-                                for(i=0; i<numSteps; i++) {
+                                for (i = 0; i < numSteps; i++) {
                                     emitter.addTime(emitter.fixedTimeStep);
                                 }
                                 stats._updatesPerFrame += numSteps;
@@ -201,18 +252,8 @@ pc.extend(pc, function() {
             }
         },
 
-        onRemove: function(entity, component) {
-            var data = component.data;
-            if (data.model) {
-                this.app.scene.removeModel(data.model);
-                entity.removeChild(data.model.getGraph());
-                data.model = null;
-            }
-
-            if (component.emitter) {
-                component.emitter.destroy();
-                component.emitter = null;
-            }
+        onRemove: function (entity, component) {
+            component.onDestroy();
         }
     });
 
