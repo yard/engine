@@ -208,7 +208,7 @@ Object.assign(pc, function () {
         this.indexBuffer = null;
         this.vertexBuffers = [];
         this.vbOffsets = [];
-        this._enableAutoInstancing = false;
+        this._enableAutoInstancing = !false;
         this.autoInstancingMaxObjects = 16384;
         this.attributesInvalidated = true;
         this.boundBuffer = null;
