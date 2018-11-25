@@ -376,6 +376,8 @@ Object.assign(pc, function () {
         this.farClipId = scope.resolve('camera_far');
         this.cameraParamsId = scope.resolve('camera_params');
         this.shadowMapLightRadiusId = scope.resolve('light_radius');
+        this.projectionParamsId = scope.resolve('_ProjectionParams');
+        this.screenParamsId = scope.resolve('_ScreenParams');
 
         this.fogColorId = scope.resolve('fog_color');
         this.fogStartId = scope.resolve('fog_start');
@@ -722,6 +724,8 @@ Object.assign(pc, function () {
             this.nearClipId.setValue(camera._nearClip);
             this.farClipId.setValue(camera._farClip);
             this.cameraParamsId.setValue(camera._shaderParams);
+            this.projectionParamsId.setValue(camera._projectionParams.data);
+            this.screenParamsId.setValue(camera._screenParams.data);
 
             var device = this.device;
             device.setRenderTarget(target);
