@@ -291,6 +291,10 @@ pc.extend(pc, function() {
                 return;
             }
 
+            if (mouseEvent.element && mouseEvent.element.tagName.toLowerCase() == 'input') {
+                return;
+            }
+
             if (!this.entity || !this.entity.enabled) {
                 return false;
             }
@@ -307,6 +311,10 @@ pc.extend(pc, function() {
 
             // We support only left mouse button
             if (!mouseEvent.button == 0) {
+                return;
+            }
+
+            if (mouseEvent.element && mouseEvent.element.tagName.toLowerCase() == 'input') {
                 return;
             }
 
